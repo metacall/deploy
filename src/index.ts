@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { input } from './cli';
 import { load, save } from './config';
 import { login, validate } from './api';

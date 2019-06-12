@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Tool for deploying into MetaCall FaaS platform.",
   "main": "dist/index.js",
+  "bin": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "tsc"
