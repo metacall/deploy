@@ -1,7 +1,5 @@
 
-export const fatal: (message: any) => never = message => {
+export const fatal = (message: any) => {
 	console.error(message);
-	process.exit(1);
-	// Needed for TypeScript
-	throw new Error(message);
+	return process.exit(1);
 };
