@@ -1,6 +1,6 @@
 {
   "name": "metacall-upload",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tool for deploying into MetaCall FaaS platform.",
   "main": "dist/index.js",
   "bin": "./dist/index.js",
