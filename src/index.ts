@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { input } from './cli';
 import { load, save } from './config';
-import { login, signup, validate, upload } from './api';
+import { login, signup, validate, upload, deploy } from './api';
 import { info, debug, fatal } from './utils';
+import yargs from 'yargs';
 
 const config = load();
 
@@ -17,7 +18,8 @@ const config = load();
 	]);
 
 	const password = validToken ? null :
-		await input('Please enter your metacall password', 'password');
+		await input('Please enter your metacall password' +
+			(config.email ? ' for user ' + config.email : ''), 'password');
 
 	const token = validToken ? config.token :
 		await login(email, password, config.baseURL).catch(err =>
@@ -38,14 +40,22 @@ const config = load();
 
 	/* Rudimentary upload code
 	const { readFileSync } = await import('fs');
-	const uploadResult = await upload(token, readFileSync('GeoIP.zip'))
+	const uploadResult = await upload(token, 'GeoIP', readFileSync('GeoIP.zip'))
 		.catch(err =>
 			err.response
-				? fatal('Could not upload project: ' + err.response.data)
-				: fatal('Could not upload package (' + err.response.data + ')'));
+				? fatal('Could not upload package: ' + err.response.data)
+				: fatal('Could not upload package (' + err.message + ')'));
 
 	info('Upload ' + uploadResult);
-	*/
+
+	const deployResult = await deploy(token, 'GeoIP')
+		.catch(err =>
+			err.response
+				? fatal('Could not deploy project: ' + err.response.data)
+				: fatal('Could not deploy project (' + err.message + ')'));
+	
+	info('Deploy ' + (deployResult || 'OK'));
+	/* End rudimentary code */
 
 	save({ email, token });
 

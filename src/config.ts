@@ -14,10 +14,10 @@ export const defaultPath = platform() === 'win32'
 		? join(process.env.HOME, '.metacall-upload')
 		: fatal('Missing HOME environment variable! Unable to load config');
 
-const ensureFolderExists: (path: string) => string = path =>
+const ensureFolderExists = (path: string) =>
 	(existsSync(path) || mkdirSync(path), path);
 
-const loadFile: (path: string) => string = path =>
+const loadFile = (path: string) =>
 	existsSync(path)
 		? readFileSync(path, 'utf8')
 		: '';
