@@ -16,7 +16,7 @@
 	- [ ] Store in config dir?
 - [ ] Figure out what arguments to take in order to generate a named deploy
 - [ ] Figure out how to organize metacall.json generation
-- [ ] Grab version from package.json?
+- [ ] Grab version from package.json for node projects?
 
 ## Detecting project type
 
