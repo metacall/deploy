@@ -3,7 +3,7 @@ import chalk from 'chalk';
 export const info = (message: any, ret = null) => {
 	// eslint-disable-next-line no-console
 	console.warn(
-		chalk.cyan.bold('i') + ' ' +
+		chalk.cyanBright.bold('i') + ' ' +
 		chalk.cyan(message));
 	return ret;
 };
@@ -11,7 +11,7 @@ export const info = (message: any, ret = null) => {
 export const debug = (message: any, ret = null) => {
 	// eslint-disable-next-line no-console
 	console.warn(
-		chalk.yellow.bold('!') + ' ' +
+		chalk.yellowBright.bold('!') + ' ' +
 		chalk.yellow(message));
 	return ret;
 };
@@ -19,7 +19,7 @@ export const debug = (message: any, ret = null) => {
 export const fatal = (message: any) => {
 	// eslint-disable-next-line no-console
 	console.error(
-		chalk.red.bold('X') + ' ' +
+		chalk.redBright.bold('X') + ' ' +
 		chalk.red(message));
 	return process.exit(1);
 };
