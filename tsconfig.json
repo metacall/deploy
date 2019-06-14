@@ -3,9 +3,13 @@
 		"strict": true,
 		"target": "ES2018",
 		"module": "CommonJS",
-		"outDir": "dist"
+		"outDir": "dist",
+		"esModuleInterop": true
 	},
 	"include": [
-		"src/index.ts"
+		"types/gauge.d.ts",
+		"src/index.ts",
+		"src/zip.ts",
+		"src/project-types/*"
 	]
 }

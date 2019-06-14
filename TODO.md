@@ -8,7 +8,8 @@
 	- [ ] Take a command-line flag to specify config dir (-d, --config-dir)
 	- [ ] Take a command-line flag to specify base URL of server (-u, --server-url)
 	- [ ] Take a command-line flag to specify name to deploy as (-n, --project-name, default to dirname)
-	- [ ] Take a command-line flag to specify scripts (comma-separated, default to main in package.json)
+	- [ ] Take a command-line flag to specify scripts (comma-separated, default to project type default (main in package.json))
+	- [ ] Take a command-line flag to specify ignore pattern for the bundle (-i, --ignore-pattern, default to project type default)
 - [ ] Figure out how to detect project type
 	- [ ] Only detect if argument wasn't passed
 - [ ] Figure out how to properly zip a folder (Respecting .gitignore? Respecting .npmignore?)

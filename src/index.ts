@@ -5,9 +5,10 @@ import { login, signup, validate, upload, deploy } from './api';
 import { info, debug, fatal } from './utils';
 import yargs from 'yargs';
 
-const config = load();
 
 (async () => {
+	
+	const config = load();
 
 	const [ email, validToken ] = await Promise.all([
 		config.email || input('Please enter your metacall email'),
@@ -38,7 +39,7 @@ const config = load();
 		fatal('Wrong username or password!');
 	}
 
-	/* Rudimentary upload code
+	/* Rudimentary upload code */
 	const { readFileSync } = await import('fs');
 	const uploadResult = await upload(token, 'GeoIP', readFileSync('GeoIP.zip'))
 		.catch(err =>
