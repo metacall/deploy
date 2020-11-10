@@ -1,12 +1,10 @@
 import archiver from 'archiver';
-import { createWriteStream, readdir as READDIR, stat as STAT } from 'fs';
+import { createWriteStream, promises as fs } from 'fs';
 import Gauge from 'gauge';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { promisify } from 'util';
 
-const readdir = promisify(READDIR);
-const stat = promisify(STAT);
+const { readdir, stat } = fs;
 
 export const zip = (
 	name: string,
