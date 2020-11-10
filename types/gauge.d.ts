@@ -23,7 +23,6 @@ declare module 'gauge' {
 		setWriteTo(writeTo: any, tty: any): void;
 
 		show(section: any, completed: any): void;
-
 	}
 
 	export = Gauge;
