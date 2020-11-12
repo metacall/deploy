@@ -1,32 +1,49 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { promises as fs } from 'fs';
 import { parse, stringify } from 'ini';
-import { platform } from 'os';
 import { join } from 'path';
-import { fatal } from './utils';
+import * as z from 'zod';
+import { configDir, ensureFolderExists, filter, loadFile } from './utils';
 
-export const defaultPath =
-	platform() === 'win32'
-		? process.env.APPDATA
-			? join(process.env.APPDATA, 'metacall-upload')
-			: fatal(
-					'Missing APPDATA environment variable! Unable to load config'
-			  )
-		: process.env.HOME
-		? join(process.env.HOME, '.metacall-upload')
-		: fatal('Missing HOME environment variable! Unable to load config');
+const log = <T>(x: T) => (console.log(x), x);
 
-const ensureFolderExists = (path: string) => (
-	existsSync(path) || mkdirSync(path), path
-);
+export const Config = z.object({
+	baseURL: z.string(),
+	renewTime: z.number(),
+	token: z.string().optional()
+});
 
-const loadFile = (path: string) =>
-	existsSync(path) ? readFileSync(path, 'utf8') : '';
+export type Config = z.infer<typeof Config>;
 
-export const load = (path = defaultPath) =>
-	parse(loadFile(join(ensureFolderExists(path), 'config.ini')));
+const defaultConfig: Config = {
+	baseURL: 'https://dashboard.metacall.io',
+	renewTime: 1000 * 60 * 60 * 24 * 15
+};
 
-export const save = (data: any, path = defaultPath) =>
-	writeFileSync(
-		join(ensureFolderExists(path), 'config.ini'),
-		stringify(data)
+const defaultPath = configDir('metacall-upload');
+
+const configFilePath = (path = defaultPath) => join(path, 'config.ini');
+
+export const load = async (path = defaultPath): Promise<Config> => {
+	const data = parse(
+		await loadFile(configFilePath(await ensureFolderExists(path)))
+	);
+	return Config.nonstrict().parse({
+		...defaultConfig,
+		...data,
+		...(data.renewTime ? { renewTime: Number(data.renewTime) } : {})
+	});
+};
+
+export const save = async (
+	data: Partial<Config>,
+	path = defaultPath
+): Promise<void> =>
+	fs.writeFile(
+		configFilePath(await ensureFolderExists(path)),
+		stringify(
+			filter(defaultConfig, {
+				...(await load(path)),
+				...data
+			})
+		)
 	);

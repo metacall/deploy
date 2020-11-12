@@ -1,10 +1,10 @@
 import { prompt } from 'inquirer';
 
-export const input = (message: string, type = 'input') =>
-	prompt([
+export const input = (message: string): Promise<string> =>
+	prompt<{ data: string }>([
 		{
+			type: 'input',
 			name: 'data',
-			message,
-			type
+			message
 		}
-	] as any).then((res: any) => res.data);
+	]).then(res => res.data);

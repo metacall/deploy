@@ -1,78 +1,32 @@
 #!/usr/bin/env node
-import { deploy, login, signup, upload, validate } from './api';
+import { AxiosError } from 'axios';
+import { refresh, validate } from './api';
 import { input } from './cli';
 import { load, save } from './config';
-import { debug, fatal, info } from './utils';
+import { expiresIn } from './token';
+import { forever, opt, warn } from './utils';
 
-(async () => {
-	const config = load();
+void (async () => {
+	const config = await load();
 
-	const [email, validToken] = await Promise.all([
-		config.email || input('Please enter your metacall email'),
-		config.token &&
-			validate(config.token).catch(err =>
-				err.response
-					? debug('Invalid token: ' + err.response.data)
-					: fatal('Could not validate token (' + err.message + ')')
-			)
-	]);
+	let token =
+		config.token || (await input('Please enter your metacall token'));
 
-	const password = validToken
-		? null
-		: await input(
-				'Please enter your metacall password' +
-					(config.email ? ' for user ' + config.email : ''),
-				'password'
-		  );
-
-	const token = validToken
-		? config.token
-		: await login(email, password, config.baseURL).catch(err =>
-				err.response
-					? err.response.data === 'account does not exist'
-						? (info(err.response.data + ', attempting to sign up'),
-						  signup(email, password, config.baseURL).catch(err =>
-								err.response
-									? fatal(
-											'Could not sign up: ' +
-												err.response.data
-									  )
-									: fatal(
-											'Could not sign up (' +
-												err.message +
-												')'
-									  )
-						  ))
-						: fatal('Could not sign in: ' + err.response.data)
-					: fatal('Could not sign in (' + err.message + ')')
-		  );
-
-	if (!token) {
-		fatal('Wrong username or password!');
+	while (forever) {
+		try {
+			await validate(token);
+			break;
+		} catch (err) {
+			warn(
+				'Token invalid' +
+					opt(x => ': ' + x, (err as AxiosError).response?.data)
+			);
+			token = await input('Please enter your metacall token');
+		}
 	}
-
-	/* Rudimentary upload code */
-	const { readFileSync } = await import('fs');
-	const uploadResult = await upload(
-		token,
-		'GeoIP',
-		readFileSync('GeoIP.zip')
-	).catch(err =>
-		err.response
-			? fatal('Could not upload package: ' + err.response.data)
-			: fatal('Could not upload package (' + err.message + ')')
-	);
-
-	info('Upload ' + uploadResult);
-
-	const deployResult = await deploy(token, 'GeoIP').catch(err =>
-		err.response
-			? fatal('Could not deploy project: ' + err.response.data)
-			: fatal('Could not deploy project (' + err.message + ')')
-	);
-
-	info('Deploy ' + (deployResult || 'OK'));
-	/* End rudimentary code */
-
-	save({ email, token });
+	if (expiresIn(token) < config.renewTime) {
+		// token expires in < renewTime
+		token = await refresh(token, config.baseURL);
+	}
+	await save({ token });
 })();
