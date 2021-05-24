@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { AxiosError } from 'axios';
-import { refresh, validate } from './api';
+import { refresh, validate, listSubscriptions } from './api';
 import { input } from './cli';
 import { load, save } from './config';
 import { expiresIn } from './token';
@@ -29,4 +29,7 @@ void (async () => {
 		token = await refresh(token, config.baseURL);
 	}
 	await save({ token });
+
+	const subscriptions = await listSubscriptions(token);
+	console.log(subscriptions);
 })();

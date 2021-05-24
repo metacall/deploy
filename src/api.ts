@@ -24,7 +24,31 @@ export const validate = (
 		})
 		.then(res => res.data);
 
-export const deploy = async (
+type SubscriptionMap = Record<string, number>;
+
+export const listSubscriptions = async (
+	token: string,
+	baseURL = defaultBaseURL
+): Promise<SubscriptionMap> => {
+	const res = await axios
+		.get<string>(baseURL + '/api/billing/list-subscriptions', {
+			headers: { Authorization: 'jwt ' + token }
+		});
+
+	const subscriptions: SubscriptionMap = {};
+
+	for (const id of res.data) {
+		if (subscriptions[id] === undefined) {
+			subscriptions[id] = 1;
+		} else {
+			++subscriptions[id];
+		}
+	}
+
+	return subscriptions;
+};
+
+export const upload = async (
 	token: string,
 	name: string,
 	path = '.',
