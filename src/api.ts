@@ -24,7 +24,7 @@ export const validate = (
 		})
 		.then(res => res.data);
 
-export const upload = async (
+export const deploy = async (
 	token: string,
 	name: string,
 	path = '.',

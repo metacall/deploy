@@ -1,10 +1,10 @@
 {
-	"name": "metacall-upload",
+	"name": "metacall-deploy",
 	"version": "0.1.2",
 	"description": "Tool for deploying into MetaCall FaaS platform.",
 	"main": "dist/index.js",
 	"bin": {
-		"metacall-upload": "dist/index.js"
+		"metacall-deploy": "dist/index.js"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
@@ -12,12 +12,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/metacall/upload.git"
+		"url": "git+https://github.com/metacall/deploy.git"
 	},
 	"keywords": [
 		"MetaCall",
 		"FaaS",
-		"upload",
+		"deploy",
 		"tool"
 	],
 	"author": "Thomas Rory Gummerson <thomas@gummerson.no> (https://trgwii.no/)",
@@ -26,9 +26,9 @@
 	],
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/metacall/upload/issues"
+		"url": "https://github.com/metacall/deploy/issues"
 	},
-	"homepage": "https://github.com/metacall/upload#readme",
+	"homepage": "https://github.com/metacall/deploy#readme",
 	"prettier": {
 		"tabWidth": 4,
 		"useTabs": true,

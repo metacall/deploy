@@ -19,7 +19,7 @@ const defaultConfig: Config = {
 	renewTime: 1000 * 60 * 60 * 24 * 15
 };
 
-const defaultPath = configDir('metacall-upload');
+const defaultPath = configDir('metacall-deploy');
 
 const configFilePath = (path = defaultPath) => join(path, 'config.ini');
 

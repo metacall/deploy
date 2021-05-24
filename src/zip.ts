@@ -12,7 +12,7 @@ export const zip = (source = '.', ignore: string[] = []): Archiver => {
 	});
 	archive.on('progress', data =>
 		gauge.show(
-			'Compressing and uploading...',
+			'Compressing and deploying...',
 			data.fs.processedBytes / data.fs.totalBytes
 		)
 	);
