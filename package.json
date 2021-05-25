@@ -12,6 +12,7 @@
 		"prepublishOnly": "npm run --silent build",
 		"build": "npm run --silent lint && tsc",
 		"lint": "eslint . --ignore-pattern dist",
+		"fix": "eslint . --ignore-pattern dist --fix",
 		"start": "node dist/index.js"
 	},
 	"repository": {
