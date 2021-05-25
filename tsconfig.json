@@ -11,6 +11,7 @@
 		"types/gauge.d.ts",
 		"src/index.ts",
 		"src/zip.ts",
-		"src/project-types/*"
+		"src/project-types/*",
+		"src/test/*.spec.ts"
 	]
 }

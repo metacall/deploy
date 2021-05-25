@@ -21,8 +21,11 @@
 
 ## Detecting project type
 
--   package.json exists -> node
--   setup.py exists OR requirements.txt exists -> python
--   Gemfile exists OR Rakefile exists OR \*.gemspec exists -> Ruby
--   _.sln exists OR _.csproj exists -> C#
--   else show list of languages and wait for user input
+-   Generic language-detection (score-based) based on ratio of files with matching language extensions
+
+-   package.json exists -> node (+50% score)
+-   setup.py exists OR requirements.txt exists -> python (+50% score)
+-   Gemfile exists OR Rakefile exists OR \*.gemspec exists -> Ruby (+50% score)
+-   _.sln exists OR _.csproj exists -> C# (+50% score)
+
+-   show list of languages sorted by score and wait for user input
