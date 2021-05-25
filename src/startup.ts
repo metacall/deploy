@@ -7,10 +7,12 @@ import { forever, opt, warn } from './utils';
 
 export const startup = async (): Promise<string> => {
 	const config = await load();
+
 	const askToken = async () =>
 		maskedInput('Please enter your metacall token');
 
-	let token = config.token || (await askToken());
+	let token: string =
+		process.env['METACALL_API_KEY'] || config.token || (await askToken());
 
 	while (forever) {
 		try {

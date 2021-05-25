@@ -19,16 +19,18 @@ export const error = (message: string): never => {
 	return process.exit(1);
 };
 
+const configPrefix = platform() === 'win32' ? '_' : '.';
+const missing = (name: string): string =>
+	`Missing ${name} environment variable! Unable to load config`;
+
 export const configDir = (name: string): string =>
 	platform() === 'win32'
 		? process.env.APPDATA
 			? join(process.env.APPDATA, name)
-			: error(
-					'Missing APPDATA environment variable! Unable to load config'
-			  )
+			: error(missing('APPDATA'))
 		: process.env.HOME
-		? join(process.env.HOME, '.' + name)
-		: error('Missing HOME environment variable! Unable to load config');
+		? join(process.env.HOME, configPrefix + name)
+		: error(missing('HOME'));
 
 export const exists = (path: string): Promise<boolean> =>
 	fs.stat(path).then(

@@ -8,3 +8,13 @@ This tool is not currently working for uploading projects yet, but you can test 
 npm i -g metacall-deploy
 metacall-deploy
 ```
+
+## Configuration
+
+The configuration is stored in:
+    - Unix: `$HOME/.metacall/config.ini`
+    - Windows: `$HOME/_metacall/config.ini`
+
+## Token
+
+The token is stored in the configuration and can be overwritten at any time with `METACALL_API_KEY` environment variable.
