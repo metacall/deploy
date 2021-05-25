@@ -44,7 +44,7 @@ interface Signature {
 	args: Argument[];
 }
 
-interface Function {
+interface Func {
 	name: string;
 	signature: Signature;
 	async: boolean;
@@ -63,7 +63,7 @@ interface Object {
 
 interface Scope {
 	name: string;
-	funcs: Function[];
+	funcs: Func[];
 	classes: string[]; // TODO: Class[];
 	objects: string[]; // TODO: Object[];
 }

@@ -4,7 +4,7 @@ import { join } from 'path';
 import * as z from 'zod';
 import { configDir, ensureFolderExists, filter, loadFile } from './utils';
 
-const log = <T>(x: T) => (console.log(x), x);
+export const log = <T>(x: T): T => (console.log(x), x);
 
 export const Config = z.object({
 	baseURL: z.string(),

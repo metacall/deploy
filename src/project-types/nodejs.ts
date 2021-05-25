@@ -8,13 +8,13 @@ const match = (path: string, patterns: string[]): Promise<string[]> =>
 		: Promise.all(
 				patterns.map(
 					pattern =>
-						new Promise((resolve, reject) =>
+						new Promise<string[]>((resolve, reject) =>
 							glob(pattern, { cwd: path }, (err, matches) =>
 								err ? reject(err) : resolve(matches)
 							)
 						)
 				)
-		  ).then(list => (list as any).flat());
+		  ).then(list => list.flat());
 
 const matchFile = (path: string, file: string) =>
 	match(
@@ -24,7 +24,7 @@ const matchFile = (path: string, file: string) =>
 			.split(/[\r\n]/)
 	);
 
-export const ignore = async (path: string) => [
+export const ignore = async (path: string): Promise<string[]> => [
 	'node_modules',
 	...(await (existsSync(join(path, '.npmignore'))
 		? matchFile(path, join(path, '.npmignore'))
@@ -33,8 +33,10 @@ export const ignore = async (path: string) => [
 		: []))
 ];
 
-export const metacall = (scripts: string[], pack: { main: string }) => ({
-	// eslint-disable-next-line @typescript-eslint/camelcase
+export const metacall = (
+	scripts: string[],
+	pack: { main: string }
+): { language_id: string; path: string; scripts: string[] } => ({
 	language_id: 'node',
 	path: '.',
 	scripts: [...scripts, ...(scripts.length === 0 ? [pack.main] : [])]

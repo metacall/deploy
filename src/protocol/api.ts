@@ -1,7 +1,7 @@
 import axios from 'axios';
 import FormData from 'form-data';
-import { zip } from './zip';
 import { Deployment } from './inspect';
+import { zip } from './zip';
 
 export const defaultBaseURL = 'https://dashboard.metacall.io';
 
@@ -41,10 +41,12 @@ export const listSubscriptions = async (
 	token: string,
 	baseURL = defaultBaseURL
 ): Promise<SubscriptionMap> => {
-	const res = await axios
-		.get<string[]>(baseURL + '/api/billing/list-subscriptions', {
+	const res = await axios.get<string[]>(
+		baseURL + '/api/billing/list-subscriptions',
+		{
 			headers: { Authorization: 'jwt ' + token }
-		});
+		}
+	);
 
 	const subscriptions: SubscriptionMap = {};
 

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export const expiresIn = (token: string) => {
+export const expiresIn = (token: string): number => {
 	const decoded = jwt.decode(token);
 	if (typeof decoded === 'string') {
 		return 0;

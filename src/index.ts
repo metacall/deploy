@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 import { startup } from './startup';
-import { refresh, validate, deployEnabled, listSubscriptions, inspect, deployDelete } from './protocol/api';
 
-void (async () => {
-	const token = await startup();
+void startup();
 
-	// TODO: Implement the cli workflow
-})();
+// TODO: Implement the cli workflow
