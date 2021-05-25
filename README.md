@@ -12,8 +12,8 @@ metacall-deploy
 ## Configuration
 
 The configuration is stored in:
-    - Unix: `$HOME/.metacall/config.ini`
-    - Windows: `$HOME/_metacall/config.ini`
+    - Unix: `$HOME/.metacall/deploy/config.ini`
+    - Windows: `%APPDATA%\metacall\deploy\config.ini`
 
 ## Token
 

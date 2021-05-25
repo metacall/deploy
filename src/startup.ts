@@ -1,11 +1,11 @@
 import { AxiosError } from 'axios';
 import { maskedInput } from './cli';
-import { load, save } from './config';
-import { refresh, validate } from './protocol/api';
+import { load, save, Config } from './config';
+import API from './protocol/api';
 import { expiresIn } from './token';
 import { forever, opt, warn } from './utils';
 
-export const startup = async (): Promise<string> => {
+export const startup = async (): Promise<Config> => {
 	const config = await load();
 
 	const askToken = async () =>
@@ -14,9 +14,11 @@ export const startup = async (): Promise<string> => {
 	let token: string =
 		process.env['METACALL_API_KEY'] || config.token || (await askToken());
 
+	const api = API(token, config.baseURL);
+
 	while (forever) {
 		try {
-			await validate(token);
+			await api.validate();
 			break;
 		} catch (err) {
 			warn(
@@ -28,10 +30,10 @@ export const startup = async (): Promise<string> => {
 	}
 	if (expiresIn(token) < config.renewTime) {
 		// token expires in < renewTime
-		token = await refresh(token, config.baseURL);
+		token = await api.refresh();
 	}
 
 	await save({ token });
 
-	return token;
+	return Object.assign(config, { token });
 };

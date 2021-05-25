@@ -5,5 +5,9 @@
 		"source.organizeImports": true,
 		"source.fixAll": true
 	},
-	"editor.rulers": [80]
+	"editor.rulers": [
+		80
+	],
+	"editor.quickSuggestions": true,
+	"editor.suggestOnTriggerCharacters": true
 }
