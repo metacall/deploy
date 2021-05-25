@@ -12,9 +12,10 @@ describe('integration', function () {
 	// This assumes that the user (token) has:
 	//	1) Deploy Enabled
 	//	2) One empty launchpad with Essential Plan
-	const tokenP = startup();
+	let tokenP: Promise<string> = Promise.resolve('');
 
 	it('Should have a valid token', async () => {
+		tokenP = startup();
 		const token = await tokenP;
 		ok(token !== '');
 	});
