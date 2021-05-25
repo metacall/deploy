@@ -1,6 +1,7 @@
 import axios from 'axios';
 import FormData from 'form-data';
 import { zip } from './zip';
+import { Deployment } from './inspect';
 
 export const defaultBaseURL = 'https://dashboard.metacall.io';
 
@@ -17,9 +18,19 @@ export const refresh = (
 export const validate = (
 	token: string,
 	baseURL = defaultBaseURL
-): Promise<string> =>
+): Promise<boolean> =>
 	axios
-		.get<string>(baseURL + '/validate', {
+		.get<boolean>(baseURL + '/validate', {
+			headers: { Authorization: 'jwt ' + token }
+		})
+		.then(res => res.data);
+
+export const deployEnabled = (
+	token: string,
+	baseURL = defaultBaseURL
+): Promise<boolean> =>
+	axios
+		.get<boolean>(baseURL + '/api/account/deploy-enabled', {
 			headers: { Authorization: 'jwt ' + token }
 		})
 		.then(res => res.data);
@@ -31,7 +42,7 @@ export const listSubscriptions = async (
 	baseURL = defaultBaseURL
 ): Promise<SubscriptionMap> => {
 	const res = await axios
-		.get<string>(baseURL + '/api/billing/list-subscriptions', {
+		.get<string[]>(baseURL + '/api/billing/list-subscriptions', {
 			headers: { Authorization: 'jwt ' + token }
 		});
 
@@ -47,6 +58,16 @@ export const listSubscriptions = async (
 
 	return subscriptions;
 };
+
+export const inspect = async (
+	token: string,
+	baseURL = defaultBaseURL
+): Promise<Deployment[]> =>
+	axios
+		.get<Deployment[]>(baseURL + '/api/inspect', {
+			headers: { Authorization: 'jwt ' + token }
+		})
+		.then(res => res.data);
 
 export const upload = async (
 	token: string,
@@ -81,6 +102,27 @@ export const deploy = (
 			{
 				resourceType: 'Package',
 				suffix: name,
+				version
+			},
+			{
+				headers: { Authorization: 'jwt ' + token }
+			}
+		)
+		.then(res => res.data);
+
+export const deployDelete = (
+	token: string,
+	prefix: string,
+	suffix: string,
+	version = 'v1',
+	baseURL = defaultBaseURL
+): Promise<string> =>
+	axios
+		.post<string>(
+			baseURL + '/api/deploy/delete',
+			{
+				prefix,
+				suffix,
 				version
 			},
 			{
