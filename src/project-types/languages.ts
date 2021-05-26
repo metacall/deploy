@@ -9,7 +9,8 @@ interface Language {
 	runnerFilesRegexes: RegExp[]; // Regex for generating the runners list
 }
 
-export const Languages: Record<LanguageId, Language> = {
+// TODO: Implement cob, rpc
+export const Languages: Record<Exclude<LanguageId, 'cob' | 'rpc'>, Language> = {
 	cs: {
 		tag: 'cs',
 		displayName: 'C#',

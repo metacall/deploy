@@ -1,4 +1,4 @@
-import { readdir, readFile, stat, writeFile } from 'fs/promises';
+import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
 import type { LanguageId } from './protocol/inspect';
 
@@ -25,12 +25,12 @@ const findFiles = async (dir = '.'): Promise<string[]> =>
 	(
 		await Promise.all(
 			(
-				await readdir(dir)
+				await fs.readdir(dir)
 			)
 				.filter(x => !x.startsWith('.') && !ignore.includes(x))
 				.map(async file => {
 					const path = dir === '.' ? file : `${dir}/${file}`;
-					return (await stat(path)).isDirectory()
+					return (await fs.stat(path)).isDirectory()
 						? await findFiles(path)
 						: [path];
 				})
@@ -38,7 +38,7 @@ const findFiles = async (dir = '.'): Promise<string[]> =>
 	).flat<string[][]>();
 
 const selectLangs = async () => {
-	const def = (await readdir('.'))
+	const def = (await fs.readdir('.'))
 		.filter(x => x.startsWith('metacall-') && x.endsWith('.json'))
 		.map(x => x.split('metacall-')[1].split('.json')[0] as LanguageId);
 	return prompt<{ langs: LanguageId[] }>([
@@ -57,7 +57,7 @@ void (async () => {
 	const allFiles = await findFiles();
 	for (const lang of langs) {
 		const fromDisk = JSON.parse(
-			await readFile(`metacall-${lang}.json`, 'utf8').catch(() => '{}')
+			await fs.readFile(`metacall-${lang}.json`, 'utf8').catch(() => '{}')
 		) as Partial<MetacallJSON>;
 		const { scripts } = await prompt<{ scripts: string[] }>([
 			{
@@ -98,7 +98,7 @@ void (async () => {
 					)
 			  )
 			: {};
-		await writeFile(
+		await fs.writeFile(
 			`metacall-${lang}.json`,
 			JSON.stringify(
 				{
