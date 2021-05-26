@@ -76,8 +76,8 @@ export default (token: string, baseURL: string): API => {
 			const fd = new FormData();
 			fd.append('name', name);
 			fd.append('type', 'application/x-zip-compressed');
-			fd.append('runners', JSON.stringify([]));
-			fd.append('jsons', JSON.stringify([]));
+			fd.append('runners', JSON.stringify([])); // TODO
+			fd.append('jsons', JSON.stringify([])); // TODO
 			fd.append('raw', zip(path), {
 				filename: 'blob',
 				contentType: 'application/x-zip-compressed'

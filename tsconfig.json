@@ -7,11 +7,5 @@
 		"outDir": "dist",
 		"esModuleInterop": true
 	},
-	"include": [
-		"types/gauge.d.ts",
-		"src/index.ts",
-		"src/zip.ts",
-		"src/project-types/*",
-		"src/test/*.spec.ts"
-	]
+	"include": ["types/*.ts", "src/*.ts", "src/**/*.ts"]
 }

@@ -1,14 +1,15 @@
 import { AxiosError } from 'axios';
-import { maskedInput } from './cli';
+import { maskedInput } from './cli/inputs';
+import { warn } from './cli/messages';
 import { load, save, Config } from './config';
 import API from './protocol/api';
 import { expiresIn } from './token';
-import { forever, opt, warn } from './utils';
+import { forever, opt } from './utils';
 
 export const startup = async (): Promise<Config> => {
 	const config = await load();
 
-	const askToken = async () =>
+	const askToken = (): Promise<string> =>
 		maskedInput('Please enter your metacall token');
 
 	let token: string =

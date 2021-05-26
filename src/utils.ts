@@ -1,23 +1,7 @@
-import chalk from 'chalk';
+import { error } from './cli/messages';
 import { promises as fs } from 'fs';
 import { platform } from 'os';
 import { join } from 'path';
-
-export const info = (message: string): void => {
-	// eslint-disable-next-line no-console
-	console.warn(chalk.cyanBright.bold('i') + ' ' + chalk.cyan(message));
-};
-
-export const warn = (message: string): void => {
-	// eslint-disable-next-line no-console
-	console.warn(chalk.yellowBright.bold('!') + ' ' + chalk.yellow(message));
-};
-
-export const error = (message: string): never => {
-	// eslint-disable-next-line no-console
-	console.error(chalk.redBright.bold('X') + ' ' + chalk.red(message));
-	return process.exit(1);
-};
 
 const missing = (name: string): string =>
 	`Missing ${name} environment variable! Unable to load config`;
