@@ -1,6 +1,14 @@
 type DeployStatus = 'create' | 'ready' | 'fail';
 
-type LanguageId = 'node' | 'ts' | 'rb' | 'py' | 'cs' | 'cob' | 'file' | 'rpc';
+export type LanguageId =
+	| 'node'
+	| 'ts'
+	| 'rb'
+	| 'py'
+	| 'cs'
+	| 'cob'
+	| 'file'
+	| 'rpc';
 
 enum ValueId {
 	METACALL_BOOL = 0,
