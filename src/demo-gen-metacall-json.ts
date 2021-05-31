@@ -22,8 +22,8 @@ type MetacallJSON = {
 };
 
 const findFiles = async (dir = '.'): Promise<string[]> =>
-	(
-		await Promise.all(
+	([] as string[]).concat(
+		...(await Promise.all(
 			(
 				await fs.readdir(dir)
 			)
@@ -34,8 +34,8 @@ const findFiles = async (dir = '.'): Promise<string[]> =>
 						? await findFiles(path)
 						: [path];
 				})
-		)
-	).flat<string[][]>();
+		))
+	);
 
 const selectLangs = async () => {
 	const def = (await fs.readdir('.'))
@@ -90,14 +90,16 @@ void (async () => {
 						message: 'Type env vars in the format: K1=V1, K2=V2'
 					}
 			  ]).then(({ env }) =>
-					Object.fromEntries(
-						env.split(',').map(kv => {
+					env
+						.split(',')
+						.map(kv => {
 							const [k, v] = kv.trim().split('=');
-							return [k, v];
+							return { [k]: v };
 						})
-					)
+						.reduce((obj, kv) => Object.assign(obj, kv), {})
 			  )
 			: {};
+		console.log(env);
 		await fs.writeFile(
 			`metacall-${lang}.json`,
 			JSON.stringify(
