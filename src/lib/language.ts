@@ -1,4 +1,4 @@
-import { LanguageId } from '../protocol/inspect';
+import { LanguageId } from './deployment';
 
 interface Language {
 	tag: string; // Tag which corresponds to language_id in metacall.json
@@ -56,7 +56,7 @@ export const Languages: Record<Exclude<LanguageId, 'cob' | 'rpc'>, Language> = {
 		displayName: 'Static Files',
 		hexColor: '#de5500',
 		fileExtRegex: /^\w+$/,
-		runnerName: undefined, // File has no runner yet
-		runnerFilesRegexes: [] // File has no runner files yet
+		runnerName: undefined, // File has no runner (yet?)
+		runnerFilesRegexes: [] // File has no runner files (yet?)
 	}
 };

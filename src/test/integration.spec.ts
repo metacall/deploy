@@ -1,5 +1,5 @@
 import { deepStrictEqual, ok } from 'assert';
-import API from '../protocol/api';
+import API from '../lib/protocol';
 import { startup } from '../startup';
 
 describe('integration', function () {

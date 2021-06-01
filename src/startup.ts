@@ -1,9 +1,9 @@
 import { AxiosError } from 'axios';
 import { maskedInput } from './cli/inputs';
 import { warn } from './cli/messages';
-import { load, save, Config } from './config';
-import API from './protocol/api';
-import { expiresIn } from './token';
+import { Config, load, save } from './config';
+import API from './lib/protocol';
+import { expiresIn } from './lib/token';
 import { forever, opt } from './utils';
 
 export const startup = async (): Promise<Config> => {

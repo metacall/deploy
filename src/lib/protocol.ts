@@ -1,7 +1,6 @@
 import axios from 'axios';
 import FormData from 'form-data';
-import { Deployment } from './inspect';
-import { zip } from './zip';
+import { Deployment } from './deployment';
 
 type SubscriptionMap = Record<string, number>;
 
@@ -12,7 +11,7 @@ interface API {
 	deployEnabled(): Promise<boolean>;
 	listSubscriptions(): Promise<SubscriptionMap>;
 	inspect(): Promise<Deployment[]>;
-	upload(name: string, path: string): Promise<string>;
+	upload(name: string, blob: any): Promise<string>;
 	deploy(name: string, version: string): Promise<string>;
 	deployDelete(
 		prefix: string,
@@ -72,13 +71,13 @@ export default (token: string, baseURL: string): API => {
 				})
 				.then(res => res.data),
 
-		upload: async (name: string, path = process.cwd()): Promise<string> => {
+		upload: async (name: string, blob: any): Promise<string> => {
 			const fd = new FormData();
 			fd.append('name', name);
 			fd.append('type', 'application/x-zip-compressed');
 			fd.append('runners', JSON.stringify([])); // TODO
 			fd.append('jsons', JSON.stringify([])); // TODO
-			fd.append('raw', zip(path), {
+			fd.append('raw', blob, {
 				filename: 'blob',
 				contentType: 'application/x-zip-compressed'
 			});
