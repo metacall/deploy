@@ -72,16 +72,11 @@ export const generatePackage = async (
 
 	const jsons = findMetaCallJsons(files);
 
-	if (jsons.length === 0) {
-		return { ...NullPackage, files, error: PackageError.JsonNotFound };
-	}
-
-	const runners = findRunners(files);
-
 	return {
-		error: PackageError.None,
+		error:
+			jsons.length === 0 ? PackageError.JsonNotFound : PackageError.None,
 		files,
 		jsons,
-		runners: Array.from(runners)
+		runners: Array.from(findRunners(files))
 	};
 };

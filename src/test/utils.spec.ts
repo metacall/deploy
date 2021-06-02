@@ -1,7 +1,7 @@
 import { ok } from 'assert';
 import { opt } from '../utils';
 
-describe('opt()', () => {
+describe('unit opt', () => {
 	it('Should call a function with the provided string', () => {
 		ok(opt(x => x, 'hello') === 'hello');
 	});

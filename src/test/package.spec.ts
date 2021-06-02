@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 import { join } from 'path';
 import { findFilesPath, findMetaCallJsons, findRunners } from '../lib/package';
 
-describe('package', function () {
+describe('unit package', function () {
 	const basePath = join(process.cwd(), 'src', 'test', 'resources', 'package');
 
 	it('findFilesPath all', async () => {
@@ -20,6 +20,7 @@ describe('package', function () {
 			'runners/mixed/Gemfile',
 			'runners/mixed/package.json',
 			'runners/mixed/requirements.txt',
+			'runners/nodejs/index.js',
 			'runners/nodejs/package.json',
 			'runners/python/requirements.txt',
 			'runners/ruby/Gemfile'
@@ -57,6 +58,7 @@ describe('package', function () {
 			'mixed/Gemfile',
 			'mixed/package.json',
 			'mixed/requirements.txt',
+			'nodejs/index.js',
 			'nodejs/package.json',
 			'python/requirements.txt',
 			'ruby/Gemfile'

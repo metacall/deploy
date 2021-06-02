@@ -49,7 +49,7 @@ export const Languages: Record<Exclude<LanguageId, 'cob' | 'rpc'>, Language> = {
 		hexColor: '#007acc',
 		fileExtRegex: /^(ts|tsx)$/,
 		runnerName: 'nodejs',
-		runnerFilesRegexes: [/^package\.json$/] // TODO: How to differenciate between ts and nodejs runner?
+		runnerFilesRegexes: [/^package\.json$/]
 	},
 	file: {
 		tag: 'file',
