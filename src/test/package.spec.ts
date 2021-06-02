@@ -3,7 +3,7 @@ import { join } from 'path';
 import { findFilesPath, findMetaCallJsons, findRunners } from '../lib/package';
 
 describe('package', function () {
-	const basePath = join(process.cwd(), 'src', 'test', 'package');
+	const basePath = join(process.cwd(), 'src', 'test', 'resources', 'package');
 
 	it('findFilesPath all', async () => {
 		const expectedFiles: string[] = [
@@ -29,13 +29,7 @@ describe('package', function () {
 	});
 
 	it('findMetaCallJsons all', async () => {
-		const basePath = join(
-			process.cwd(),
-			'src',
-			'test',
-			'package',
-			'loaders'
-		);
+		const loadersPath = join(basePath, 'loaders');
 		const expectedFiles: string[] = [
 			'a/depth/folder/metacall.json',
 			'csharp/metacall-cs.json',
@@ -44,7 +38,14 @@ describe('package', function () {
 			'python/metacall-py.json',
 			'ruby/metacall-rb.json'
 		];
-		const files = await findFilesPath(basePath);
+		const files = await findFilesPath(loadersPath);
+		deepStrictEqual(findMetaCallJsons(files), expectedFiles);
+	});
+
+	it('findMetaCallJsons empty', async () => {
+		const runnersPath = join(basePath, 'runners');
+		const expectedFiles: string[] = [];
+		const files = await findFilesPath(runnersPath);
 		deepStrictEqual(findMetaCallJsons(files), expectedFiles);
 	});
 
@@ -68,6 +69,13 @@ describe('package', function () {
 		];
 		const files = await findFilesPath(runnersPath);
 		deepStrictEqual(files, expectedFiles);
+		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('findRunners empty', async () => {
+		const loadersPath = join(basePath, 'loaders');
+		const expectedRunners: string[] = [];
+		const files = await findFilesPath(loadersPath);
 		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
 	});
 

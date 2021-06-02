@@ -1,9 +1,12 @@
 #!/usr/bin/env node
-/*
+import { generatePackage } from './lib/package';
 import { startup } from './startup';
 
-void startup();
-*/
+void (async () => {
+	const config = await startup();
+
+	const descriptor = generatePackage();
+})();
 /*
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
@@ -49,14 +52,12 @@ const selectLangs = async () => {
     ]);
 };
 */
-
+/*
 import { findFilesPath } from './lib/package';
 
 void (async () => {
 	//const { langs } = await selectLangs();
 	const allFiles = await findFilesPath();
-	console.log(allFiles);
-	/*
     for (const lang of langs) {
         const fromDisk = JSON.parse(
             await fs.readFile(`metacall-${lang}.json`, 'utf8').catch(() => '{}')
@@ -121,5 +122,5 @@ void (async () => {
             )
         );
     }
-    */
 })();
+*/

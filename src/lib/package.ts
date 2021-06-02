@@ -40,3 +40,48 @@ export const findRunners = (files: string[]): Set<string> => {
 
 	return runners;
 };
+
+enum PackageError {
+	Empty = 'No files found in the current folder',
+	JsonNotFound = 'No metacall.json found in the current folder',
+	None = 'Package correctly generated'
+}
+
+interface PackageDescriptor {
+	error: PackageError;
+	files: string[];
+	jsons: string[];
+	runners: string[];
+}
+
+const NullPackage: PackageDescriptor = {
+	error: PackageError.None,
+	files: [],
+	jsons: [],
+	runners: []
+};
+
+export const generatePackage = async (
+	path: string = process.cwd()
+): Promise<PackageDescriptor> => {
+	const files = await findFilesPath(path);
+
+	if (files.length === 0) {
+		return { ...NullPackage, error: PackageError.Empty };
+	}
+
+	const jsons = findMetaCallJsons(files);
+
+	if (jsons.length === 0) {
+		return { ...NullPackage, files, error: PackageError.JsonNotFound };
+	}
+
+	const runners = findRunners(files);
+
+	return {
+		error: PackageError.None,
+		files,
+		jsons,
+		runners: Array.from(runners)
+	};
+};

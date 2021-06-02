@@ -2,7 +2,7 @@ import { deepStrictEqual, ok } from 'assert';
 import API from '../lib/protocol';
 import { startup } from '../startup';
 
-describe('integration', function () {
+describe('integration protocol', function () {
 	this.timeout(30_000);
 
 	let api: ReturnType<typeof API>;
