@@ -44,7 +44,7 @@ describe('integration protocol', function () {
 	// TODO: Inspect with correct deployment data
 	it('Should have the deployment set up', async () => {
 		deepStrictEqual(await api.inspect(), [
-			/* TODO */
+			// TODO
 		]);
 	});
 

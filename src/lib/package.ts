@@ -10,7 +10,7 @@ export const findFilesPath = async (
 		await walk({
 			path,
 			ignoreFiles,
-			includeEmpty: true,
+			includeEmpty: false,
 			follow: true
 		})
 	).filter(x => !x.startsWith('.git'));
@@ -41,7 +41,7 @@ export const findRunners = (files: string[]): Set<string> => {
 	return runners;
 };
 
-enum PackageError {
+export enum PackageError {
 	Empty = 'No files found in the current folder',
 	JsonNotFound = 'No metacall.json found in the current folder',
 	None = 'Package correctly generated'
