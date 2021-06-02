@@ -1,30 +1,41 @@
-import { join } from 'path';
+import walk from 'ignore-walk';
+import { basename } from 'path';
+import { Languages } from './language';
 
-type ReadDir = (path: string) => Promise<string[]>;
-// type ReadFile = (path: string) => Promise<string[]>;
-type IsDirectory = (path: string) => Promise<boolean>;
-
-export const findFiles = async (
-	dir: string,
-	readDir: ReadDir,
-	isDirectory: IsDirectory
+export const findFilesPath = async (
+	path: string = process.cwd(),
+	ignoreFiles: string[] = ['.gitignore']
 ): Promise<string[]> =>
-	([] as string[]).concat(
-		...(await Promise.all(
-			(
-				await readDir(dir)
-			).map(async file => {
-				const path = dir === '.' ? file : join(dir, file);
-				return (await isDirectory(path))
-					? await findFiles(path, readDir, isDirectory)
-					: [path];
-			})
-		))
-	);
+	(
+		await walk({
+			path,
+			ignoreFiles,
+			includeEmpty: true,
+			follow: true
+		})
+	).filter(x => !x.startsWith('.git'));
 
-// const filterIgnoreFiles = async (
-//     files: Promise<string[]>,
-//     readFile: ReadFile
-// ): Promise<string[]> => (await files).map(f => {
+const pathIsMetaCallJson = (path: string): boolean =>
+	!!/^metacall(-.+)?\.json$/.exec(basename(path));
 
-// });
+export const findMetaCallJsons = (files: string[]): string[] =>
+	files.filter(pathIsMetaCallJson);
+
+type LanguageIds = keyof typeof Languages;
+
+export const findRunners = (files: string[]): Set<LanguageIds> => {
+	const runners: Set<LanguageIds> = new Set<LanguageIds>();
+
+	for (const file of files) {
+		for (const langId of Object.keys(Languages)) {
+			for (const re of Languages[langId as LanguageIds]
+				.runnerFilesRegexes) {
+				if (re.exec(file)) {
+					runners.add(langId as LanguageIds);
+				}
+			}
+		}
+	}
+
+	return runners;
+};

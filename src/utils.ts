@@ -13,8 +13,8 @@ export const configDir = (name: string): string =>
 			? join(process.env.APPDATA, name)
 			: error(missing('APPDATA'))
 		: process.env.HOME
-			? join(process.env.HOME, `.${name}`)
-			: error(missing('HOME'));
+		? join(process.env.HOME, `.${name}`)
+		: error(missing('HOME'));
 
 export const exists = (path: string): Promise<boolean> =>
 	fs.stat(path).then(
@@ -25,8 +25,8 @@ export const exists = (path: string): Promise<boolean> =>
 export const ensureFolderExists = async <Path extends string>(
 	path: Path
 ): Promise<Path> => (
-		(await exists(path)) || (await fs.mkdir(path, { recursive: true })), path
-	);
+	(await exists(path)) || (await fs.mkdir(path, { recursive: true })), path
+);
 
 export const loadFile = async (path: string): Promise<string> =>
 	(await exists(path)) ? fs.readFile(path, 'utf8') : '';

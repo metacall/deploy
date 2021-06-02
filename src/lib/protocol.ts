@@ -11,7 +11,7 @@ interface API {
 	deployEnabled(): Promise<boolean>;
 	listSubscriptions(): Promise<SubscriptionMap>;
 	inspect(): Promise<Deployment[]>;
-	upload(name: string, blob: any): Promise<string>;
+	upload(name: string, blob: unknown): Promise<string>;
 	deploy(name: string, version: string): Promise<string>;
 	deployDelete(
 		prefix: string,
@@ -71,7 +71,7 @@ export default (token: string, baseURL: string): API => {
 				})
 				.then(res => res.data),
 
-		upload: async (name: string, blob: any): Promise<string> => {
+		upload: async (name: string, blob: unknown): Promise<string> => {
 			const fd = new FormData();
 			fd.append('name', name);
 			fd.append('type', 'application/x-zip-compressed');
