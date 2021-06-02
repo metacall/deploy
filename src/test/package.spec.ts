@@ -3,8 +3,9 @@ import { join } from 'path';
 import { findFilesPath, findMetaCallJsons, findRunners } from '../lib/package';
 
 describe('package', function () {
-	it('findFilesPath', async () => {
-		const basePath = join(process.cwd(), 'src', 'test', 'package');
+	const basePath = join(process.cwd(), 'src', 'test', 'package');
+
+	it('findFilesPath all', async () => {
 		const expectedFiles: string[] = [
 			'loaders/a/depth/folder/metacall.json',
 			'loaders/csharp/metacall-cs.json',
@@ -26,7 +27,8 @@ describe('package', function () {
 		const files = await findFilesPath(basePath);
 		deepStrictEqual(files, expectedFiles);
 	});
-	it('findMetaCallJsons', async () => {
+
+	it('findMetaCallJsons all', async () => {
 		const basePath = join(
 			process.cwd(),
 			'src',
@@ -45,14 +47,9 @@ describe('package', function () {
 		const files = await findFilesPath(basePath);
 		deepStrictEqual(findMetaCallJsons(files), expectedFiles);
 	});
-	it('findRunners', async () => {
-		const basePath = join(
-			process.cwd(),
-			'src',
-			'test',
-			'package',
-			'runners'
-		);
+
+	it('findRunners all', async () => {
+		const runnersPath = join(basePath, 'runners');
 		const expectedFiles: string[] = [
 			'csharp/project.csproj',
 			'mixed/a.csproj',
@@ -63,12 +60,54 @@ describe('package', function () {
 			'python/requirements.txt',
 			'ruby/Gemfile'
 		];
-		const expectedRunners: string[] = ['cs', 'rb', 'node', 'py'];
-		const files = await findFilesPath(basePath);
+		const expectedRunners: string[] = [
+			'csharp',
+			'ruby',
+			'nodejs',
+			'python'
+		];
+		const files = await findFilesPath(runnersPath);
 		deepStrictEqual(files, expectedFiles);
-		console.log('................................................');
-		console.log(Array.from(findRunners(files)));
-		console.log('................................................');
+		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('findRunners mixed', async () => {
+		const runnersMixedPath = join(basePath, 'runners', 'mixed');
+		const expectedRunners: string[] = [
+			'csharp',
+			'ruby',
+			'nodejs',
+			'python'
+		];
+		const files = await findFilesPath(runnersMixedPath);
+		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('findRunners csharp', async () => {
+		const runnersPath = join(basePath, 'runners', 'csharp');
+		const expectedRunners: string[] = ['csharp'];
+		const files = await findFilesPath(runnersPath);
+		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('findRunners nodejs', async () => {
+		const runnersPath = join(basePath, 'runners', 'nodejs');
+		const expectedRunners: string[] = ['nodejs'];
+		const files = await findFilesPath(runnersPath);
+		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('findRunners python', async () => {
+		const runnersPath = join(basePath, 'runners', 'python');
+		const expectedRunners: string[] = ['python'];
+		const files = await findFilesPath(runnersPath);
+		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('findRunners ruby', async () => {
+		const runnersPath = join(basePath, 'runners', 'ruby');
+		const expectedRunners: string[] = ['ruby'];
+		const files = await findFilesPath(runnersPath);
 		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
 	});
 });

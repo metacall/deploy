@@ -23,15 +23,16 @@ export const findMetaCallJsons = (files: string[]): string[] =>
 
 type LanguageIds = keyof typeof Languages;
 
-export const findRunners = (files: string[]): Set<LanguageIds> => {
-	const runners: Set<LanguageIds> = new Set<LanguageIds>();
+export const findRunners = (files: string[]): Set<string> => {
+	const runners: Set<string> = new Set<string>();
 
 	for (const file of files) {
+		const fileName = basename(file);
 		for (const langId of Object.keys(Languages)) {
-			for (const re of Languages[langId as LanguageIds]
-				.runnerFilesRegexes) {
-				if (re.exec(file)) {
-					runners.add(langId as LanguageIds);
+			const lang = Languages[langId as LanguageIds];
+			for (const re of lang.runnerFilesRegexes) {
+				if (re.exec(fileName) && lang.runnerName) {
+					runners.add(lang.runnerName);
 				}
 			}
 		}
