@@ -1,6 +1,6 @@
 import axios from 'axios';
 import FormData from 'form-data';
-import { Deployment } from './deployment';
+import { Deployment, MetaCallJSON } from './deployment';
 
 type SubscriptionMap = Record<string, number>;
 
@@ -11,8 +11,19 @@ interface API {
 	deployEnabled(): Promise<boolean>;
 	listSubscriptions(): Promise<SubscriptionMap>;
 	inspect(): Promise<Deployment[]>;
-	upload(name: string, blob: unknown): Promise<string>;
-	deploy(name: string, version: string): Promise<string>;
+	upload(
+		name: string,
+		blob: unknown,
+		jsons: MetaCallJSON[],
+		runners: string[]
+	): Promise<string>;
+	deploy(
+		name: string,
+		env: string[],
+		plan: string,
+		release?: string,
+		version?: string
+	): Promise<string>;
 	deployDelete(
 		prefix: string,
 		suffix: string,
@@ -71,12 +82,17 @@ export default (token: string, baseURL: string): API => {
 				})
 				.then(res => res.data),
 
-		upload: async (name: string, blob: unknown): Promise<string> => {
+		upload: async (
+			name: string,
+			blob: unknown,
+			jsons: MetaCallJSON[] = [],
+			runners: string[] = []
+		): Promise<string> => {
 			const fd = new FormData();
-			fd.append('name', name);
+			fd.append('id', name);
 			fd.append('type', 'application/x-zip-compressed');
-			fd.append('runners', JSON.stringify([])); // TODO
-			fd.append('jsons', JSON.stringify([])); // TODO
+			fd.append('jsons', JSON.stringify(jsons));
+			fd.append('runners', JSON.stringify(runners));
 			fd.append('raw', blob, {
 				filename: 'blob',
 				contentType: 'application/x-zip-compressed'
@@ -94,13 +110,22 @@ export default (token: string, baseURL: string): API => {
 			return res.data;
 		},
 
-		deploy: (name: string, version = 'v1'): Promise<string> =>
+		deploy: (
+			name: string,
+			env: string[],
+			plan: string,
+			release: string = Date.now().toString(16),
+			version = 'v1'
+		): Promise<string> =>
 			axios
 				.post<string>(
 					baseURL + '/api/deploy/create',
 					{
 						resourceType: 'Package',
 						suffix: name,
+						release,
+						env,
+						plan,
 						version
 					},
 					{

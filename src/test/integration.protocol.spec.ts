@@ -1,9 +1,11 @@
-import { deepStrictEqual, ok } from 'assert';
+import { deepStrictEqual, ok, strictEqual } from 'assert';
+import { createReadStream } from 'fs';
+import { basename, join } from 'path';
 import API from '../lib/protocol';
 import { startup } from '../startup';
 
 describe('integration protocol', function () {
-	this.timeout(30_000);
+	this.timeout(200_000);
 
 	let api: ReturnType<typeof API>;
 
@@ -12,7 +14,7 @@ describe('integration protocol', function () {
 	> => {
 		// This assumes that the user (token) has:
 		//	1) Deploy Enabled
-		//	2) One empty launchpad with Essential Plan
+		//	2) One empty (and only one) launchpad with Essential Plan
 		const { token, baseURL } = await startup();
 		ok(token);
 		ok(baseURL === 'https://dashboard.metacall.io');
@@ -22,39 +24,100 @@ describe('integration protocol', function () {
 
 	// Deploy Enabled
 	it('Should have the deploy enabled', async () => {
-		ok(await api.deployEnabled());
+		const enabled = await api.deployEnabled();
+		ok(enabled === true);
+		return enabled;
 	});
 
 	// Subscriptions
 	it('Should have one Essential Plan', async () => {
-		deepStrictEqual(await api.listSubscriptions(), {
+		const result = await api.listSubscriptions();
+		deepStrictEqual(result, {
 			Essential: 1
 		});
+		return result;
 	});
 
 	// Inspect
 	it('Should have no deployments yet', async () => {
-		deepStrictEqual(await api.inspect(), []);
+		const result = await api.inspect();
+		deepStrictEqual(result, []);
+		return result;
 	});
 
-	// TODO: Implement deploy
+	// Upload
+	it('Should be able to upload', async () => {
+		const filePath = join(
+			process.cwd(),
+			'src',
+			'test',
+			'resources',
+			'integration',
+			'protocol',
+			'python-jose.zip'
+		);
+		const fileStream = createReadStream(filePath);
+		const result = await api.upload(
+			basename(filePath),
+			fileStream,
+			[],
+			['python']
+		);
+		deepStrictEqual(result, { id: 'python-jose' });
+		return result;
+	});
 
-	// TODO: Wait for deploy
+	// Deploy
+	it('Should be able to deploy', async () => {
+		const result = await api.deploy('python-jose', [], 'Essential');
+		strictEqual(result, '');
+		return result;
+	});
 
-	// TODO: Inspect with correct deployment data
+	// Wait for deploy
 	it('Should have the deployment set up', async () => {
-		deepStrictEqual(await api.inspect(), [
-			// TODO
-		]);
+		const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
+			new Promise(resolve => setTimeout(resolve, ms));
+		let result = false,
+			wait = true;
+		while (wait) {
+			await sleep(1000);
+			const inspect = await api.inspect();
+			const deployIdx = inspect.findIndex(
+				deploy => deploy.suffix === 'python-jose'
+			);
+			if (deployIdx !== -1) {
+				switch (inspect[deployIdx].status) {
+					case 'create':
+						break;
+					case 'ready':
+						wait = false;
+						result = true;
+						break;
+					default:
+						wait = false;
+						result = false;
+						break;
+				}
+			}
+		}
+		strictEqual(result, true);
+		return result;
 	});
 
-	// Delete Deploy (TODO: This wont pass until deploy is done)
+	// Delete Deploy
 	it('Should delete the deployment properly', async () => {
-		const inspectData = await api.inspect();
+		const inspect = await api.inspect();
 
-		ok(inspectData.length > 0);
+		ok(inspect.length > 0);
 
-		const { prefix, suffix, version } = inspectData[0];
+		const deployIdx = inspect.findIndex(
+			deploy => deploy.suffix === 'python-jose'
+		);
+
+		ok(deployIdx !== -1);
+
+		const { prefix, suffix, version } = inspect[deployIdx];
 		const result = await api.deployDelete(prefix, suffix, version);
 
 		ok(result === 'Deploy Delete Succeed');

@@ -1,12 +1,19 @@
 #!/usr/bin/env node
-import { generatePackage } from './lib/package';
+/*
+import { generatePackage, PackageError } from './lib/package';
 import { startup } from './startup';
+import {  }
 
 void (async () => {
 	const config = await startup();
 
-	const descriptor = generatePackage();
+	const descriptor = await generatePackage(process.argv[1] || process.cwd());
+
+	if (descriptor.error === PackageError.None) {
+		// TODO: Deploy package directly
+	}
 })();
+*/
 /*
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';

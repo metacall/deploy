@@ -89,3 +89,9 @@ export interface Deployment {
 	packages: Record<LanguageId, Handle[]>;
 	ports: number[];
 }
+
+export type MetaCallJSON = {
+	language_id: LanguageId;
+	path: string;
+	scripts: string[];
+};
