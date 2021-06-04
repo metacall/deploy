@@ -1,19 +1,62 @@
 #!/usr/bin/env node
-/*
+import { promises as fs } from 'fs';
+import { fileSelection } from './cli/selection';
 import { generatePackage, PackageError } from './lib/package';
-import { startup } from './startup';
-import {  }
+// import { startup } from './startup';
 
+enum ErrorCode {
+	Ok = 0,
+	NotDirectoryRootPath = 1,
+	EmptyRootPath = 2,
+	NotFoundRootPath = 3
+}
+
+// npm run build && npm start `pwd`/src/test/resources/integration/selection/
 void (async () => {
-	const config = await startup();
+	const rootPath = process.argv[2] || process.cwd();
 
-	const descriptor = await generatePackage(process.argv[1] || process.cwd());
+	try {
+		if (!(await fs.stat(rootPath)).isDirectory()) {
+			console.error(`Invalid root path, ${rootPath} is not a directory.`);
+			return process.exit(ErrorCode.NotDirectoryRootPath);
+		}
+	} catch (e) {
+		console.error(`Invalid root path, ${rootPath} not found.`);
+		return process.exit(ErrorCode.NotFoundRootPath);
+	}
 
-	if (descriptor.error === PackageError.None) {
-		// TODO: Deploy package directly
+	try {
+		// TODO:
+		// const config = await startup();
+		const descriptor = await generatePackage(rootPath);
+
+		switch (descriptor.error) {
+			case PackageError.None: {
+				console.log(`Deploying (from ${rootPath})...`);
+				console.log(descriptor);
+				// TODO: Deploy package directly
+				break;
+			}
+			case PackageError.Empty: {
+				console.error(
+					`The directory you specified (${rootPath}) is empty`
+				);
+				return process.exit(ErrorCode.EmptyRootPath);
+			}
+			case PackageError.JsonNotFound: {
+				const files = await fileSelection(
+					'Select the files you want to deploy:',
+					rootPath,
+					descriptor.files
+				);
+				console.log(files);
+				break;
+			}
+		}
+	} catch (e) {
+		console.error(e);
 	}
 })();
-*/
 /*
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
