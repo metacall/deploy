@@ -95,22 +95,21 @@ const matchFilesByLanguage = (
 	);
 
 export const generateJsonsFromFiles = (files: string[]): MetaCallJSON[] =>
-	Object.keys(Languages).reduce<keyof typeof Languages>(
-		(jsons: MetaCallJSON[], lang: keyof typeof Languages) => {
-			const scripts = matchFilesByLanguage(lang, files);
+	(Object.keys(Languages) as (keyof typeof Languages)[]).reduce<
+		MetaCallJSON[]
+	>((jsons: MetaCallJSON[], lang: keyof typeof Languages) => {
+		const scripts = matchFilesByLanguage(lang, files);
 
-			if (scripts.length === 0) {
-				return jsons;
-			} else {
-				return [
-					{
-						language_id: lang,
-						path: '.',
-						scripts
-					},
-					...jsons
-				];
-			}
-		},
-		[]
-	);
+		if (scripts.length === 0) {
+			return jsons;
+		} else {
+			return [
+				{
+					language_id: lang,
+					path: '.',
+					scripts
+				} as MetaCallJSON,
+				...jsons
+			];
+		}
+	}, []);
