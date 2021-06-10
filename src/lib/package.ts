@@ -1,6 +1,6 @@
 import walk from 'ignore-walk';
 import { basename, extname } from 'path';
-import { MetaCallJSON } from './deployment';
+import { LanguageId, MetaCallJSON } from './deployment';
 import { Languages } from './language';
 
 export const findFilesPath = async (
@@ -22,15 +22,13 @@ const pathIsMetaCallJson = (path: string): boolean =>
 export const findMetaCallJsons = (files: string[]): string[] =>
 	files.filter(pathIsMetaCallJson);
 
-type LanguageIds = keyof typeof Languages;
-
 export const findRunners = (files: string[]): Set<string> => {
 	const runners: Set<string> = new Set<string>();
 
 	for (const file of files) {
 		const fileName = basename(file);
 		for (const langId of Object.keys(Languages)) {
-			const lang = Languages[langId as LanguageIds];
+			const lang = Languages[langId as LanguageId];
 			for (const re of lang.runnerFilesRegexes) {
 				if (re.exec(fileName) && lang.runnerName) {
 					runners.add(lang.runnerName);
@@ -87,10 +85,7 @@ const getExtension = (file: string) => {
 	return ext[ext.length - 1];
 };
 
-const matchFilesByLanguage = (
-	lang: keyof typeof Languages,
-	files: string[]
-): string[] =>
+const matchFilesByLanguage = (lang: LanguageId, files: string[]): string[] =>
 	files.reduce(
 		(arr: string[], file: string) =>
 			Languages[lang].fileExtRegex.exec(
@@ -102,21 +97,22 @@ const matchFilesByLanguage = (
 	);
 
 export const generateJsonsFromFiles = (files: string[]): MetaCallJSON[] =>
-	(Object.keys(Languages) as (keyof typeof Languages)[]).reduce<
-		MetaCallJSON[]
-	>((jsons, lang) => {
-		const scripts = matchFilesByLanguage(lang, files);
+	(Object.keys(Languages) as LanguageId[]).reduce<MetaCallJSON[]>(
+		(jsons, lang) => {
+			const scripts = matchFilesByLanguage(lang, files);
 
-		if (scripts.length === 0) {
-			return jsons;
-		} else {
-			return [
-				{
-					language_id: lang,
-					path: '.',
-					scripts
-				} as MetaCallJSON,
-				...jsons
-			];
-		}
-	}, []);
+			if (scripts.length === 0) {
+				return jsons;
+			} else {
+				return [
+					{
+						language_id: lang,
+						path: '.',
+						scripts
+					} as MetaCallJSON,
+					...jsons
+				];
+			}
+		},
+		[]
+	);

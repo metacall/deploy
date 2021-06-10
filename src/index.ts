@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
-import { fileSelection } from './cli/selection';
+import { fileSelection, languageSelection } from './cli/selection';
+import { LanguageId } from './lib/deployment';
+import { Languages } from './lib/language';
 import {
 	generateJsonsFromFiles,
 	generatePackage,
@@ -35,7 +37,8 @@ void (async () => {
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				console.log(`Deploying (from ${rootPath})...`);
+				// TODO: Use inquirer or chalk
+				console.log(`Deploying from ${rootPath}...`);
 				console.log(descriptor);
 				// TODO: Deploy package directly
 				break;
@@ -47,14 +50,36 @@ void (async () => {
 				return process.exit(ErrorCode.EmptyRootPath);
 			}
 			case PackageError.JsonNotFound: {
-				const scripts = await fileSelection(
-					'Select the files you want to deploy:',
+				const potentialPackages = generateJsonsFromFiles(
 					descriptor.files
 				);
+				const potentialLanguages = Array.from(
+					new Set<LanguageId>(
+						potentialPackages.reduce<LanguageId[]>(
+							(langs, pkg) => [...langs, pkg.language_id],
+							[]
+						)
+					)
+				);
+				const languages = await languageSelection(potentialLanguages);
+				const packages = potentialPackages.filter(pkg =>
+					languages.includes(pkg.language_id)
+				);
 
-				const packages = generateJsonsFromFiles(scripts);
+				for (const pkg of packages) {
+					pkg.scripts = await fileSelection(
+						`Select files to load with ${
+							Languages[pkg.language_id].displayName
+						}`,
+						pkg.scripts
+					);
+				}
+
 				console.log(packages);
-
+				// console.log(languages);
+				//const scripts = await fileSelection(descriptor.files);
+				//console.log(descriptor.files);
+				//console.log(descriptor.runners);
 				break;
 			}
 		}

@@ -9,8 +9,7 @@ interface Language {
 	runnerFilesRegexes: RegExp[]; // Regex for generating the runners list
 }
 
-// TODO: Implement cob, rpc
-export const Languages: Record<Exclude<LanguageId, 'cob' | 'rpc'>, Language> = {
+export const Languages: Record<LanguageId, Language> = {
 	cs: {
 		tag: 'cs',
 		displayName: 'C#',
@@ -58,5 +57,31 @@ export const Languages: Record<Exclude<LanguageId, 'cob' | 'rpc'>, Language> = {
 		fileExtRegex: /^\w+$/,
 		runnerName: undefined, // File has no runner (yet?)
 		runnerFilesRegexes: [] // File has no runner files (yet?)
+	},
+	cob: {
+		tag: 'cob',
+		displayName: 'Cobol',
+		hexColor: '#01325a',
+		fileExtRegex: /^(cob|cbl|cbl)$/,
+		runnerName: undefined, // Cobol has no runner (yet?)
+		runnerFilesRegexes: [] // Cobol has no runner files (yet?)
+	},
+	rpc: {
+		tag: 'rpc',
+		displayName: 'RPC',
+		hexColor: '#0f564d',
+		fileExtRegex: /^rpc$/,
+		runnerName: undefined, // RPC has no runner (yet?)
+		runnerFilesRegexes: [] // RPC has no runner files (yet?)
 	}
 };
+
+export const DisplayNameToLanguageId: Record<string, LanguageId> = Object.keys(
+	Languages
+).reduce(
+	(obj, lang) =>
+		Object.assign(obj, {
+			[Languages[lang as LanguageId].displayName]: lang
+		}),
+	{}
+);
