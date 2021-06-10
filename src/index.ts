@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
+import { error, info, warn } from './cli/messages';
 import { fileSelection, languageSelection } from './cli/selection';
 import { LanguageId } from './lib/deployment';
 import { Languages } from './lib/language';
@@ -22,11 +23,11 @@ void (async () => {
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
-			console.error(`Invalid root path, ${rootPath} is not a directory.`);
+			error(`Invalid root path, ${rootPath} is not a directory.`);
 			return process.exit(ErrorCode.NotDirectoryRootPath);
 		}
 	} catch (e) {
-		console.error(`Invalid root path, ${rootPath} not found.`);
+		error(`Invalid root path, ${rootPath} not found.`);
 		return process.exit(ErrorCode.NotFoundRootPath);
 	}
 
@@ -37,19 +38,18 @@ void (async () => {
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				// TODO: Use inquirer or chalk
-				console.log(`Deploying from ${rootPath}...`);
-				console.log(descriptor);
+				info(`Deploying from ${rootPath}...`);
 				// TODO: Deploy package directly
 				break;
 			}
 			case PackageError.Empty: {
-				console.error(
-					`The directory you specified (${rootPath}) is empty`
-				);
+				error(`The directory you specified (${rootPath}) is empty`);
 				return process.exit(ErrorCode.EmptyRootPath);
 			}
 			case PackageError.JsonNotFound: {
+				warn(
+					`No metacall.json was found in ${rootPath}, launching the wizard`
+				);
 				const potentialPackages = generateJsonsFromFiles(
 					descriptor.files
 				);

@@ -2,7 +2,7 @@ import chalk from 'chalk';
 
 export const info = (message: string): void => {
 	// eslint-disable-next-line no-console
-	console.warn(chalk.cyanBright.bold('i') + ' ' + chalk.cyan(message));
+	console.log(chalk.cyanBright.bold('i') + ' ' + chalk.cyan(message));
 };
 
 export const warn = (message: string): void => {
