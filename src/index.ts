@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
 import { fileSelection } from './cli/selection';
-import { generatePackage, PackageError } from './lib/package';
+import {
+	generateJsonsFromFiles,
+	generatePackage,
+	PackageError
+} from './lib/package';
 // import { startup } from './startup';
 
 enum ErrorCode {
@@ -11,7 +15,6 @@ enum ErrorCode {
 	NotFoundRootPath = 3
 }
 
-// npm run build && npm start `pwd`/src/test/resources/integration/selection/
 void (async () => {
 	const rootPath = process.argv[2] || process.cwd();
 
@@ -44,12 +47,14 @@ void (async () => {
 				return process.exit(ErrorCode.EmptyRootPath);
 			}
 			case PackageError.JsonNotFound: {
-				const files = await fileSelection(
+				const scripts = await fileSelection(
 					'Select the files you want to deploy:',
-					rootPath,
 					descriptor.files
 				);
-				console.log(files);
+
+				const packages = generateJsonsFromFiles(scripts);
+				console.log(packages);
+
 				break;
 			}
 		}

@@ -1,5 +1,6 @@
 import walk from 'ignore-walk';
-import { basename } from 'path';
+import { basename, extname } from 'path';
+import { MetaCallJSON } from './deployment';
 import { Languages } from './language';
 
 export const findFilesPath = async (
@@ -80,3 +81,36 @@ export const generatePackage = async (
 		runners: Array.from(findRunners(files))
 	};
 };
+
+const matchFilesByLanguage = (
+	lang: keyof typeof Languages,
+	files: string[]
+): string[] =>
+	files.reduce(
+		(arr: string[], file: string) =>
+			Languages[lang].fileExtRegex.exec(extname(file) || basename(file))
+				? [...arr, file]
+				: arr,
+		[]
+	);
+
+export const generateJsonsFromFiles = (files: string[]): MetaCallJSON[] =>
+	Object.keys(Languages).reduce<keyof typeof Languages>(
+		(jsons: MetaCallJSON[], lang: keyof typeof Languages) => {
+			const scripts = matchFilesByLanguage(lang, files);
+
+			if (scripts.length === 0) {
+				return jsons;
+			} else {
+				return [
+					{
+						language_id: lang,
+						path: '.',
+						scripts
+					},
+					...jsons
+				];
+			}
+		},
+		[]
+	);
