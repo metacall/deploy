@@ -82,13 +82,20 @@ export const generatePackage = async (
 	};
 };
 
+const getExtension = (file: string) => {
+	const ext = extname(file || '').split('.');
+	return ext[ext.length - 1];
+};
+
 const matchFilesByLanguage = (
 	lang: keyof typeof Languages,
 	files: string[]
 ): string[] =>
 	files.reduce(
 		(arr: string[], file: string) =>
-			Languages[lang].fileExtRegex.exec(extname(file) || basename(file))
+			Languages[lang].fileExtRegex.exec(
+				getExtension(file) || basename(file)
+			)
 				? [...arr, file]
 				: arr,
 		[]
@@ -97,7 +104,7 @@ const matchFilesByLanguage = (
 export const generateJsonsFromFiles = (files: string[]): MetaCallJSON[] =>
 	(Object.keys(Languages) as (keyof typeof Languages)[]).reduce<
 		MetaCallJSON[]
-	>((jsons: MetaCallJSON[], lang: keyof typeof Languages) => {
+	>((jsons, lang) => {
 		const scripts = matchFilesByLanguage(lang, files);
 
 		if (scripts.length === 0) {

@@ -1,6 +1,12 @@
 import { deepStrictEqual } from 'assert';
 import { join } from 'path';
-import { findFilesPath, findMetaCallJsons, findRunners } from '../lib/package';
+import { MetaCallJSON } from '../lib/deployment';
+import {
+	findFilesPath,
+	findMetaCallJsons,
+	findRunners,
+	generateJsonsFromFiles
+} from '../lib/package';
 
 describe('unit package', function () {
 	const basePath = join(process.cwd(), 'src', 'test', 'resources', 'package');
@@ -119,5 +125,29 @@ describe('unit package', function () {
 		const expectedRunners: string[] = ['ruby'];
 		const files = await findFilesPath(runnersPath);
 		deepStrictEqual(Array.from(findRunners(files)), expectedRunners);
+	});
+
+	it('generateJsonsFromFiles', async () => {
+		const runnersPath = join(basePath, 'runners');
+		const files = await findFilesPath(runnersPath);
+		const expectedJsons: MetaCallJSON[] = [
+			{
+				language_id: 'file',
+				path: '.',
+				scripts: [
+					'csharp/project.csproj',
+					'mixed/a.csproj',
+					'mixed/Gemfile',
+					'mixed/package.json',
+					'mixed/requirements.txt',
+					'nodejs/index.js',
+					'nodejs/package.json',
+					'python/requirements.txt',
+					'ruby/Gemfile'
+				]
+			},
+			{ language_id: 'node', path: '.', scripts: ['nodejs/index.js'] }
+		];
+		deepStrictEqual(generateJsonsFromFiles(files), expectedJsons);
 	});
 });

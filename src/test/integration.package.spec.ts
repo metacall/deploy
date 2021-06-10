@@ -1,7 +1,13 @@
 import { deepStrictEqual, rejects } from 'assert';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { generatePackage, PackageError } from '../lib/package';
+import { MetaCallJSON } from '../lib/deployment';
+import {
+	findFilesPath,
+	generateJsonsFromFiles,
+	generatePackage,
+	PackageError
+} from '../lib/package';
 
 describe('integration package', function () {
 	const basePath = join(
@@ -99,5 +105,27 @@ describe('integration package', function () {
 			jsons: ['metacall.json'],
 			runners: ['nodejs']
 		});
+	});
+
+	it('generateJsonsFromFiles', async () => {
+		const allPath = join(basePath, 'all');
+		const files = await findFilesPath(allPath);
+		const expectedJsons: MetaCallJSON[] = [
+			{
+				language_id: 'file',
+				path: '.',
+				scripts: [
+					'nodejs/index.js',
+					'nodejs/metacall.json',
+					'nodejs/package.json',
+					'python/index.py',
+					'python/metacall.json',
+					'python/requirements.txt'
+				]
+			},
+			{ language_id: 'node', path: '.', scripts: ['nodejs/index.js'] },
+			{ language_id: 'py', path: '.', scripts: ['python/index.py'] }
+		];
+		deepStrictEqual(generateJsonsFromFiles(files), expectedJsons);
 	});
 });
