@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import { LanguageId } from '../lib/deployment';
+import { Languages } from '../lib/language';
 
 export const info = (message: string): void => {
 	// eslint-disable-next-line no-console
@@ -15,3 +17,8 @@ export const error = (message: string): never => {
 	console.error(chalk.redBright.bold('X') + ' ' + chalk.red(message));
 	return process.exit(1);
 };
+
+export const printLanguage = (language: LanguageId): string =>
+	chalk
+		.hex(Languages[language].hexColor)
+		.bold(Languages[language].displayName);

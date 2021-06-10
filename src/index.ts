@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
-import { error, info, warn } from './cli/messages';
+import { error, info, printLanguage, warn } from './cli/messages';
 import { fileSelection, languageSelection } from './cli/selection';
 import { LanguageId } from './lib/deployment';
-import { Languages } from './lib/language';
 import {
 	generateJsonsFromFiles,
 	generatePackage,
@@ -68,9 +67,9 @@ void (async () => {
 
 				for (const pkg of packages) {
 					pkg.scripts = await fileSelection(
-						`Select files to load with ${
-							Languages[pkg.language_id].displayName
-						}`,
+						`Select files to load with ${printLanguage(
+							pkg.language_id
+						)}`,
 						pkg.scripts
 					);
 				}
