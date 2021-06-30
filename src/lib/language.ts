@@ -48,7 +48,7 @@ export const Languages: Record<LanguageId, Language> = {
 		hexColor: '#007acc',
 		fileExtRegex: /^(ts|tsx)$/,
 		runnerName: 'nodejs',
-		runnerFilesRegexes: [/^package\.json$/]
+		runnerFilesRegexes: [/^package\.json$/] // TODO: Use tsconfig instead?
 	},
 	file: {
 		tag: 'file',
