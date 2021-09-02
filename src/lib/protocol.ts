@@ -1,3 +1,20 @@
+/*
+
+* About File:
+
+	this is just a client that implements all the rest API from the FaaS, so each function it contains is an endpoint in the FaaS for deploying and similar
+
+	refresh: updates the auth token
+	validate: validates the auth token
+	deployEnabled: checks if you're able to deploy
+	listSubscriptions: gives you a list of the subscription available
+	inspect: gives you are deploys with it's endpoints
+	upload: uploads a zip (package) into the faas
+	deploy: deploys the previously uploaded zip into the faas
+	deployDelete: deletes the deploy and the zip
+
+*/
+
 import axios from 'axios';
 import FormData from 'form-data';
 import { Deployment, MetaCallJSON } from './deployment';

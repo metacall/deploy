@@ -1,3 +1,10 @@
+/*
+
+* About File:
+	it verifies that your token is up to date and executes any routine needed to work properly
+
+*/
+
 import { AxiosError } from 'axios';
 import { maskedInput } from './cli/inputs';
 import { warn } from './cli/messages';
