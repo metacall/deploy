@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { LanguageId } from '../lib/deployment';
-import { Languages } from '../lib/language';
+import { LanguageId } from 'metacall-protocol/deployment';
+import { Languages } from 'metacall-protocol/language';
 
 export const info = (message: string): void => {
 	// eslint-disable-next-line no-console

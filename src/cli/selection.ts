@@ -1,7 +1,7 @@
 import { prompt } from 'inquirer';
-import { LanguageId } from '../lib/deployment';
-import { DisplayNameToLanguageId, Languages } from '../lib/language';
-import { Plans } from '../lib/plan';
+import { LanguageId } from 'metacall-protocol/deployment';
+import { DisplayNameToLanguageId, Languages } from 'metacall-protocol/language';
+import { Plans } from 'metacall-protocol/plan';
 
 export const fileSelection = (
 	message: string,
