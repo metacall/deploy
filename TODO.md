@@ -1,6 +1,6 @@
 # TODO
 
--   [ ] Move the `./src/lib` to a new repo so it can be reused in https://github.com/metacall/faas
+-   [x] Move the `./src/lib` to a new repo so it can be reused in https://github.com/metacall/faas -> https://github.com/metacall/protocol
 -   [ ] Implement the deployment in case of `PackageError.None` in `index.ts`:
     -   [ ] It should ask for a plan in the user (we should store this in the configuration, in a list of projects mapped to plans) or reuse an existent plan if it has been already selected.
     -   [ ] Use the protocol integration test and the descriptor in order to deploy it, we can implement a function which wraps all the behavior into a simple function or implement it directly in the `index.ts`
