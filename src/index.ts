@@ -5,9 +5,9 @@ import { error, info, printLanguage, warn } from './cli/messages';
 import { fileSelection, languageSelection } from './cli/selection';
 import { LanguageId } from './lib/deployment';
 import {
-	generateJsonsFromFiles,
-	generatePackage,
-	PackageError
+    generateJsonsFromFiles,
+    generatePackage,
+    PackageError
 } from './lib/package';
 // import { startup } from './startup';
 
@@ -31,10 +31,8 @@ export const args = parse<CLIArgs>({
 	email: { type: String, alias: 'e', optional: true },
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
-	force: { type: Boolean, alias: 'f' }
+	force: { type: Boolean, alias: 'f', defaultValue: false },
 });
-
-console.log(args);
 
 void (async () => {
 	const rootPath = args['workdir'];

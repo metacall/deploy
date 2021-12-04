@@ -6,6 +6,9 @@ export type LanguageId =
 	| 'rb'
 	| 'py'
 	| 'cs'
+	// | 'wasm'
+	// | 'java'
+	// | 'c'
 	| 'cob'
 	| 'file'
 	| 'rpc';
