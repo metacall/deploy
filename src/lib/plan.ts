@@ -1,5 +1,5 @@
 export enum Plans {
-	Basic = 'Basic',
-	Medium = 'Medium',
-	Enterprise = 'Enterprise'
+	Essential = 'Essential',
+	Standard = 'Standard',
+	Premium = 'Premium'
 }

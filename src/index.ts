@@ -2,14 +2,17 @@
 import { promises as fs } from 'fs';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
-import { fileSelection, languageSelection } from './cli/selection';
+import {
+	fileSelection,
+	languageSelection,
+	planSelection
+} from './cli/selection';
 import { LanguageId } from './lib/deployment';
 import {
-    generateJsonsFromFiles,
-    generatePackage,
-    PackageError
+	generateJsonsFromFiles,
+	generatePackage,
+	PackageError
 } from './lib/package';
-import { Plans } from './lib/plan';
 // import { startup } from './startup';
 
 enum ErrorCode {
@@ -32,7 +35,7 @@ export const args = parse<CLIArgs>({
 	email: { type: String, alias: 'e', optional: true },
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
-	force: { type: Boolean, alias: 'f', defaultValue: false },
+	force: { type: Boolean, alias: 'f', defaultValue: false }
 });
 
 void (async () => {
@@ -56,9 +59,10 @@ void (async () => {
 		switch (descriptor.error) {
 			case PackageError.None: {
 				info(`Deploying from ${rootPath}...\n`);
-				info(
-					`Please Select Plan from the list:\n \t1. ${Plans.Basic}\n \t2. ${Plans.Medium}\n \t3. ${Plans.Enterprise}`
+				const plan = await planSelection(
+					'Please select plan from the list'
 				);
+				info(`Plan ${plan}\n`);
 				// TODO: Deploy package directly
 				break;
 			}

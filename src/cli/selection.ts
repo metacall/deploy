@@ -1,6 +1,7 @@
 import { prompt } from 'inquirer';
 import { LanguageId } from '../lib/deployment';
 import { DisplayNameToLanguageId, Languages } from '../lib/language';
+import { Plans } from '../lib/plan';
 
 export const fileSelection = (
 	message: string,
@@ -26,3 +27,13 @@ export const languageSelection = (
 			choices: languages.map(lang => Languages[lang].displayName)
 		}
 	]).then(res => res.langs.map(lang => DisplayNameToLanguageId[lang]));
+
+export const planSelection = (message: string): Promise<Plans> =>
+	prompt<{ plan: Plans }>([
+		{
+			type: 'checkbox',
+			name: 'plan',
+			message,
+			choices: Object.keys(Plans)
+		}
+	]).then(res => res.plan);
