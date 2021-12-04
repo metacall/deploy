@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
+import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
 import { fileSelection, languageSelection } from './cli/selection';
 import { LanguageId } from './lib/deployment';
@@ -17,8 +18,26 @@ enum ErrorCode {
 	NotFoundRootPath = 3
 }
 
+interface CLIArgs {
+	workdir: string;
+	email?: string;
+	password?: string;
+	token?: string;
+	force: boolean;
+}
+
+export const args = parse<CLIArgs>({
+	workdir: { type: String, alias: 'w', defaultValue: process.cwd() },
+	email: { type: String, alias: 'e', optional: true },
+	password: { type: String, alias: 'p', optional: true },
+	token: { type: String, alias: 't', optional: true },
+	force: { type: Boolean, alias: 'f' }
+});
+
+console.log(args);
+
 void (async () => {
-	const rootPath = process.argv[2] || process.cwd();
+	const rootPath = args['workdir'];
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
