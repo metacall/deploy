@@ -83,11 +83,13 @@
 		"ini": "^1.3.5",
 		"inquirer": "^8.1.0",
 		"jsonwebtoken": "^8.5.1",
+		"ts-command-line-args": "^2.2.0",
 		"yargs": "^16.1.0",
 		"zod": "^1.11.10"
 	},
 	"devDependencies": {
 		"@types/archiver": "^3.1.1",
+		"@types/command-line-usage": "^5.0.2",
 		"@types/ignore-walk": "^3.0.1",
 		"@types/ini": "^1.3.30",
 		"@types/inquirer": "^7.3.1",
