@@ -1,3 +1,10 @@
+/*
+
+* About File:
+	it is for dealing with the local configuration of the cli, for storing there the data
+
+*/
+
 import { promises as fs } from 'fs';
 import { parse, stringify } from 'ini';
 import { join } from 'path';

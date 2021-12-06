@@ -9,6 +9,7 @@ import {
     generatePackage,
     PackageError
 } from './lib/package';
+import { Plans } from './lib/plan';
 // import { startup } from './startup';
 
 enum ErrorCode {
@@ -54,7 +55,10 @@ void (async () => {
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				info(`Deploying from ${rootPath}...`);
+				info(`Deploying from ${rootPath}...\n`);
+				info(
+					`Please Select Plan from the list:\n \t1. ${Plans.Basic}\n \t2. ${Plans.Medium}\n \t3. ${Plans.Enterprise}`
+				);
 				// TODO: Deploy package directly
 				break;
 			}

@@ -1,3 +1,10 @@
+/*
+
+* About File:
+	it contains utility functions to deal with files/folders and zipping filed
+
+*/
+
 import archiver, { Archiver } from 'archiver';
 import { promises as fs } from 'fs';
 import { platform } from 'os';

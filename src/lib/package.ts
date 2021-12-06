@@ -1,3 +1,17 @@
+/*
+
+* About File:
+
+	defines a package and its routines, a package is just a metacall.json with some extra details, for example, the runners needed to build a it (for example, if we find a requirements.txt then it means we need to run the python installer pip, so the python runner is needed)
+
+	it includes ignore files (like .gitignore), it is able to list all files in a path and classify them depending on what loader is the correct for each file extension
+
+	generatePackage is an exported function that given a path it generates all the information needed, for example, what runners are needed, what metacall-*.json are generated (depending on file extension) and the list of files that will be in that package (excluding the ones in gitignore)
+
+	generateJsonsFromFiles is similar but it is more fine grained, it uses a list of files and returns what are the metacall-*.json generated from them
+
+*/
+
 import walk from 'ignore-walk';
 import { basename, extname } from 'path';
 import { LanguageId, MetaCallJSON } from './deployment';

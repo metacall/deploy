@@ -1,3 +1,10 @@
+/*
+
+* About File:
+	it defines the structure of the deployments (when we do inspect for example), it also defines the structure of metacall.json
+
+*/
+
 type DeployStatus = 'create' | 'ready' | 'fail';
 
 export type LanguageId =

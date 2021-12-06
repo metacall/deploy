@@ -1,3 +1,10 @@
+/*
+
+* About File:
+	this is already documented but it defines the languages supported, extensions, runners, coloring, etc
+
+*/
+
 import { LanguageId } from './deployment';
 
 interface Language {
