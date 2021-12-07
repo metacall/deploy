@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
+import { LanguageId } from 'metacall-protocol/deployment';
+import {
+	generateJsonsFromFiles,
+	generatePackage,
+	PackageError
+} from 'metacall-protocol/package';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
 import {
@@ -7,12 +13,6 @@ import {
 	languageSelection,
 	planSelection
 } from './cli/selection';
-import { LanguageId } from './lib/deployment';
-import {
-	generateJsonsFromFiles,
-	generatePackage,
-	PackageError
-} from './lib/package';
 // import { startup } from './startup';
 
 enum ErrorCode {
@@ -114,8 +114,8 @@ void (async () => {
 /*
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
-import type { LanguageId } from './lib/deployment';
-import { findFiles } from './lib/package';
+import type { LanguageId } from 'metacall-protocol/deployment';
+import { findFiles } from 'metacall-protocol/package';
 
 const matches: Record<LanguageId, RegExp> = {
     node: /^.*\.jsx?$/i,
@@ -157,7 +157,7 @@ const selectLangs = async () => {
 };
 */
 /*
-import { findFilesPath } from './lib/package';
+import { findFilesPath } from 'metacall-protocol/package';
 
 void (async () => {
 	//const { langs } = await selectLangs();

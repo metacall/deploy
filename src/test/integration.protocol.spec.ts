@@ -1,7 +1,7 @@
 import { deepStrictEqual, ok, strictEqual } from 'assert';
 import { createReadStream } from 'fs';
+import API from 'metacall-protocol/protocol';
 import { basename, join } from 'path';
-import API from '../lib/protocol';
 import { startup } from '../startup';
 
 describe('integration protocol', function () {

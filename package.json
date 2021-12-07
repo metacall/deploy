@@ -83,6 +83,7 @@
 		"ini": "^1.3.5",
 		"inquirer": "^8.1.0",
 		"jsonwebtoken": "^8.5.1",
+		"metacall-protocol": "github:metacall/protocol",
 		"ts-command-line-args": "^2.2.0",
 		"zod": "^1.11.10"
 	},
