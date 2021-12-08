@@ -33,12 +33,8 @@ interface CLIArgs {
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
-	if (planType === 'Essential') {
-		return Plans.Essential;
-	} else if (planType === 'Standard') {
-		return Plans.Standard;
-	} else if (planType === 'Premium') {
-		return Plans.Premium;
+	if (Object.keys(Plans).includes(planType)) {
+		return Plans[planType as keyof typeof Plans];
 	}
 };
 
