@@ -49,6 +49,12 @@ export const args = parse<CLIArgs>({
 
 void (async () => {
 	const rootPath = args['workdir'];
+	const plan = args['plan'];
+
+	if (!plan) {
+		console.error('Please select a valid plan type');
+		process.exit(1);
+	}
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
