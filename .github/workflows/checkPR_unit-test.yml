@@ -10,10 +10,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
+            - name: git configure
+              run: |
+                  git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf ssh://git@github.com
             - name: Run Unit Test
               uses: actions/setup-node@v2
               with:
                   node-version: '14'
-            - run: |
+              run: |
                   npm ci
                   npm run unit
