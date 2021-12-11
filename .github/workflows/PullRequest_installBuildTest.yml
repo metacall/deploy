@@ -13,10 +13,23 @@ jobs:
             - name: git configure
               run: |
                   git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf ssh://git@github.com
-            - name: Run Build
+            - name: Installing dependencies
               uses: actions/setup-node@v2
               with:
                   node-version: '14'
             - run: |
-                  npm ci
+                  npm i
+            - name: Lint
+              run: |
+                  npm run lint
+            - name: Build
+              run: |
                   npm run build
+            - name: Run Unit Tests
+              run: |
+                  npm run unit
+            # TODO: Intefration tests requires metacall/FaaS
+            # TODO: unComment when FaaS is ready
+            # - name: Run Tests
+            #   run: |
+            #       npm run test
