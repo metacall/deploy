@@ -67,11 +67,11 @@ void (async () => {
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				info(`Deploying from ${rootPath}...\n`);
-				const plan = await planSelection(
-					'Please select plan from the list'
-				);
-				info(`Plan ${plan}\n`);
+				info(`Deploying ${rootPath}...\n`);
+				const plan =
+					args['plan'] ||
+					(await planSelection('Please select plan from the list'));
+				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
 				// TODO: Deploy package directly
 				break;
 			}
@@ -107,6 +107,15 @@ void (async () => {
 						pkg.scripts
 					);
 				}
+
+				/*
+interface PackageDescriptor {
+    error: PackageError;
+    files: string[];
+    jsons: string[];
+    runners: string[];
+}
+				*/
 
 				console.log(packages);
 				// console.log(languages);

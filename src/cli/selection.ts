@@ -31,7 +31,7 @@ export const languageSelection = (
 export const planSelection = (message: string): Promise<Plans> =>
 	prompt<{ plan: Plans }>([
 		{
-			type: 'checkbox',
+			type: 'list',
 			name: 'plan',
 			message,
 			choices: Object.keys(Plans)
