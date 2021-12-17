@@ -6,6 +6,7 @@ import {
 	generatePackage,
 	PackageError
 } from 'metacall-protocol/package';
+import { Plans } from 'metacall-protocol/plan';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
 import {
@@ -28,14 +29,22 @@ interface CLIArgs {
 	password?: string;
 	token?: string;
 	force: boolean;
+	plan?: Plans;
 }
+
+const parsePlan = (planType: string): Plans | undefined => {
+	if (Object.keys(Plans).includes(planType)) {
+		return Plans[planType as keyof typeof Plans];
+	}
+};
 
 export const args = parse<CLIArgs>({
 	workdir: { type: String, alias: 'w', defaultValue: process.cwd() },
 	email: { type: String, alias: 'e', optional: true },
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
-	force: { type: Boolean, alias: 'f', defaultValue: false }
+	force: { type: Boolean, alias: 'f', defaultValue: false },
+	plan: { type: parsePlan, alias: 'P', optional: true }
 });
 
 void (async () => {
