@@ -30,6 +30,7 @@ interface CLIArgs {
 	token?: string;
 	force: boolean;
 	plan?: Plans;
+	confDir?: string;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -44,7 +45,8 @@ export const args = parse<CLIArgs>({
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
 	force: { type: Boolean, alias: 'f', defaultValue: false },
-	plan: { type: parsePlan, alias: 'P', optional: true }
+	plan: { type: parsePlan, alias: 'P', optional: true },
+	confDir: { type: String, alias: 'd', optional: true }
 });
 
 void (async () => {
