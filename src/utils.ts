@@ -8,7 +8,7 @@
 import archiver, { Archiver } from 'archiver';
 import { promises as fs } from 'fs';
 import { platform } from 'os';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { error } from './cli/messages';
 
 const missing = (name: string): string =>
@@ -52,12 +52,12 @@ export const filter = (
 		{}
 	);
 
-export const zip = (
-	source = process.cwd(),
-	ignore: string[] = [],
+export const zip = async (
+	source: string,
+	files: string[],
 	progress: (text: string, bytes: number) => void,
 	pulse: (name: string) => void
-): Archiver => {
+): Promise<Archiver> => {
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
 	});
@@ -69,16 +69,21 @@ export const zip = (
 	);
 	archive.on('entry', entry => pulse(entry.name));
 
-	void fs
-		.readdir(source)
-		.then(files => files.filter(file => !ignore.includes(file)))
-		.then(async files => {
-			for (const file of files) {
-				(await fs.stat(join(source, file))).isDirectory()
-					? archive.directory(join(source, file), file)
-					: archive.file(join(source, file), { name: file });
-			}
-			await archive.finalize();
-		});
+	files = files.map(file => join(source, file));
+
+	for (const file of files) {
+		(await fs.stat(file)).isDirectory()
+			? archive.directory(file, basename(file))
+			: archive.file(file, { name: basename(file) });
+	}
+	await archive.finalize();
+	// void fs.then(async files => {
+	// 	for (const file of files) {
+	// 		(await fs.stat(join(source, file))).isDirectory()
+	// 			? archive.directory(join(source, file), file)
+	// 			: archive.file(join(source, file), { name: file });
+	// 	}
+	// 	await archive.finalize();
+	// });
 	return archive;
 };
