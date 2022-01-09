@@ -7,6 +7,7 @@ import {
 	PackageError
 } from 'metacall-protocol/package';
 import { Plans } from 'metacall-protocol/plan';
+import API from 'metacall-protocol/protocol';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
 import {
@@ -14,7 +15,7 @@ import {
 	languageSelection,
 	planSelection
 } from './cli/selection';
-// import { startup } from './startup';
+import { startup } from './startup';
 
 enum ErrorCode {
 	Ok = 0,
@@ -30,6 +31,7 @@ interface CLIArgs {
 	token?: string;
 	force: boolean;
 	plan?: Plans;
+	confDir?: string;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -44,7 +46,8 @@ export const args = parse<CLIArgs>({
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
 	force: { type: Boolean, alias: 'f', defaultValue: false },
-	plan: { type: parsePlan, alias: 'P', optional: true }
+	plan: { type: parsePlan, alias: 'P', optional: true },
+	confDir: { type: String, alias: 'd', optional: true }
 });
 
 void (async () => {
@@ -61,8 +64,7 @@ void (async () => {
 	}
 
 	try {
-		// TODO:
-		// const config = await startup();
+		const config = await startup();
 		const descriptor = await generatePackage(rootPath);
 
 		switch (descriptor.error) {
@@ -71,8 +73,14 @@ void (async () => {
 				const plan =
 					args['plan'] ||
 					(await planSelection('Please select plan from the list'));
-				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
+
 				// TODO: Deploy package directly
+
+				const api = API(config.token as string, config.baseURL);
+				if (await api.deployEnabled()) {
+					//TODO: zip the files and upload
+				}
+				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
 				break;
 			}
 			case PackageError.Empty: {
