@@ -6,6 +6,8 @@ import {
 	generatePackage,
 	PackageError
 } from 'metacall-protocol/package';
+import { Plans } from 'metacall-protocol/plan';
+import API from 'metacall-protocol/protocol';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
 import {
@@ -13,7 +15,7 @@ import {
 	languageSelection,
 	planSelection
 } from './cli/selection';
-// import { startup } from './startup';
+import { startup } from './startup';
 
 enum ErrorCode {
 	Ok = 0,
@@ -28,14 +30,24 @@ interface CLIArgs {
 	password?: string;
 	token?: string;
 	force: boolean;
+	plan?: Plans;
+	confDir?: string;
 }
+
+const parsePlan = (planType: string): Plans | undefined => {
+	if (Object.keys(Plans).includes(planType)) {
+		return Plans[planType as keyof typeof Plans];
+	}
+};
 
 export const args = parse<CLIArgs>({
 	workdir: { type: String, alias: 'w', defaultValue: process.cwd() },
 	email: { type: String, alias: 'e', optional: true },
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
-	force: { type: Boolean, alias: 'f', defaultValue: false }
+	force: { type: Boolean, alias: 'f', defaultValue: false },
+	plan: { type: parsePlan, alias: 'P', optional: true },
+	confDir: { type: String, alias: 'd', optional: true }
 });
 
 void (async () => {
@@ -52,18 +64,23 @@ void (async () => {
 	}
 
 	try {
-		// TODO:
-		// const config = await startup();
+		const config = await startup();
 		const descriptor = await generatePackage(rootPath);
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				info(`Deploying from ${rootPath}...\n`);
-				const plan = await planSelection(
-					'Please select plan from the list'
-				);
-				info(`Plan ${plan}\n`);
+				info(`Deploying ${rootPath}...\n`);
+				const plan =
+					args['plan'] ||
+					(await planSelection('Please select plan from the list'));
+
 				// TODO: Deploy package directly
+
+				const api = API(config.token as string, config.baseURL);
+				if (await api.deployEnabled()) {
+					//TODO: zip the files and upload
+				}
+				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
 				break;
 			}
 			case PackageError.Empty: {
@@ -98,6 +115,15 @@ void (async () => {
 						pkg.scripts
 					);
 				}
+
+				/*
+interface PackageDescriptor {
+    error: PackageError;
+    files: string[];
+    jsons: string[];
+    runners: string[];
+}
+				*/
 
 				console.log(packages);
 				// console.log(languages);
