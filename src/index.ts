@@ -10,7 +10,7 @@ import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
-import { progress, pulse } from './cli/progress';
+import Progress from './cli/progress';
 import {
 	fileSelection,
 	languageSelection,
@@ -80,6 +80,7 @@ void (async () => {
 
 				const api = API(config.token as string, config.baseURL);
 				if (await api.deployEnabled()) {
+					const { progress, pulse } = Progress();
 					const archive = await zip(
 						rootPath,
 						descriptor.files,
