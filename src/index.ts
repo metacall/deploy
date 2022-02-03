@@ -10,12 +10,14 @@ import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import { parse } from 'ts-command-line-args';
 import { error, info, printLanguage, warn } from './cli/messages';
+import Progress from './cli/progress';
 import {
 	fileSelection,
 	languageSelection,
 	planSelection
 } from './cli/selection';
 import { startup } from './startup';
+import { zip } from './utils';
 
 enum ErrorCode {
 	Ok = 0,
@@ -78,6 +80,13 @@ void (async () => {
 
 				const api = API(config.token as string, config.baseURL);
 				if (await api.deployEnabled()) {
+					const { progress, pulse } = Progress();
+					const archive = await zip(
+						rootPath,
+						descriptor.files,
+						progress,
+						pulse
+					);
 					//TODO: zip the files and upload
 				}
 				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);

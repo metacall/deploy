@@ -18,3 +18,11 @@ The configuration is stored in:
 ## Token
 
 The token is stored in the configuration and can be overwritten at any time with `METACALL_API_KEY` environment variable.
+
+## Contribute
+
+> You Can Directly Start Contributing to this deployer in Cloud with ready to run, build & test the project.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/metacall/deploy)
+
+To use it on your forked repo, edit the 'Open in Gitpod' button url to `https://gitpod.io/#https://github.com/<my-github-username>/deploy`
