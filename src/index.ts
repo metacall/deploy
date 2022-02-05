@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { promises as fs } from 'fs';
+import { createReadStream, createWriteStream, promises as fs } from 'fs';
 import { LanguageId } from 'metacall-protocol/deployment';
 import {
 	generateJsonsFromFiles,
@@ -8,7 +8,9 @@ import {
 } from 'metacall-protocol/package';
 import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
+import { basename } from 'path';
 import { parse } from 'ts-command-line-args';
+import { auth } from './auth';
 import { error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -28,6 +30,7 @@ enum ErrorCode {
 
 interface CLIArgs {
 	workdir: string;
+	projectName: string;
 	email?: string;
 	password?: string;
 	token?: string;
@@ -44,6 +47,11 @@ const parsePlan = (planType: string): Plans | undefined => {
 
 export const args = parse<CLIArgs>({
 	workdir: { type: String, alias: 'w', defaultValue: process.cwd() },
+	projectName: {
+		type: String,
+		alias: 'n',
+		defaultValue: basename(process.cwd())
+	},
 	email: { type: String, alias: 'e', optional: true },
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
@@ -54,6 +62,7 @@ export const args = parse<CLIArgs>({
 
 void (async () => {
 	const rootPath = args['workdir'];
+	const name = args['projectName'];
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
@@ -66,6 +75,7 @@ void (async () => {
 	}
 
 	try {
+		await auth();
 		const config = await startup();
 		const descriptor = await generatePackage(rootPath);
 
@@ -87,7 +97,16 @@ void (async () => {
 						progress,
 						pulse
 					);
-					//TODO: zip the files and upload
+
+					const output = createWriteStream(rootPath + '.zip');
+
+					archive.pipe(output);
+
+					const zipBlob = createReadStream(rootPath + '.zip');
+
+					await api.upload(name, zipBlob, [], descriptor.runners);
+
+					await api.deploy(name, [], plan);
 				}
 				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
 				break;
