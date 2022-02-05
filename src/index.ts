@@ -98,14 +98,9 @@ void (async () => {
 						pulse
 					);
 
-					const output = createWriteStream(rootPath + '.zip');
+					await api.upload(name, archive, descriptor.jsons, descriptor.runners);
 
-					archive.pipe(output);
-
-					const zipBlob = createReadStream(rootPath + '.zip');
-
-					await api.upload(name, zipBlob, [], descriptor.runners);
-
+					// TODO: We can ask for environment variables too, and cache them
 					await api.deploy(name, [], plan);
 				}
 				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
