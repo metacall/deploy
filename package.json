@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"test": "npm run --silent build && mocha dist/test",
-		"unit": "npm run --silent test -- --ignore **/integration**",
+		"unit": "npm run --silent test -- --ignore **/*.integration.spec.js",
 		"prepublishOnly": "npm run --silent build",
 		"build": "npm run --silent lint && tsc",
 		"lint": "eslint . --ignore-pattern dist",
