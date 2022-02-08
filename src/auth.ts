@@ -6,21 +6,48 @@
 */
 import { AxiosError } from 'axios';
 import login from 'metacall-protocol/login';
+import API from 'metacall-protocol/protocol';
+import { expiresIn } from 'metacall-protocol/token';
 import { input, maskedInput } from './cli/inputs';
-import { info, warn } from './cli/messages';
-import { load, save } from './config';
+import { warn } from './cli/messages';
+import { loginSelection } from './cli/selection';
+import { Config } from './config';
 import { args } from './index';
 import { forever, opt } from './utils';
 
-export const auth = async (): Promise<void> => {
-	const config = await load();
+const authToken = async (config: Config): Promise<string> => {
+	const askToken = (): Promise<string> =>
+		maskedInput('Please enter your metacall token');
 
-	let token: string = process.env['METACALL_API_KEY'] || config.token || '';
+	let token: string = await askToken();
 
-	// If there is token simply return.
-	if (token) return;
+	const api = API(token, config.baseURL);
 
-	// If no token then must evaluate it using login.
+	while (forever) {
+		try {
+			await api.validate();
+			break;
+		} catch (err) {
+			warn(
+				'Token invalid' +
+					opt(
+						x => ': ' + x,
+						String((err as AxiosError).response?.data)
+					)
+			);
+			token = await askToken();
+		}
+	}
+
+	if (expiresIn(token) < config.renewTime) {
+		// Token expires in < renewTime
+		token = await api.refresh();
+	}
+
+	return token;
+};
+
+const authLogin = async (config: Config): Promise<string> => {
 	const askEmail = (): Promise<string> =>
 		input('Please enter your email id: ');
 
@@ -36,7 +63,9 @@ export const auth = async (): Promise<void> => {
 	};
 
 	await askCredentials();
-	// Now we got email and password let's call login api endpoint and get the token and store it int somewhere else.
+
+	// Now we got email and password let's call login api endpoint and get the token and store it int somewhere else
+	let token = '';
 
 	while (forever) {
 		try {
@@ -50,7 +79,19 @@ export const auth = async (): Promise<void> => {
 		}
 	}
 
-	await save({ token });
+	return token;
+};
 
-	info('Login Successfull!');
+export const auth = async (config: Config): Promise<string> => {
+	const methods: Record<string, (config: Config) => Promise<string>> = {
+		'Login by token': authToken,
+		'Login by email and password': authLogin
+	};
+
+	const token =
+		process.env['METACALL_API_KEY'] ||
+		config.token ||
+		methods[await loginSelection(Object.keys(methods))](config);
+
+	return token;
 };

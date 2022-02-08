@@ -3,6 +3,16 @@ import { LanguageId } from 'metacall-protocol/deployment';
 import { DisplayNameToLanguageId, Languages } from 'metacall-protocol/language';
 import { Plans } from 'metacall-protocol/plan';
 
+export const loginSelection = (methods: string[]): Promise<string> =>
+	prompt<{ method: string }>([
+		{
+			type: 'list',
+			name: 'method',
+			message: 'Select the login method',
+			choices: methods
+		}
+	]).then((res: { method: string }) => res.method);
+
 export const fileSelection = (
 	message: string,
 	files: string[] = []
@@ -14,7 +24,7 @@ export const fileSelection = (
 			message,
 			choices: files
 		}
-	]).then(res => res.scripts);
+	]).then((res: { scripts: string[] }) => res.scripts);
 
 export const languageSelection = (
 	languages: LanguageId[] = []
@@ -23,10 +33,12 @@ export const languageSelection = (
 		{
 			type: 'checkbox',
 			name: 'langs',
-			message: 'Select languages to run on Metacall',
+			message: 'Select languages to run on MetaCall',
 			choices: languages.map(lang => Languages[lang].displayName)
 		}
-	]).then(res => res.langs.map(lang => DisplayNameToLanguageId[lang]));
+	]).then((res: { langs: string[] }) =>
+		res.langs.map(lang => DisplayNameToLanguageId[lang])
+	);
 
 export const planSelection = (message: string): Promise<Plans> =>
 	prompt<{ plan: Plans }>([
@@ -36,4 +48,4 @@ export const planSelection = (message: string): Promise<Plans> =>
 			message,
 			choices: Object.keys(Plans)
 		}
-	]).then(res => res.plan);
+	]).then((res: { plan: Plans }) => res.plan);

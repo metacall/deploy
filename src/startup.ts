@@ -5,46 +5,17 @@
 
 */
 
-import { AxiosError } from 'axios';
-import API from 'metacall-protocol/protocol';
-import { expiresIn } from 'metacall-protocol/token';
-import { maskedInput } from './cli/inputs';
-import { warn } from './cli/messages';
+import { auth } from './auth';
+import { info } from './cli/messages';
 import { Config, load, save } from './config';
-import { forever, opt } from './utils';
 
 export const startup = async (): Promise<Config> => {
 	const config = await load();
-
-	const askToken = (): Promise<string> =>
-		maskedInput('Please enter your metacall token');
-
-	let token: string =
-		process.env['METACALL_API_KEY'] || config.token || (await askToken());
-
-	const api = API(token, config.baseURL);
-
-	while (forever) {
-		try {
-			await api.validate();
-			break;
-		} catch (err) {
-			warn(
-				'Token invalid' +
-					opt(
-						x => ': ' + x,
-						String((err as AxiosError).response?.data)
-					)
-			);
-			token = await askToken();
-		}
-	}
-	if (expiresIn(token) < config.renewTime) {
-		// token expires in < renewTime
-		token = await api.refresh();
-	}
+	const token = await auth(config);
 
 	await save({ token });
+
+	info('Login Successfull!');
 
 	return Object.assign(config, { token });
 };

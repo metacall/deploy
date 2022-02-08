@@ -10,7 +10,6 @@ import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import { basename } from 'path';
 import { parse } from 'ts-command-line-args';
-import { auth } from './auth';
 import { error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -76,7 +75,6 @@ void (async () => {
 	}
 
 	try {
-		await auth();
 		const config = await startup();
 		const descriptor = await generatePackage(rootPath);
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
@@ -139,6 +137,8 @@ void (async () => {
 				: {};
 			*/
 
+			info(`Deploying ${rootPath}...\n`);
+
 			// TODO: We should do something with the return value, for example
 			// check for error or show the output to the user
 			await api.deploy(name, [], plan);
@@ -148,7 +148,6 @@ void (async () => {
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				info(`Deploying ${rootPath}...\n`);
 				await deploy([]);
 				break;
 			}
