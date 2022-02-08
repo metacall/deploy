@@ -31,7 +31,10 @@ export const startup = async (): Promise<Config> => {
 		} catch (err) {
 			warn(
 				'Token invalid' +
-					opt(x => ': ' + x, (err as AxiosError).response?.data)
+					opt(
+						x => ': ' + x,
+						String((err as AxiosError).response?.data)
+					)
 			);
 			token = await askToken();
 		}

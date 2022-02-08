@@ -43,7 +43,9 @@ export const auth = async (): Promise<void> => {
 			token = await login(email, password, config.baseURL);
 			break;
 		} catch (err) {
-			warn(opt(x => ': ' + x, (err as AxiosError).response?.data));
+			warn(
+				opt(x => ': ' + x, String((err as AxiosError).response?.data))
+			);
 			await askCredentials();
 		}
 	}
