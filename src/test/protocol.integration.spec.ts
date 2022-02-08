@@ -9,19 +9,18 @@ describe('integration protocol', function () {
 
 	let api: ReturnType<typeof API>;
 
-	before(
-		'Should have a valid token',
-		async (): Promise<ReturnType<typeof API>> => {
-			// This assumes that the user (token) has:
-			//	1) Deploy Enabled
-			//	2) One empty (and only one) launchpad with Essential Plan
-			const { token, baseURL } = await startup();
-			ok(token);
-			ok(baseURL === 'https://dashboard.metacall.io');
-			api = API(token, baseURL);
-			return api;
-		}
-	);
+	before('Should have a valid token', async (): Promise<
+		ReturnType<typeof API>
+	> => {
+		// This assumes that the user (token) has:
+		//	1) Deploy Enabled
+		//	2) One empty (and only one) launchpad with Essential Plan
+		const { token, baseURL } = await startup();
+		ok(token);
+		ok(baseURL === 'https://dashboard.metacall.io');
+		api = API(token, baseURL);
+		return api;
+	});
 
 	// Deploy Enabled
 	it('Should have the deploy enabled', async () => {
