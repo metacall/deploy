@@ -76,14 +76,8 @@ export const zip = async (
 			? archive.directory(file, basename(file))
 			: archive.file(file, { name: basename(file) });
 	}
+
 	await archive.finalize();
-	// void fs.then(async files => {
-	// 	for (const file of files) {
-	// 		(await fs.stat(join(source, file))).isDirectory()
-	// 			? archive.directory(join(source, file), file)
-	// 			: archive.file(join(source, file), { name: file });
-	// 	}
-	// 	await archive.finalize();
-	// });
+
 	return archive;
 };
