@@ -173,13 +173,14 @@ void (async () => {
 				);
 			}
 
-			if (saveConsent.toUpperCase() === 'Y')
+			if (saveConsent.toUpperCase() === 'Y') {
 				for (const pkg of packages) {
 					await fs.writeFile(
-						join(rootPath, `metacall.json`),
+						join(rootPath, `metacall-${pkg.language_id}.json`),
 						JSON.stringify(pkg, null, 2)
 					);
 				}
+			}
 
 			await deploy(saveConsent.toUpperCase() === 'Y' ? [] : packages);
 		};
