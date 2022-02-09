@@ -8,8 +8,9 @@ import {
 } from 'metacall-protocol/package';
 import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
-import { basename } from 'path';
+import { basename, join } from 'path';
 import { parse } from 'ts-command-line-args';
+import { input } from './cli/inputs';
 import { error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -92,6 +93,7 @@ void (async () => {
 			}
 
 			const { progress, pulse } = Progress();
+
 			const archive = await zip(
 				rootPath,
 				descriptor.files,
@@ -146,6 +148,42 @@ void (async () => {
 			// TODO: Anything more? Showing logs... or wait to be ready?
 		};
 
+		const createJsonAndDeploy = async (saveConsent: string) => {
+			const potentialPackages = generateJsonsFromFiles(descriptor.files);
+			const potentialLanguages = Array.from(
+				new Set<LanguageId>(
+					potentialPackages.reduce<LanguageId[]>(
+						(langs, pkg) => [...langs, pkg.language_id],
+						[]
+					)
+				)
+			);
+
+			const languages = await languageSelection(potentialLanguages);
+			const packages = potentialPackages.filter(pkg =>
+				languages.includes(pkg.language_id)
+			);
+
+			for (const pkg of packages) {
+				pkg.scripts = await fileSelection(
+					`Select files to load with ${printLanguage(
+						pkg.language_id
+					)}`,
+					pkg.scripts
+				);
+			}
+
+			if (saveConsent.toUpperCase() === 'Y')
+				for (const pkg of packages) {
+					await fs.writeFile(
+						join(rootPath, `metacall.json`),
+						JSON.stringify(pkg, null, 2)
+					);
+				}
+
+			await deploy(saveConsent.toUpperCase() === 'Y' ? [] : packages);
+		};
+
 		switch (descriptor.error) {
 			case PackageError.None: {
 				await deploy([]);
@@ -159,50 +197,11 @@ void (async () => {
 				warn(
 					`No metacall.json was found in ${rootPath}, launching the wizard`
 				);
-				const potentialPackages = generateJsonsFromFiles(
-					descriptor.files
-				);
-				const potentialLanguages = Array.from(
-					new Set<LanguageId>(
-						potentialPackages.reduce<LanguageId[]>(
-							(langs, pkg) => [...langs, pkg.language_id],
-							[]
-						)
-					)
-				);
-				const languages = await languageSelection(potentialLanguages);
-				const packages = potentialPackages.filter(pkg =>
-					languages.includes(pkg.language_id)
-				);
 
-				for (const pkg of packages) {
-					pkg.scripts = await fileSelection(
-						`Select files to load with ${printLanguage(
-							pkg.language_id
-						)}`,
-						pkg.scripts
-					);
-				}
+				const askToCachePackagesFile = (): Promise<string> =>
+					input('Do you want to save metacall.json file? (Y/N): ');
 
-				// TODO: Ask for (caching) saving 'packages: MetaCallJSON[]' into the filesystem
-				console.log(packages);
-				/*
-				for (const pkg of packages) {
-					await fs.writeFile(
-						path.join(rootPath, `metacall-${pkg.language_id}.json`),
-						JSON.stringify(pkg,
-							null,
-							2
-						)
-					);
-				}
-				*/
-
-				// If the packages have been cached, we can jump to the case PackageError.None
-				// await deploy([]);
-				// Otherwise:
-				await deploy(packages);
-
+				await createJsonAndDeploy(await askToCachePackagesFile());
 				break;
 			}
 		}
