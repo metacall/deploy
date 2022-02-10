@@ -9,9 +9,9 @@ import login from 'metacall-protocol/login';
 import API from 'metacall-protocol/protocol';
 import { expiresIn } from 'metacall-protocol/token';
 import { input, maskedInput } from './cli/inputs';
-import { warn } from './cli/messages';
+import { info, warn } from './cli/messages';
 import { loginSelection } from './cli/selection';
-import { Config } from './config';
+import { Config, save } from './config';
 import { args } from './index';
 import { forever, opt } from './utils';
 
@@ -43,6 +43,9 @@ const authToken = async (config: Config): Promise<string> => {
 		// Token expires in < renewTime
 		token = await api.refresh();
 	}
+
+	await save({ token });
+	info('Login Successfull!');
 
 	return token;
 };
@@ -78,6 +81,9 @@ const authLogin = async (config: Config): Promise<string> => {
 			await askCredentials();
 		}
 	}
+
+	await save({ token });
+	info('Login Successfull!');
 
 	return token;
 };

@@ -77,7 +77,8 @@ void (async () => {
 
 	try {
 		const config = await startup();
-		const descriptor = await generatePackage(rootPath);
+		let descriptor = await generatePackage(rootPath);
+
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
 			// TODO: We should cache the plan and ask for it only once
 			const plan =
@@ -149,6 +150,8 @@ void (async () => {
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
+			saveConsent = saveConsent.toUpperCase();
+
 			const potentialPackages = generateJsonsFromFiles(descriptor.files);
 			const potentialLanguages = Array.from(
 				new Set<LanguageId>(
@@ -173,16 +176,19 @@ void (async () => {
 				);
 			}
 
-			if (saveConsent.toUpperCase() === 'Y') {
+			if (saveConsent === 'Y' || saveConsent === 'YES') {
 				for (const pkg of packages) {
 					await fs.writeFile(
 						join(rootPath, `metacall-${pkg.language_id}.json`),
 						JSON.stringify(pkg, null, 2)
 					);
+					descriptor = await generatePackage(rootPath);
 				}
 			}
 
-			await deploy(saveConsent.toUpperCase() === 'Y' ? [] : packages);
+			await deploy(
+				saveConsent === 'Y' || saveConsent === 'YES' ? [] : packages
+			);
 		};
 
 		switch (descriptor.error) {
