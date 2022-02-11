@@ -6,16 +6,11 @@
 */
 
 import { auth } from './auth';
-import { info } from './cli/messages';
-import { Config, load, save } from './config';
+import { Config, load } from './config';
 
 export const startup = async (): Promise<Config> => {
 	const config = await load();
 	const token = await auth(config);
-
-	await save({ token });
-
-	info('Login Successfull!');
 
 	return Object.assign(config, { token });
 };
