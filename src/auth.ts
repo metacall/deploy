@@ -44,9 +44,6 @@ const authToken = async (config: Config): Promise<string> => {
 		token = await api.refresh();
 	}
 
-	await save({ token });
-	info('Login Successfull!');
-
 	return token;
 };
 
@@ -82,22 +79,31 @@ const authLogin = async (config: Config): Promise<string> => {
 		}
 	}
 
+	return token;
+};
+
+const authSelection = async (config: Config): Promise<string> => {
+	const methods: Record<string, (config: Config) => Promise<string>> = {
+		'Login by token': authToken,
+		'Login by email and password': authLogin
+	};
+
+	const token = await methods[await loginSelection(Object.keys(methods))](
+		config
+	);
+
 	await save({ token });
+
 	info('Login Successfull!');
 
 	return token;
 };
 
 export const auth = async (config: Config): Promise<string> => {
-	const methods: Record<string, (config: Config) => Promise<string>> = {
-		'Login by token': authToken,
-		'Login by email and password': authLogin
-	};
-
 	const token =
 		process.env['METACALL_API_KEY'] ||
 		config.token ||
-		methods[await loginSelection(Object.keys(methods))](config);
+		(await authSelection(config));
 
 	return token;
 };

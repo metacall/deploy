@@ -150,8 +150,6 @@ void (async () => {
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
-			saveConsent = saveConsent.toUpperCase();
-
 			const potentialPackages = generateJsonsFromFiles(descriptor.files);
 			const potentialLanguages = Array.from(
 				new Set<LanguageId>(
@@ -176,19 +174,30 @@ void (async () => {
 				);
 			}
 
-			if (saveConsent === 'Y' || saveConsent === 'YES') {
-				for (const pkg of packages) {
-					await fs.writeFile(
-						join(rootPath, `metacall-${pkg.language_id}.json`),
-						JSON.stringify(pkg, null, 2)
-					);
-					descriptor = await generatePackage(rootPath);
-				}
-			}
+			const cacheJsons = saveConsent === 'Y' || saveConsent === 'YES';
 
-			await deploy(
-				saveConsent === 'Y' || saveConsent === 'YES' ? [] : packages
-			);
+			const additionalPackages = cacheJsons
+				? await (async () => {
+						for (const pkg of packages) {
+							await fs.writeFile(
+								join(
+									rootPath,
+									`metacall-${pkg.language_id}.json`
+								),
+								JSON.stringify(pkg, null, 2)
+							);
+						}
+
+						// If they are cached, genearte the descriptor again
+						descriptor = await generatePackage(rootPath);
+
+						// The descriptor already contains the packages so
+						// there is no need to send additional packages
+						return [];
+				  })()
+				: packages; // Otherwise, packages are not cached, send them
+
+			await deploy(additionalPackages);
 		};
 
 		switch (descriptor.error) {
@@ -208,7 +217,9 @@ void (async () => {
 				const askToCachePackagesFile = (): Promise<string> =>
 					input('Do you want to save metacall.json file? (Y/N): ');
 
-				await createJsonAndDeploy(await askToCachePackagesFile());
+				await createJsonAndDeploy(
+					(await askToCachePackagesFile()).toUpperCase()
+				);
 				break;
 			}
 		}
