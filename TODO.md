@@ -26,3 +26,4 @@
     -   [ ] Ask for the plan (store them in the client on the configuration? or implement a way to reuse them in the deploy on the FaaS?)
     -   [ ] Store the `metacall-${lang_id}.json`s once the wizard finishes so it can be reused on the next run of the deploy
 -   [ ] Clean code and unused comments left for implementing the rest of options
+-   [ ] Style all error messages and input requests everything looks uniform, clear and with the same appearence (for example, add ':' when needed, or dot / exclamations/question marks at the end of a sentence).

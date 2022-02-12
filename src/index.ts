@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
-import { LanguageId } from 'metacall-protocol/deployment';
+import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
 import {
 	generateJsonsFromFiles,
 	generatePackage,
@@ -8,7 +8,9 @@ import {
 } from 'metacall-protocol/package';
 import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
+import { basename, join } from 'path';
 import { parse } from 'ts-command-line-args';
+import { input } from './cli/inputs';
 import { error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -23,11 +25,13 @@ enum ErrorCode {
 	Ok = 0,
 	NotDirectoryRootPath = 1,
 	EmptyRootPath = 2,
-	NotFoundRootPath = 3
+	NotFoundRootPath = 3,
+	AccountDisabled = 4
 }
 
 interface CLIArgs {
 	workdir: string;
+	projectName: string;
 	email?: string;
 	password?: string;
 	token?: string;
@@ -44,6 +48,11 @@ const parsePlan = (planType: string): Plans | undefined => {
 
 export const args = parse<CLIArgs>({
 	workdir: { type: String, alias: 'w', defaultValue: process.cwd() },
+	projectName: {
+		type: String,
+		alias: 'n',
+		defaultValue: basename(process.cwd())
+	},
 	email: { type: String, alias: 'e', optional: true },
 	password: { type: String, alias: 'p', optional: true },
 	token: { type: String, alias: 't', optional: true },
@@ -54,6 +63,7 @@ export const args = parse<CLIArgs>({
 
 void (async () => {
 	const rootPath = args['workdir'];
+	const name = args['projectName'];
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
@@ -67,29 +77,132 @@ void (async () => {
 
 	try {
 		const config = await startup();
-		const descriptor = await generatePackage(rootPath);
+		let descriptor = await generatePackage(rootPath);
+
+		const deploy = async (additionalJsons: MetaCallJSON[]) => {
+			// TODO: We should cache the plan and ask for it only once
+			const plan =
+				args['plan'] ||
+				(await planSelection('Please select plan from the list'));
+
+			const api = API(config.token as string, config.baseURL);
+			const enabled = await api.deployEnabled();
+
+			if (!enabled) {
+				error('Your account is not enabled to deploy');
+				return process.exit(ErrorCode.AccountDisabled);
+			}
+
+			const { progress, pulse } = Progress();
+
+			const archive = await zip(
+				rootPath,
+				descriptor.files,
+				progress,
+				pulse
+			);
+
+			// TODO: We should do something with the return value, for example
+			// check for error or show the output to the user
+			await api.upload(
+				name,
+				archive,
+				additionalJsons,
+				descriptor.runners
+			);
+
+			// TODO: We can ask for environment variables here too and cache them
+			/*
+			const { enableEnv } = await prompt<{ enableEnv: boolean }>([
+				{
+					type: 'confirm',
+					name: 'enableEnv',
+					message: 'Add env vars?',
+					default: false
+				}
+			]);
+			const env = enableEnv
+				? await prompt<{ env: string }>([
+						{
+							type: 'input',
+							name: 'env',
+							message: 'Type env vars in the format: K1=V1, K2=V2'
+						}
+				]).then(({ env }) =>
+						env
+							.split(',')
+							.map(kv => {
+								const [k, v] = kv.trim().split('=');
+								return { [k]: v };
+							})
+							.reduce((obj, kv) => Object.assign(obj, kv), {})
+				)
+				: {};
+			*/
+
+			info(`Deploying ${rootPath}...\n`);
+
+			// TODO: We should do something with the return value, for example
+			// check for error or show the output to the user
+			await api.deploy(name, [], plan);
+
+			// TODO: Anything more? Showing logs... or wait to be ready?
+		};
+
+		const createJsonAndDeploy = async (saveConsent: string) => {
+			const potentialPackages = generateJsonsFromFiles(descriptor.files);
+			const potentialLanguages = Array.from(
+				new Set<LanguageId>(
+					potentialPackages.reduce<LanguageId[]>(
+						(langs, pkg) => [...langs, pkg.language_id],
+						[]
+					)
+				)
+			);
+
+			const languages = await languageSelection(potentialLanguages);
+			const packages = potentialPackages.filter(pkg =>
+				languages.includes(pkg.language_id)
+			);
+
+			for (const pkg of packages) {
+				pkg.scripts = await fileSelection(
+					`Select files to load with ${printLanguage(
+						pkg.language_id
+					)}`,
+					pkg.scripts
+				);
+			}
+
+			const cacheJsons = saveConsent === 'Y' || saveConsent === 'YES';
+
+			const additionalPackages = cacheJsons
+				? await (async () => {
+						for (const pkg of packages) {
+							await fs.writeFile(
+								join(
+									rootPath,
+									`metacall-${pkg.language_id}.json`
+								),
+								JSON.stringify(pkg, null, 2)
+							);
+						}
+
+						// If they are cached, genearte the descriptor again
+						descriptor = await generatePackage(rootPath);
+
+						// The descriptor already contains the packages so
+						// there is no need to send additional packages
+						return [];
+				  })()
+				: packages; // Otherwise, packages are not cached, send them
+
+			await deploy(additionalPackages);
+		};
 
 		switch (descriptor.error) {
 			case PackageError.None: {
-				info(`Deploying ${rootPath}...\n`);
-				const plan =
-					args['plan'] ||
-					(await planSelection('Please select plan from the list'));
-
-				// TODO: Deploy package directly
-
-				const api = API(config.token as string, config.baseURL);
-				if (await api.deployEnabled()) {
-					const { progress, pulse } = Progress();
-					const archive = await zip(
-						rootPath,
-						descriptor.files,
-						progress,
-						pulse
-					);
-					//TODO: zip the files and upload
-				}
-				info(`Deploying ${JSON.stringify(descriptor.jsons)}...\n`);
+				await deploy([]);
 				break;
 			}
 			case PackageError.Empty: {
@@ -100,45 +213,13 @@ void (async () => {
 				warn(
 					`No metacall.json was found in ${rootPath}, launching the wizard`
 				);
-				const potentialPackages = generateJsonsFromFiles(
-					descriptor.files
-				);
-				const potentialLanguages = Array.from(
-					new Set<LanguageId>(
-						potentialPackages.reduce<LanguageId[]>(
-							(langs, pkg) => [...langs, pkg.language_id],
-							[]
-						)
-					)
-				);
-				const languages = await languageSelection(potentialLanguages);
-				const packages = potentialPackages.filter(pkg =>
-					languages.includes(pkg.language_id)
-				);
 
-				for (const pkg of packages) {
-					pkg.scripts = await fileSelection(
-						`Select files to load with ${printLanguage(
-							pkg.language_id
-						)}`,
-						pkg.scripts
-					);
-				}
+				const askToCachePackagesFile = (): Promise<string> =>
+					input('Do you want to save metacall.json file? (Y/N): ');
 
-				/*
-interface PackageDescriptor {
-    error: PackageError;
-    files: string[];
-    jsons: string[];
-    runners: string[];
-}
-				*/
-
-				console.log(packages);
-				// console.log(languages);
-				//const scripts = await fileSelection(descriptor.files);
-				//console.log(descriptor.files);
-				//console.log(descriptor.runners);
+				await createJsonAndDeploy(
+					(await askToCachePackagesFile()).toUpperCase()
+				);
 				break;
 			}
 		}
@@ -146,120 +227,3 @@ interface PackageDescriptor {
 		console.error(e);
 	}
 })();
-/*
-import { promises as fs } from 'fs';
-import { prompt } from 'inquirer';
-import type { LanguageId } from 'metacall-protocol/deployment';
-import { findFiles } from 'metacall-protocol/package';
-
-const matches: Record<LanguageId, RegExp> = {
-    node: /^.*\.jsx?$/i,
-    ts: /^.*\.tsx?$/i,
-    rb: /^.*\.rb$/i,
-    py: /^.*\.py$/i,
-    cs: /^.*\.cs$/i,
-    cob: /^.*\.cob$/i,
-    file: /^.*$/,
-    rpc: /^.*$/
-};
-
-type MetacallJSON = {
-    language_id: LanguageId;
-    path: string;
-    scripts: string[];
-};
-
-const findFilesFileSystem = (dir = '.') =>
-    findFiles(
-        dir,
-        (dir: string) => fs.readdir(dir),
-        async (path: string) => (await fs.stat(path)).isDirectory()
-    );
-
-const selectLangs = async () => {
-    const def = (await fs.readdir('.'))
-        .filter(x => x.startsWith('metacall-') && x.endsWith('.json'))
-        .map(x => x.split('metacall-')[1].split('.json')[0] as LanguageId);
-    return prompt<{ langs: LanguageId[] }>([
-        {
-            type: 'checkbox',
-            name: 'langs',
-            message: 'Select languages to run on Metacall',
-            choices: ['node', 'ts', 'rb', 'py', 'cs', 'cob', 'file', 'rpc'],
-            default: def
-        }
-    ]);
-};
-*/
-/*
-import { findFilesPath } from 'metacall-protocol/package';
-
-void (async () => {
-	//const { langs } = await selectLangs();
-	const allFiles = await findFilesPath();
-    for (const lang of langs) {
-        const fromDisk = JSON.parse(
-            await fs.readFile(`metacall-${lang}.json`, 'utf8').catch(() => '{}')
-        ) as Partial<MetacallJSON>;
-        const { scripts } = await prompt<{ scripts: string[] }>([
-            {
-                type: 'checkbox',
-                name: 'scripts',
-                message: `Select files to load with ${lang}`,
-                choices: [
-                    ...new Set([
-                        ...allFiles.filter(file => matches[lang].test(file)),
-                        ...(fromDisk.scripts ?? [])
-                    ])
-                ],
-                default: fromDisk.scripts ?? []
-            }
-        ]);
-
-        const { enableEnv } = await prompt<{ enableEnv: boolean }>([
-            {
-                type: 'confirm',
-                name: 'enableEnv',
-                message: 'Add env vars?',
-                default: false
-            }
-        ]);
-        const env = enableEnv
-            ? await prompt<{ env: string }>([
-                    {
-                        type: 'input',
-                        name: 'env',
-                        message: 'Type env vars in the format: K1=V1, K2=V2'
-                    }
-              ]).then(({ env }) =>
-                    env
-                        .split(',')
-                        .map(kv => {
-                            const [k, v] = kv.trim().split('=');
-                            return { [k]: v };
-                        })
-                        .reduce((obj, kv) => Object.assign(obj, kv), {})
-              )
-            : {};
-        console.log(env);
-        await fs.writeFile(
-            `metacall-${lang}.json`,
-            JSON.stringify(
-                {
-                    ...fromDisk,
-                    language_id: lang,
-                    path: fromDisk.path ?? '.',
-                    scripts: [
-                        ...new Set([
-                            ...(fromDisk.scripts ?? []),
-                            ...(scripts ?? [])
-                        ])
-                    ]
-                },
-                null,
-                2
-            )
-        );
-    }
-})();
-*/

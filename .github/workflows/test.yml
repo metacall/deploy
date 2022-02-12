@@ -1,4 +1,4 @@
-name: PR - Build
+name: Test
 on:
     pull_request:
         branches: [master]
@@ -28,7 +28,7 @@ jobs:
             - name: Run Unit Tests
               run: |
                   npm run unit
-            # TODO: Intefration tests requires metacall/FaaS
+            # TODO: Integration tests requires metacall/FaaS or dashboard.metacall.io credentials
             # TODO: unComment when FaaS is ready
             # - name: Run Tests
             #   run: |
