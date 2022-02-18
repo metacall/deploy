@@ -11,6 +11,7 @@ import API from 'metacall-protocol/protocol';
 import { basename, join } from 'path';
 import { parse } from 'ts-command-line-args';
 import { input } from './cli/inputs';
+import { ins } from './cli/inspect';
 import { error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -39,6 +40,7 @@ interface CLIArgs {
 	force: boolean;
 	plan?: Plans;
 	confDir?: string;
+	inspect: boolean;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -108,7 +110,12 @@ export const args = parse<CLIArgs>(
 			optional: true,
 			description: cliArgsDescription.plan
 		},
-		confDir: { type: String, alias: 'd', optional: true }
+		confDir: { type: String, alias: 'd', optional: true },
+		inspect: {
+			type: Boolean,
+			alias: 'i',
+			defaultValue: false
+		}
 	},
 	{
 		helpArg: 'help',
@@ -124,6 +131,12 @@ export const args = parse<CLIArgs>(
 void (async () => {
 	const rootPath = args['workdir'];
 	const name = args['projectName'];
+	const inspect = args['inspect'];
+
+	if (inspect) {
+		await ins();
+		process.exit();
+	}
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
