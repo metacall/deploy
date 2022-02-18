@@ -56,7 +56,8 @@ export const zip = async (
 	source: string,
 	files: string[],
 	progress: (text: string, bytes: number) => void,
-	pulse: (name: string) => void
+	pulse: (name: string) => void,
+	hide: () => void
 ): Promise<Archiver> => {
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
@@ -76,6 +77,8 @@ export const zip = async (
 			? archive.directory(file, basename(file))
 			: archive.file(file, { name: basename(file) });
 	}
+
+	archive.on('finish', () => hide());
 
 	await archive.finalize();
 

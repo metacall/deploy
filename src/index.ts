@@ -153,13 +153,14 @@ void (async () => {
 				return process.exit(ErrorCode.AccountDisabled);
 			}
 
-			const { progress, pulse } = Progress();
+			const { progress, pulse, hide } = Progress();
 
 			const archive = await zip(
 				rootPath,
 				descriptor.files,
 				progress,
-				pulse
+				pulse,
+				hide
 			);
 
 			// TODO: We should do something with the return value, for example
