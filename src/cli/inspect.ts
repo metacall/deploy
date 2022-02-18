@@ -8,7 +8,7 @@ interface row {
 	Deployments: string;
 	Status: string;
 	Version: string;
-	Ports: number[];
+	Ports: number[] | string;
 	Endpoints: string;
 }
 
@@ -16,7 +16,7 @@ const genRow = (
 	Deployments: string,
 	Status: string,
 	Version: string,
-	Ports: number[],
+	Ports: number[] | string,
 	Endpoints: string
 ): row => {
 	return { Deployments, Status, Version, Ports, Endpoints };
@@ -60,12 +60,17 @@ const genUrls = (
 	return urls;
 };
 
+const sleep = (ms: number) => {
+	return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 export const ins = async (): Promise<void> => {
 	const config = await startup();
 
 	const api = API(config.token as string, config.baseURL);
 
 	for (;;) {
+		await sleep(5000);
 		const res = await api.inspect();
 
 		console.clear();
@@ -87,8 +92,8 @@ export const ins = async (): Promise<void> => {
 				el.suffix,
 				colors(el.status),
 				el.version,
-				el.ports,
-				urls[el.suffix].length > 0 ? urls[el.suffix][0] : 'deploying...'
+				el.ports.length > 0 ? el.ports : '---',
+				urls[el.suffix].length > 0 ? urls[el.suffix][0] : '   ---'
 			)
 		);
 

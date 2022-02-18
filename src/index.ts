@@ -133,10 +133,7 @@ void (async () => {
 	const name = args['projectName'];
 	const inspect = args['inspect'];
 
-	if (inspect) {
-		await ins();
-		process.exit();
-	}
+	if (inspect) await ins();
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
