@@ -40,7 +40,7 @@ interface CLIArgs {
 	force: boolean;
 	plan?: Plans;
 	confDir?: string;
-	inspect: boolean;
+	inspect?: boolean;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -114,7 +114,8 @@ export const args = parse<CLIArgs>(
 		inspect: {
 			type: Boolean,
 			alias: 'i',
-			defaultValue: false
+			defaultValue: false,
+			optional: true
 		}
 	},
 	{
