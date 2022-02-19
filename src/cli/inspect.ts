@@ -39,22 +39,24 @@ const colors = (status: string): string => {
 
 const genUrls = (
 	res: Deployment[],
-	baseURL: string
+	apiURL: string
 ): { [k: string]: string[] } => {
 	const urls: { [k: string]: string[] } = {};
 
 	res.forEach(el => {
 		urls[el.suffix] = [];
 
-		Object.entries(el.packages).forEach(pack => {
-			pack[1].forEach(ele => {
-				ele.scope.funcs.forEach(f => {
+		Object.entries(el.packages).forEach(pack =>
+			pack[1].forEach(ele =>
+				ele.scope.funcs.forEach(f =>
 					urls[el.suffix].push(
-						`${baseURL}/${el.prefix}/${el.suffix}/${el.version}/call/${f.name}`
-					);
-				});
-			});
-		});
+						`${apiURL}/${el.prefix}/${el.suffix}/${el.version}/${
+							pack[0] === 'file' ? 'static' : 'call'
+						}/${f.name}`
+					)
+				)
+			)
+		);
 	});
 
 	return urls;
@@ -85,7 +87,7 @@ export const ins = async (): Promise<void> => {
 			]
 		});
 
-		const urls = genUrls(res, config.baseURL);
+		const urls = genUrls(res, config.apiURL);
 
 		const allApps = res.map(el =>
 			genRow(

@@ -110,13 +110,13 @@ export const args = parse<CLIArgs>(
 			optional: true,
 			description: cliArgsDescription.plan
 		},
-		confDir: { type: String, alias: 'd', optional: true },
 		inspect: {
 			type: Boolean,
 			alias: 'i',
 			defaultValue: false,
 			optional: true
-		}
+		},
+		confDir: { type: String, alias: 'd', optional: true }
 	},
 	{
 		helpArg: 'help',
