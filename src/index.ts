@@ -57,7 +57,8 @@ const cliArgsDescription: { [k: string]: string } = {
 	password: 'accepts password for authentication.',
 	token: 'accepts token for authentication, either pass email & password or token.',
 	force: 'accepts boolean value : it deletes the deployment present on an existing plan and deploys again.',
-	plan: 'accepts type of plan : "Essential", "Standard", "Premium".'
+	plan: 'accepts type of plan : "Essential", "Standard", "Premium".',
+	inspect: 'lists out all the deployments with specifications'
 };
 
 export const args = parse<CLIArgs>(
@@ -114,7 +115,8 @@ export const args = parse<CLIArgs>(
 			type: Boolean,
 			alias: 'i',
 			defaultValue: false,
-			optional: true
+			optional: true,
+			description: cliArgsDescription.inspect
 		},
 		confDir: { type: String, alias: 'd', optional: true }
 	},
