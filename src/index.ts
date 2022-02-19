@@ -30,6 +30,7 @@ enum ErrorCode {
 }
 
 interface CLIArgs {
+	help?: boolean;
 	workdir: string;
 	projectName: string;
 	email?: string;
@@ -46,20 +47,79 @@ const parsePlan = (planType: string): Plans | undefined => {
 	}
 };
 
-export const args = parse<CLIArgs>({
-	workdir: { type: String, alias: 'w', defaultValue: process.cwd() },
-	projectName: {
-		type: String,
-		alias: 'n',
-		defaultValue: basename(process.cwd())
+const cliArgsDescription: { [k: string]: string } = {
+	help: 'prints help.',
+	workdir: 'accepts path to application directory.',
+	projectName: 'accepts name of the application.',
+	email: 'accepts email id for authentication.',
+	password: 'accepts password for authentication.',
+	token: 'accepts token for authentication, either pass email & password or token.',
+	force: 'accepts boolean value : it deletes the deployment present on an existing plan and deploys again.',
+	plan: 'accepts type of plan : "Essential", "Standard", "Premium".'
+};
+
+export const args = parse<CLIArgs>(
+	{
+		help: {
+			type: Boolean,
+			optional: true,
+			alias: 'h',
+			description: cliArgsDescription.help
+		},
+		workdir: {
+			type: String,
+			alias: 'w',
+			defaultValue: process.cwd(),
+			description: cliArgsDescription.workdir
+		},
+		projectName: {
+			type: String,
+			alias: 'n',
+			defaultValue: basename(process.cwd()),
+			description: cliArgsDescription.projectName
+		},
+		email: {
+			type: String,
+			alias: 'e',
+			optional: true,
+			description: cliArgsDescription.email
+		},
+		password: {
+			type: String,
+			alias: 'p',
+			optional: true,
+			description: cliArgsDescription.password
+		},
+		token: {
+			type: String,
+			alias: 't',
+			optional: true,
+			description: cliArgsDescription.token
+		},
+		force: {
+			type: Boolean,
+			alias: 'f',
+			defaultValue: false,
+			description: cliArgsDescription.force
+		},
+		plan: {
+			type: parsePlan,
+			alias: 'P',
+			optional: true,
+			description: cliArgsDescription.plan
+		},
+		confDir: { type: String, alias: 'd', optional: true }
 	},
-	email: { type: String, alias: 'e', optional: true },
-	password: { type: String, alias: 'p', optional: true },
-	token: { type: String, alias: 't', optional: true },
-	force: { type: Boolean, alias: 'f', defaultValue: false },
-	plan: { type: parsePlan, alias: 'P', optional: true },
-	confDir: { type: String, alias: 'd', optional: true }
-});
+	{
+		helpArg: 'help',
+		headerContentSections: [
+			{
+				header: 'Official CLI for metacall-deploy',
+				content: 'Usage: metacall-deploy [--args]'
+			}
+		]
+	}
+);
 
 void (async () => {
 	const rootPath = args['workdir'];
