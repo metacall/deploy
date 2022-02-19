@@ -3,6 +3,7 @@ import { Table } from 'console-table-printer';
 import { Deployment } from 'metacall-protocol/deployment';
 import API from 'metacall-protocol/protocol';
 import { startup } from './../startup';
+import { sleep } from './../utils';
 
 interface row {
 	Deployments: string;
@@ -12,17 +13,7 @@ interface row {
 	Endpoints: string;
 }
 
-const genRow = (
-	Deployments: string,
-	Status: string,
-	Version: string,
-	Ports: number[] | string,
-	Endpoints: string
-): row => {
-	return { Deployments, Status, Version, Ports, Endpoints };
-};
-
-const colors = (status: string): string => {
+const colorStatus = (status: string): string => {
 	switch (status) {
 		case 'create':
 			status = chalk.yellowBright(status);
@@ -37,7 +28,33 @@ const colors = (status: string): string => {
 	return status;
 };
 
-const genUrls = (
+const genRow = (
+	Deployments: string,
+	Status: string,
+	Version: string,
+	Ports: number[] | string,
+	Endpoints: string
+): row => {
+	return { Deployments, Status, Version, Ports, Endpoints };
+};
+
+const genSingleURL = (
+	packageType: string,
+	apiURL: string,
+	app: Deployment,
+	f: { name: string; async: boolean }
+): string => {
+	const prefix = app.prefix;
+	const suffix = app.suffix;
+	const version = app.version;
+	const funcName = f.name;
+	const funcType =
+		packageType === 'file' ? 'static' : f.async ? 'await' : 'call';
+
+	return `${apiURL}/${prefix}/${suffix}/${version}/${funcType}/${funcName}`;
+};
+
+const genAllURL = (
 	res: Deployment[],
 	apiURL: string
 ): { [k: string]: string[] } => {
@@ -49,11 +66,7 @@ const genUrls = (
 		Object.entries(el.packages).forEach(pack =>
 			pack[1].forEach(ele =>
 				ele.scope.funcs.forEach(f =>
-					urls[el.suffix].push(
-						`${apiURL}/${el.prefix}/${el.suffix}/${el.version}/${
-							pack[0] === 'file' ? 'static' : 'call'
-						}/${f.name}`
-					)
+					urls[el.suffix].push(genSingleURL(pack[0], apiURL, el, f))
 				)
 			)
 		);
@@ -62,13 +75,8 @@ const genUrls = (
 	return urls;
 };
 
-const sleep = (ms: number) => {
-	return new Promise(resolve => setTimeout(resolve, ms));
-};
-
 export const ins = async (): Promise<void> => {
 	const config = await startup();
-
 	const api = API(config.token as string, config.baseURL);
 
 	for (;;) {
@@ -87,17 +95,18 @@ export const ins = async (): Promise<void> => {
 			]
 		});
 
-		const urls = genUrls(res, config.apiURL);
+		const urls = genAllURL(res, config.apiURL);
 
-		const allApps = res.map(el =>
-			genRow(
-				el.suffix,
-				colors(el.status),
-				el.version,
-				el.ports.length > 0 ? el.ports : '---',
-				urls[el.suffix].length > 0 ? urls[el.suffix][0] : '   ---'
-			)
-		);
+		const allApps = res.map(el => {
+			const suffix = el.suffix;
+			const status = colorStatus(el.status);
+			const version = el.version;
+			const ports = el.ports.length > 0 ? el.ports : '---';
+			const url =
+				urls[el.suffix].length > 0 ? urls[el.suffix][0] : '   ---';
+
+			return genRow(suffix, status, version, ports, url);
+		});
 
 		allApps.forEach((app, i) => {
 			p.addRow(app);
