@@ -14,6 +14,10 @@ import { error } from './cli/messages';
 const missing = (name: string): string =>
 	`Missing ${name} environment variable! Unable to load config`;
 
+export const sleep = (ms: number) => {
+	return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 export const configDir = (name: string): string =>
 	platform() === 'win32'
 		? process.env.APPDATA
