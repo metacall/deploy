@@ -22,10 +22,11 @@ export const apiError = (err: AxiosError): never => {
 	// eslint-disable-next-line no-console
 	console.error(
 		chalk.redBright.bold('X') +
-			chalk.redBright(' Server responded with error code: ') +
-			chalk.redBright(err.response?.status.toString()) +
-			' ' +
-			chalk.redBright(err.response?.data)
+			chalk.redBright(
+				` Server responded with error code: ${
+					err.response?.status || ''
+				} ${err.response?.data as string}`
+			)
 	);
 	return process.exit(1);
 };
