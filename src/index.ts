@@ -10,6 +10,7 @@ import API from 'metacall-protocol/protocol';
 import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
+import { ins } from './cli/inspect';
 import { error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -31,6 +32,9 @@ enum ErrorCode {
 void (async () => {
 	const rootPath = args['workdir'];
 	const name = args['projectName'];
+	const inspect = args['inspect'];
+
+	if (inspect) await ins();
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
