@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { AxiosError } from 'axios';
 import { promises as fs } from 'fs';
 import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
 import {
@@ -11,7 +12,7 @@ import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
 import { ins } from './cli/inspect';
-import { error, info, printLanguage, warn } from './cli/messages';
+import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
 	fileSelection,
@@ -64,13 +65,14 @@ void (async () => {
 				return process.exit(ErrorCode.AccountDisabled);
 			}
 
-			const { progress, pulse } = Progress();
+			const { progress, pulse, hide } = Progress();
 
 			const archive = await zip(
 				rootPath,
 				descriptor.files,
 				progress,
-				pulse
+				pulse,
+				hide
 			);
 
 			// TODO: We should do something with the return value, for example
@@ -113,9 +115,11 @@ void (async () => {
 
 			info(`Deploying ${rootPath}...\n`);
 
-			// TODO: We should do something with the return value, for example
-			// check for error or show the output to the user
-			await api.deploy(name, [], plan);
+			try {
+				await api.deploy(name, [], plan);
+			} catch (err) {
+				apiError(err as AxiosError);
+			}
 
 			// TODO: Anything more? Showing logs... or wait to be ready?
 		};
