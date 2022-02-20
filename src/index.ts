@@ -204,8 +204,6 @@ void (async () => {
 
 			info(`Deploying ${rootPath}...\n`);
 
-			// TODO: We should do something with the return value, for example
-			// check for error or show the output to the user
 			try {
 				await api.deploy(name, [], plan);
 			} catch (err) {
