@@ -80,7 +80,6 @@ export const ins = async (): Promise<void> => {
 	const api = API(config.token as string, config.baseURL);
 
 	for (;;) {
-		await sleep(5000);
 		const res = await api.inspect();
 
 		console.clear();
@@ -125,5 +124,6 @@ export const ins = async (): Promise<void> => {
 		});
 
 		p.printTable();
+		await sleep(5000);
 	}
 };
