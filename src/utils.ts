@@ -14,6 +14,10 @@ import { error } from './cli/messages';
 const missing = (name: string): string =>
 	`Missing ${name} environment variable! Unable to load config`;
 
+export const sleep = (ms: number) => {
+	return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 export const configDir = (name: string): string =>
 	platform() === 'win32'
 		? process.env.APPDATA
@@ -56,7 +60,8 @@ export const zip = async (
 	source: string,
 	files: string[],
 	progress: (text: string, bytes: number) => void,
-	pulse: (name: string) => void
+	pulse: (name: string) => void,
+	hide: () => void
 ): Promise<Archiver> => {
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
@@ -76,6 +81,8 @@ export const zip = async (
 			? archive.directory(file, basename(file))
 			: archive.file(file, { name: basename(file) });
 	}
+
+	archive.on('finish', () => hide());
 
 	await archive.finalize();
 

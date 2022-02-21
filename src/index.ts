@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { AxiosError } from 'axios';
 import { promises as fs } from 'fs';
 import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
 import {
@@ -6,12 +7,12 @@ import {
 	generatePackage,
 	PackageError
 } from 'metacall-protocol/package';
-import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
-import { basename, join } from 'path';
-import { parse } from 'ts-command-line-args';
+import { join } from 'path';
+import args from './cli/args';
 import { input } from './cli/inputs';
-import { error, info, printLanguage, warn } from './cli/messages';
+import { ins } from './cli/inspect';
+import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
 	fileSelection,
@@ -29,101 +30,12 @@ enum ErrorCode {
 	AccountDisabled = 4
 }
 
-interface CLIArgs {
-	help?: boolean;
-	workdir: string;
-	projectName: string;
-	email?: string;
-	password?: string;
-	token?: string;
-	force: boolean;
-	plan?: Plans;
-	confDir?: string;
-}
-
-const parsePlan = (planType: string): Plans | undefined => {
-	if (Object.keys(Plans).includes(planType)) {
-		return Plans[planType as keyof typeof Plans];
-	}
-};
-
-const cliArgsDescription: { [k: string]: string } = {
-	help: 'prints help.',
-	workdir: 'accepts path to application directory.',
-	projectName: 'accepts name of the application.',
-	email: 'accepts email id for authentication.',
-	password: 'accepts password for authentication.',
-	token: 'accepts token for authentication, either pass email & password or token.',
-	force: 'accepts boolean value : it deletes the deployment present on an existing plan and deploys again.',
-	plan: 'accepts type of plan : "Essential", "Standard", "Premium".'
-};
-
-export const args = parse<CLIArgs>(
-	{
-		help: {
-			type: Boolean,
-			optional: true,
-			alias: 'h',
-			description: cliArgsDescription.help
-		},
-		workdir: {
-			type: String,
-			alias: 'w',
-			defaultValue: process.cwd(),
-			description: cliArgsDescription.workdir
-		},
-		projectName: {
-			type: String,
-			alias: 'n',
-			defaultValue: basename(process.cwd()),
-			description: cliArgsDescription.projectName
-		},
-		email: {
-			type: String,
-			alias: 'e',
-			optional: true,
-			description: cliArgsDescription.email
-		},
-		password: {
-			type: String,
-			alias: 'p',
-			optional: true,
-			description: cliArgsDescription.password
-		},
-		token: {
-			type: String,
-			alias: 't',
-			optional: true,
-			description: cliArgsDescription.token
-		},
-		force: {
-			type: Boolean,
-			alias: 'f',
-			defaultValue: false,
-			description: cliArgsDescription.force
-		},
-		plan: {
-			type: parsePlan,
-			alias: 'P',
-			optional: true,
-			description: cliArgsDescription.plan
-		},
-		confDir: { type: String, alias: 'd', optional: true }
-	},
-	{
-		helpArg: 'help',
-		headerContentSections: [
-			{
-				header: 'Official CLI for metacall-deploy',
-				content: 'Usage: metacall-deploy [--args]'
-			}
-		]
-	}
-);
-
 void (async () => {
 	const rootPath = args['workdir'];
 	const name = args['projectName'];
+	const inspect = args['inspect'];
+
+	if (inspect) await ins();
 
 	try {
 		if (!(await fs.stat(rootPath)).isDirectory()) {
@@ -153,13 +65,14 @@ void (async () => {
 				return process.exit(ErrorCode.AccountDisabled);
 			}
 
-			const { progress, pulse } = Progress();
+			const { progress, pulse, hide } = Progress();
 
 			const archive = await zip(
 				rootPath,
 				descriptor.files,
 				progress,
-				pulse
+				pulse,
+				hide
 			);
 
 			// TODO: We should do something with the return value, for example
@@ -202,9 +115,11 @@ void (async () => {
 
 			info(`Deploying ${rootPath}...\n`);
 
-			// TODO: We should do something with the return value, for example
-			// check for error or show the output to the user
-			await api.deploy(name, [], plan);
+			try {
+				await api.deploy(name, [], plan);
+			} catch (err) {
+				apiError(err as AxiosError);
+			}
 
 			// TODO: Anything more? Showing logs... or wait to be ready?
 		};
