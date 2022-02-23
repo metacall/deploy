@@ -10,20 +10,20 @@ import {
 	generatePackage,
 	PackageError
 } from 'metacall-protocol/package';
+import API from 'metacall-protocol/protocol';
+import { join } from 'path';
+import args from './cli/args';
+import { input } from './cli/inputs';
 import { apiError, error, info, printLanguage, warn } from './cli/messages';
+import Progress from './cli/progress';
 import {
 	containerSelection,
 	fileSelection,
 	languageSelection
 } from './cli/selection';
-import args from './cli/args';
-import Progress from './cli/progress';
-import { zip } from './utils';
-import { join } from 'path';
-import API from 'metacall-protocol/protocol';
-import { logs } from './logs';
-import { input } from './cli/inputs';
 import { Config } from './config';
+import { logs } from './logs';
+import { zip } from './utils';
 
 enum ErrorCode {
 	Ok = 0,
@@ -33,14 +33,12 @@ enum ErrorCode {
 	AccountDisabled = 4
 }
 
-export interface addResponse {
-	id: string;
-}
-
-export const deployPackage = async (config: Config, plan: string) => {
+export const deployPackage = async (
+	rootPath: string,
+	config: Config,
+	plan: string
+) => {
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const rootPath = args['workdir']!;
 		const name = args['projectName'].toLowerCase();
 		let descriptor = await generatePackage(rootPath);
 
@@ -197,7 +195,7 @@ export const deployPackage = async (config: Config, plan: string) => {
 			}
 		}
 	} catch (e) {
-		console.error(e);
+		error(String(e));
 	}
 };
 

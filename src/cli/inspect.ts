@@ -75,7 +75,7 @@ const genAllURL = (
 	return urls;
 };
 
-export const ins = async (): Promise<void> => {
+export const inspect = async (): Promise<void> => {
 	const config = await startup();
 	const api = API(config.token as string, config.baseURL);
 
