@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { AxiosError } from 'axios';
 import { promises as fs } from 'fs';
-import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
+import {
+	LanguageId,
+	LogType,
+	MetaCallJSON
+} from 'metacall-protocol/deployment';
 import {
 	generateJsonsFromFiles,
 	generatePackage,
@@ -12,9 +16,11 @@ import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
 import { ins } from './cli/inspect';
+import { logs } from './cli/logs';
 import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
+	containerSelection,
 	fileSelection,
 	languageSelection,
 	planSelection
@@ -32,7 +38,7 @@ enum ErrorCode {
 
 void (async () => {
 	const rootPath = args['workdir'];
-	const name = args['projectName'];
+	const name = args['projectName'].toLowerCase();
 	const inspect = args['inspect'];
 
 	if (inspect) await ins();
@@ -121,7 +127,20 @@ void (async () => {
 				apiError(err as AxiosError);
 			}
 
-			// TODO: Anything more? Showing logs... or wait to be ready?
+			// TODO: Need a TUI for logs
+
+			try {
+				const container: string = await containerSelection([
+					...descriptor.runners,
+					'deploy'
+				]);
+				const type =
+					container === 'deploy' ? LogType.Deploy : LogType.Job;
+
+				await logs(container, name, type);
+			} catch (err) {
+				apiError(err as AxiosError);
+			}
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
