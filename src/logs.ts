@@ -1,9 +1,13 @@
 import axios from 'axios';
-import { Deployment, LogType } from 'metacall-protocol/deployment';
+import {
+	Deployment,
+	DeployStatus,
+	LogType
+} from 'metacall-protocol/deployment';
 import API from 'metacall-protocol/protocol';
-import { info } from '../cli/messages';
-import { startup } from '../startup';
-import { sleep } from '../utils';
+import { info } from './cli/messages';
+import { startup } from './startup';
+import { sleep } from './utils';
 
 export const logs = async (
 	container: string,
@@ -18,7 +22,7 @@ export const logs = async (
 	let logsTill: string[] = [''];
 
 	let app: Deployment;
-	let status = 'create';
+	let status: DeployStatus = 'create';
 
 	while (status !== 'ready') {
 		app = (await api.inspect()).filter(dep => dep.suffix === suffix)[0];

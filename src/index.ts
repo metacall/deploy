@@ -16,7 +16,6 @@ import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
 import { ins } from './cli/inspect';
-import { logs } from './cli/logs';
 import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
@@ -25,6 +24,7 @@ import {
 	languageSelection,
 	planSelection
 } from './cli/selection';
+import { logs } from './logs';
 import { startup } from './startup';
 import { zip } from './utils';
 
