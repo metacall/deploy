@@ -139,7 +139,7 @@ void (async () => {
 
 				await logs(container, name, type);
 			} catch (err) {
-				console.log(err);
+				apiError(err as AxiosError);
 			}
 		};
 
