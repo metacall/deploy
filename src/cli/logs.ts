@@ -5,8 +5,6 @@ import { info } from '../cli/messages';
 import { startup } from '../startup';
 import { sleep } from '../utils';
 
-type DeployStatus = 'create' | 'ready' | 'fail';
-
 export const logs = async (
 	container: string,
 	suffix: string,
@@ -20,7 +18,7 @@ export const logs = async (
 	let logsTill: string[] = [''];
 
 	let app: Deployment;
-	let status: DeployStatus = 'create';
+	let status = 'create';
 
 	while (status !== 'ready') {
 		app = (await api.inspect()).filter(dep => dep.suffix === suffix)[0];
