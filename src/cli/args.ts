@@ -12,7 +12,8 @@ const cliArgsDescription: { [k: string]: string } = {
 	token: 'accepts token for authentication, either pass email & password or token.',
 	force: 'accepts boolean value : it deletes the deployment present on an existing plan and deploys again.',
 	plan: 'accepts type of plan : "Essential", "Standard", "Premium".',
-	inspect: 'lists out all the deployments with specifications'
+	inspect: 'lists out all the deployments with specifications',
+	delete: 'accepts boolean value: it provides you all the available deployment options to delete'
 };
 
 interface CLIArgs {
@@ -27,6 +28,7 @@ interface CLIArgs {
 	plan?: Plans;
 	confDir?: string;
 	inspect?: boolean;
+	delete?: boolean;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -98,6 +100,13 @@ export default parse<CLIArgs>(
 			defaultValue: false,
 			optional: true,
 			description: cliArgsDescription.inspect
+		},
+		delete: {
+			type: Boolean,
+			alias: 'D',
+			defaultValue: false,
+			optional: true,
+			description: cliArgsDescription.delete
 		},
 		confDir: { type: String, alias: 'd', optional: true }
 	},
