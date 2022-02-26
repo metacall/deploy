@@ -5,7 +5,7 @@
     -   [ ] It should ask for a plan in the user (we should store this in the configuration, in a list of projects mapped to plans) or reuse an existent plan if it has been already selected.
     -   [ ] Use the protocol integration test and the descriptor in order to deploy it, we can implement a function which wraps all the behavior into a simple function or implement it directly in the `index.ts`
 -   [ ] Implement command-line arguments:
-    -   [ ] Take a command-line argument to specify project dir (-w, --workdir, default to process.cwd())
+    -   [x] Take a command-line argument to specify project dir (-w, --workdir, default to process.cwd())
     -   [ ] Take a command-line flag to specify email (-e, --email)
     -   [ ] Take a command-line flag to specify password (-p, --password)
     -   [ ] Take a command-line flag to specify token (-t, --token)

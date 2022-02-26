@@ -4,6 +4,7 @@ import { parse } from 'ts-command-line-args';
 
 const cliArgsDescription: { [k: string]: string } = {
 	help: 'prints help.',
+	addrepo: 'deploy from repository',
 	workdir: 'accepts path to application directory.',
 	projectName: 'accepts name of the application.',
 	email: 'accepts email id for authentication.',
@@ -11,12 +12,14 @@ const cliArgsDescription: { [k: string]: string } = {
 	token: 'accepts token for authentication, either pass email & password or token.',
 	force: 'accepts boolean value : it deletes the deployment present on an existing plan and deploys again.',
 	plan: 'accepts type of plan : "Essential", "Standard", "Premium".',
-	inspect: 'lists out all the deployments with specifications'
+	inspect: 'lists out all the deployments with specifications',
+	delete: 'accepts boolean value: it provides you all the available deployment options to delete'
 };
 
 interface CLIArgs {
 	help?: boolean;
-	workdir: string;
+	addrepo?: string;
+	workdir?: string;
 	projectName: string;
 	email?: string;
 	password?: string;
@@ -25,6 +28,7 @@ interface CLIArgs {
 	plan?: Plans;
 	confDir?: string;
 	inspect?: boolean;
+	delete?: boolean;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -41,8 +45,15 @@ export default parse<CLIArgs>(
 			alias: 'h',
 			description: cliArgsDescription.help
 		},
+		addrepo: {
+			type: String,
+			optional: true,
+			alias: 'a',
+			description: cliArgsDescription.addrepo
+		},
 		workdir: {
 			type: String,
+			optional: true,
 			alias: 'w',
 			defaultValue: process.cwd(),
 			description: cliArgsDescription.workdir
@@ -89,6 +100,13 @@ export default parse<CLIArgs>(
 			defaultValue: false,
 			optional: true,
 			description: cliArgsDescription.inspect
+		},
+		delete: {
+			type: Boolean,
+			alias: 'D',
+			defaultValue: false,
+			optional: true,
+			description: cliArgsDescription.delete
 		},
 		confDir: { type: String, alias: 'd', optional: true }
 	},
