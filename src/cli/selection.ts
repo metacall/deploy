@@ -50,12 +50,15 @@ export const planSelection = (message: string): Promise<Plans> =>
 		}
 	]).then((res: { plan: Plans }) => res.plan);
 
-export const containerSelection = (containers: string[]): Promise<string> =>
+export const listSelection = (
+	list: string[],
+	message: string
+): Promise<string> =>
 	prompt<{ container: string }>([
 		{
 			type: 'list',
 			name: 'container',
-			message: 'Select a container to get logs',
-			choices: containers
+			message,
+			choices: list
 		}
 	]).then((res: { container: string }) => res.container);

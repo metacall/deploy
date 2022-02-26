@@ -17,9 +17,9 @@ import { input } from './cli/inputs';
 import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import {
-	containerSelection,
 	fileSelection,
-	languageSelection
+	languageSelection,
+	listSelection
 } from './cli/selection';
 import { Config } from './config';
 import { logs } from './logs';
@@ -107,10 +107,10 @@ export const deployPackage = async (
 			// TODO: Need a TUI for logs
 
 			try {
-				const container: string = await containerSelection([
-					...descriptor.runners,
-					'deploy'
-				]);
+				const container: string = await listSelection(
+					[...descriptor.runners, 'deploy'],
+					'Select a container to get logs'
+				);
 				const type =
 					container === 'deploy' ? LogType.Deploy : LogType.Job;
 
