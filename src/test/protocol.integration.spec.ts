@@ -70,7 +70,12 @@ describe('integration protocol', function () {
 
 	// Deploy
 	it('Should be able to deploy', async () => {
-		const result = await api.deploy('python-jose', [], 'Essential');
+		const result = await api.deploy(
+			'python-jose',
+			[],
+			'Essential',
+			'Package'
+		);
 		strictEqual(result, '');
 		return result;
 	});

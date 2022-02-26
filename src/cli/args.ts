@@ -4,6 +4,7 @@ import { parse } from 'ts-command-line-args';
 
 const cliArgsDescription: { [k: string]: string } = {
 	help: 'prints help.',
+	addrepo: 'deploy from repository',
 	workdir: 'accepts path to application directory.',
 	projectName: 'accepts name of the application.',
 	email: 'accepts email id for authentication.',
@@ -16,7 +17,8 @@ const cliArgsDescription: { [k: string]: string } = {
 
 interface CLIArgs {
 	help?: boolean;
-	workdir: string;
+	addrepo?: string;
+	workdir?: string;
 	projectName: string;
 	email?: string;
 	password?: string;
@@ -41,8 +43,15 @@ export default parse<CLIArgs>(
 			alias: 'h',
 			description: cliArgsDescription.help
 		},
+		addrepo: {
+			type: String,
+			optional: true,
+			alias: 'a',
+			description: cliArgsDescription.addrepo
+		},
 		workdir: {
 			type: String,
+			optional: true,
 			alias: 'w',
 			defaultValue: process.cwd(),
 			description: cliArgsDescription.workdir
