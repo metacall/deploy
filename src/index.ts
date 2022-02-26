@@ -36,6 +36,7 @@ void (async () => {
 	if (args['addrepo']) {
 		try {
 			await deployFromRepository(config, plan);
+			return;
 		} catch (e) {
 			console.error(e);
 		}
