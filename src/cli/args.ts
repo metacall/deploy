@@ -53,6 +53,7 @@ export default parse<CLIArgs>(
 			type: String,
 			optional: true,
 			alias: 'w',
+			defaultValue: process.cwd(),
 			description: cliArgsDescription.workdir
 		},
 		projectName: {

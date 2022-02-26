@@ -32,6 +32,15 @@ void (async () => {
 
 	const config = await startup();
 
+	//if addrepo is passed then deploy from repository url
+	if (args['addrepo']) {
+		try {
+			await deployFromRepository(config, plan);
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	//if workdir is passed call than deploy using package
 	if (args['workdir']) {
 		const rootPath = args['workdir'];
@@ -48,15 +57,6 @@ void (async () => {
 
 		try {
 			await deployPackage(config, plan);
-		} catch (e) {
-			console.error(e);
-		}
-	}
-
-	//if addrepo is passed then deploy from repository url
-	if (args['addrepo']) {
-		try {
-			await deployFromRepository(config, plan);
 		} catch (e) {
 			console.error(e);
 		}
