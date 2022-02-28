@@ -200,18 +200,26 @@ export const deployPackage = async (
 };
 
 export const deployFromRepository = async (config: Config, plan: string) => {
-	//TODO fetch branch list via api and then show option rather than taking branch name
-	const branch = await input('Enter branch name');
-	//TODO check if repo url is valid
+	const api = API(config.token as string, config.baseURL);
+
+	let branch;
 	const url = args['addrepo'];
+
+	try {
+		const { branches } = await api.branchList(url as string);
+
+		if (!branches.length) return error('Invalid Repository URL');
+
+		branch = await listSelection(branches, 'Select branch :');
+	} catch (err) {
+		apiError(err as AxiosError);
+	}
 
 	info(`Deploying from ${url as string}...\n`);
 
-	const api = API(config.token as string, config.baseURL);
-
 	try {
 		//todo api response type should be created in protocol , it is string as of now
-		const response = await api.add(url as string, branch, []);
+		const response = await api.add(url as string, branch as string, []);
 
 		await api.deploy(response.id, [], plan, 'Repository');
 		info('Repository deployed');
