@@ -25,30 +25,23 @@ void (async () => {
 		const config = await startup();
 		const api = API(config.token as string, config.baseURL);
 
-		let deployments: Deployment[] = [];
-
 		try {
-			deployments = (await api.inspect()).filter(
+			const deployments: Deployment[] = (await api.inspect()).filter(
 				dep => dep.status === 'ready'
 			);
-		} catch (err) {
-			error(String(err));
-		}
+			if (!deployments.length) error('No deployment found');
 
-		if (!deployments.length) error('No deployment found');
+			const project: string = await listSelection(
+				[...deployments.map(el => `${el.suffix} ${el.version}`)],
+				'Select the deployment to delete :-'
+			);
 
-		const project: string = await listSelection(
-			[...deployments.map(el => `${el.suffix} ${el.version}`)],
-			'Select the deployment to delete :-'
-		);
+			const app = deployments.filter(
+				dep =>
+					dep.suffix === project.split(' ')[0] &&
+					dep.version === project.split(' ')[1]
+			)[0];
 
-		const app = deployments.filter(
-			dep =>
-				dep.suffix === project.split(' ')[0] &&
-				dep.version === project.split(' ')[1]
-		)[0];
-
-		try {
 			return await del(app.prefix, app.suffix, app.version);
 		} catch (err) {
 			error(String(err));
