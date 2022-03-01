@@ -48,14 +48,6 @@ void (async () => {
 		}
 	}
 
-	// Those options are mutually exclusive (either workdir or addrepo)
-	if (
-		(!args['workdir'] && !args['addrepo']) ||
-		(args['workdir'] && args['addrepo'])
-	) {
-		error('Either provide work directory or repository url to deploy');
-	}
-
 	// TODO: We should cache the plan and ask for it only once
 	const plan =
 		args['plan'] ||
