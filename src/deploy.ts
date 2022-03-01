@@ -212,13 +212,15 @@ export const deployFromRepository = async (
 		if (!branches.length) return error('Invalid Repository URL');
 
 		//todo api response type should be created in protocol , it is string as of now
-		const response = await api.add(
-			url,
-			await listSelection(branches, 'Select branch :'),
-			[]
-		);
+		const name = (
+			await api.add(
+				url,
+				await listSelection(branches, 'Select branch :'),
+				[]
+			)
+		).id;
 
-		await api.deploy(response.id, [], plan, 'Repository');
+		await api.deploy(name, [], plan, 'Repository');
 		info('Repository deployed');
 	} catch (e) {
 		error(String(e));
