@@ -55,10 +55,13 @@ void (async () => {
 
 	const config = await startup();
 
-	// If addrepo is passed then deploy from repository url
 	if (args['addrepo']) {
 		try {
-			return await deployFromRepository(config, plan);
+			return await deployFromRepository(
+				config,
+				plan,
+				new URL(args['addrepo']).href
+			);
 		} catch (e) {
 			error(String(e));
 		}
