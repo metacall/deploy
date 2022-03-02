@@ -44,12 +44,10 @@ export const deployPackage = async (
 
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
 			// TODO: We should cache the plan and ask for it only once
-			let api;
-			if (args['dev']) {
-				api = API(config.token as string, config.devURL);
-			} else {
-				api = API(config.token as string, config.baseURL);
-			}
+			const api = API(
+				config.token as string,
+				args['dev'] ? config.devURL : config.baseURL
+			);
 			const descriptor = await generatePackage(rootPath);
 
 			const { progress, pulse, hide } = Progress();
@@ -203,32 +201,32 @@ export const deployPackage = async (
 	}
 };
 
-export const deployFromRepository = async (config: Config, plan: string) => {
-	const api = API(config.token as string, config.baseURL);
-
-	let branch;
-	const url = args['addrepo'];
-
+export const deployFromRepository = async (
+	config: Config,
+	plan: string,
+	url: string
+) => {
+	const api = API(
+		config.token as string,
+		args['dev'] ? config.devURL : config.baseURL
+	);
 	try {
-		const { branches } = await api.branchList(url as string);
+		const { branches } = await api.branchList(url);
 
 		if (!branches.length) return error('Invalid Repository URL');
 
-		branch = await listSelection(branches, 'Select branch :');
-	} catch (err) {
-		apiError(err as AxiosError);
-	}
-
-	info(`Deploying from ${url as string}...\n`);
-
-	try {
 		//todo api response type should be created in protocol , it is string as of now
-		const response = await api.add(url as string, branch as string, []);
+		const name = (
+			await api.add(
+				url,
+				await listSelection(branches, 'Select branch :'),
+				[]
+			)
+		).id;
 
-		await api.deploy(response.id, [], plan, 'Repository');
+		await api.deploy(name, [], plan, 'Repository');
 		info('Repository deployed');
-		//TODO TUI will be added here for logs
-	} catch (err) {
-		apiError(err as AxiosError);
+	} catch (e) {
+		error(String(e));
 	}
 };
