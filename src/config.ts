@@ -16,6 +16,7 @@ export const log = <T>(x: T): T => (console.log(x), x);
 export const Config = z.object({
 	baseURL: z.string(),
 	apiURL: z.string(),
+	devURL: z.string(),
 	renewTime: z.number(),
 	token: z.string().optional()
 });
@@ -25,6 +26,7 @@ export type Config = z.infer<typeof Config>;
 const defaultConfig: Config = {
 	baseURL: 'https://dashboard.metacall.io',
 	apiURL: 'https://api.metacall.io',
+	devURL: 'http://localhost:9000',
 	renewTime: 1000 * 60 * 60 * 24 * 15
 };
 

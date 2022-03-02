@@ -44,8 +44,12 @@ export const deployPackage = async (
 
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
 			// TODO: We should cache the plan and ask for it only once
-
-			const api = API(config.token as string, config.baseURL);
+			let api;
+			if (args['dev']) {
+				api = API(config.token as string, config.devURL);
+			} else {
+				api = API(config.token as string, config.baseURL);
+			}
 			const descriptor = await generatePackage(rootPath);
 
 			const { progress, pulse, hide } = Progress();

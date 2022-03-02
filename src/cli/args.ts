@@ -6,6 +6,7 @@ const cliArgsDescription: { [k: string]: string } = {
 	help: 'prints help.',
 	addrepo: 'deploy from repository',
 	workdir: 'accepts path to application directory.',
+	dev: 'run project in dev mode',
 	projectName: 'accepts name of the application.',
 	email: 'accepts email id for authentication.',
 	password: 'accepts password for authentication.',
@@ -20,6 +21,7 @@ interface CLIArgs {
 	help?: boolean;
 	addrepo?: string;
 	workdir?: string;
+	dev?: boolean;
 	projectName: string;
 	email?: string;
 	password?: string;
@@ -57,6 +59,12 @@ export default parse<CLIArgs>(
 			alias: 'w',
 			defaultValue: process.cwd(),
 			description: cliArgsDescription.workdir
+		},
+		dev: {
+			type: Boolean,
+			optional: true,
+			defaultValue: false,
+			description: cliArgsDescription.dev
 		},
 		projectName: {
 			type: String,
