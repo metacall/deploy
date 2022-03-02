@@ -199,32 +199,30 @@ export const deployPackage = async (
 	}
 };
 
-export const deployFromRepository = async (config: Config, plan: string) => {
+export const deployFromRepository = async (
+	config: Config,
+	plan: string,
+	url: string
+) => {
 	const api = API(config.token as string, config.baseURL);
 
-	let branch;
-	const url = args['addrepo'];
-
 	try {
-		const { branches } = await api.branchList(url as string);
+		const { branches } = await api.branchList(url);
 
 		if (!branches.length) return error('Invalid Repository URL');
 
-		branch = await listSelection(branches, 'Select branch :');
-	} catch (err) {
-		apiError(err as AxiosError);
-	}
-
-	info(`Deploying from ${url as string}...\n`);
-
-	try {
 		//todo api response type should be created in protocol , it is string as of now
-		const response = await api.add(url as string, branch as string, []);
+		const name = (
+			await api.add(
+				url,
+				await listSelection(branches, 'Select branch :'),
+				[]
+			)
+		).id;
 
-		await api.deploy(response.id, [], plan, 'Repository');
+		await api.deploy(name, [], plan, 'Repository');
 		info('Repository deployed');
-		//TODO TUI will be added here for logs
-	} catch (err) {
-		apiError(err as AxiosError);
+	} catch (e) {
+		error(String(e));
 	}
 };
