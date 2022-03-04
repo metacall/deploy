@@ -3,18 +3,18 @@ import { basename } from 'path';
 import { parse } from 'ts-command-line-args';
 
 const cliArgsDescription: { [k: string]: string } = {
-	help: 'prints help.',
-	addrepo: 'deploy from repository',
-	workdir: 'accepts path to application directory.',
-	dev: 'run project in dev mode',
-	projectName: 'accepts name of the application.',
-	email: 'accepts email id for authentication.',
-	password: 'accepts password for authentication.',
-	token: 'accepts token for authentication, either pass email & password or token.',
-	force: 'accepts boolean value : it deletes the deployment present on an existing plan and deploys again.',
-	plan: 'accepts type of plan : "Essential", "Standard", "Premium".',
-	inspect: 'lists out all the deployments with specifications',
-	delete: 'accepts boolean value: it provides you all the available deployment options to delete'
+	help: 'Prints help.',
+	addrepo: 'Deploy from repository.',
+	workdir: 'Accepts path to application directory.',
+	dev: 'Run CLI in dev mode (deploy locally to metacall/faas).',
+	projectName: 'Accepts name of the application.',
+	email: 'Accepts email id for authentication.',
+	password: 'Accepts password for authentication.',
+	token: 'Accepts token for authentication, either pass email & password or token.',
+	force: 'Accepts boolean value: it deletes the deployment present on an existing plan and deploys again.',
+	plan: 'Accepts type of plan: "Essential", "Standard", "Premium".',
+	inspect: 'Lists out all the deployments with specifications.',
+	delete: 'Accepts boolean value: it provides you all the available deployment options to delete.'
 };
 
 interface CLIArgs {

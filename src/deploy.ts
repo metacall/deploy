@@ -210,12 +210,13 @@ export const deployFromRepository = async (
 		config.token as string,
 		args['dev'] ? config.devURL : config.baseURL
 	);
+
 	try {
 		const { branches } = await api.branchList(url);
 
 		if (!branches.length) return error('Invalid Repository URL');
 
-		//todo api response type should be created in protocol , it is string as of now
+		// TODO: API response type should be created in protocol, it is string as of now
 		const name = (
 			await api.add(
 				url,
@@ -225,6 +226,7 @@ export const deployFromRepository = async (
 		).id;
 
 		await api.deploy(name, [], plan, 'Repository');
+
 		info('Repository deployed');
 	} catch (e) {
 		error(String(e));
