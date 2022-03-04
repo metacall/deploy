@@ -44,8 +44,10 @@ export const deployPackage = async (
 
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
 			// TODO: We should cache the plan and ask for it only once
-
-			const api = API(config.token as string, config.baseURL);
+			const api = API(
+				config.token as string,
+				args['dev'] ? config.devURL : config.baseURL
+			);
 			const descriptor = await generatePackage(rootPath);
 
 			const { progress, pulse, hide } = Progress();
@@ -204,8 +206,10 @@ export const deployFromRepository = async (
 	plan: string,
 	url: string
 ) => {
-	const api = API(config.token as string, config.baseURL);
-
+	const api = API(
+		config.token as string,
+		args['dev'] ? config.devURL : config.baseURL
+	);
 	try {
 		const { branches } = await api.branchList(url);
 
