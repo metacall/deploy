@@ -18,7 +18,8 @@ export const Config = z.object({
 	apiURL: z.string(),
 	devURL: z.string(),
 	renewTime: z.number(),
-	token: z.string().optional()
+	token: z.string().optional(),
+	cache: z.record(z.string().optional())
 });
 
 export type Config = z.infer<typeof Config>;
@@ -27,9 +28,20 @@ const defaultConfig: Config = {
 	baseURL: 'https://dashboard.metacall.io',
 	apiURL: 'https://api.metacall.io',
 	devURL: 'http://localhost:9000',
-	renewTime: 1000 * 60 * 60 * 24 * 15
+	renewTime: 1000 * 60 * 60 * 24 * 15,
+	cache: {}
 };
 
+export const updateCache = async (key: string, val: string) => {
+	const config = await load(defaultPath);
+	config.cache[key] = val;
+	await save(config, defaultPath);
+};
+
+export const cachePlan = async (key: string) => {
+	const config = await load(defaultPath);
+	return config.cache[key];
+};
 const defaultPath = configDir(join('metacall', 'deploy'));
 
 const configFilePath = (path = defaultPath) => join(path, 'config.ini');

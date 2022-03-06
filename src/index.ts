@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
 import { Deployment } from 'metacall-protocol/deployment';
+import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';
 import { listSelection, planSelection } from './cli/selection';
+import { cachePlan, updateCache } from './config';
 import { del } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
 import { startup } from './startup';
@@ -48,10 +50,18 @@ void (async () => {
 		}
 	}
 
-	// TODO: We should cache the plan and ask for it only once
+	if (args['plan']) {
+		await updateCache(args['workdir'] || process.cwd(), args['plan']);
+	}
+
 	const plan =
-		args['plan'] ||
-		(await planSelection('Please select plan from the list'));
+		Plans[
+			(await cachePlan(
+				args['workdir'] || process.cwd()
+			)) as keyof typeof Plans
+		] || planSelection('Please Select The Plan');
+
+	await updateCache(args['workdir'] || process.cwd(), plan);
 
 	const config = await startup();
 
