@@ -100,7 +100,7 @@ export const deployPackage = async (
 			try {
 				await api.deploy(name, [], plan, 'Package');
 
-				await logs(descriptor.runners, name);
+				await logs(descriptor.runners, name, args['dev']);
 			} catch (err) {
 				apiError(err as AxiosError);
 			}
@@ -216,7 +216,7 @@ export const deployFromRepository = async (
 
 		info('Deploying...');
 
-		await logs(runners, deploy.suffix);
+		await logs(runners, deploy.suffix, args['dev']);
 
 		info('Repository deployed');
 	} catch (e) {

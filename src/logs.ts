@@ -13,10 +13,14 @@ import { sleep } from './utils';
 const showLogs = async (
 	container: string,
 	suffix: string,
-	type: LogType
+	type: LogType,
+	dev: boolean
 ): Promise<void> => {
 	const config = await startup();
-	const api = API(config.token as string, config.baseURL);
+	const api = API(
+		config.token as string,
+		dev ? config.devURL : config.baseURL
+	);
 
 	info(`Getting ${type} logs...`);
 
@@ -47,7 +51,11 @@ const showLogs = async (
 	}
 };
 
-export const logs = async (containers: string[], name: string) => {
+export const logs = async (
+	containers: string[],
+	name: string,
+	dev: boolean
+) => {
 	try {
 		const container: string = await listSelection(
 			[...containers, 'deploy'],
@@ -55,7 +63,7 @@ export const logs = async (containers: string[], name: string) => {
 		);
 		const type = container === 'deploy' ? LogType.Deploy : LogType.Job;
 
-		await showLogs(container, name, type);
+		await showLogs(container, name, type, dev);
 	} catch (e) {
 		error(String(e));
 	}
