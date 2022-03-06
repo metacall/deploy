@@ -5,17 +5,22 @@ import {
 	LogType
 } from 'metacall-protocol/deployment';
 import API from 'metacall-protocol/protocol';
-import { info } from './cli/messages';
+import { error, info } from './cli/messages';
+import { listSelection } from './cli/selection';
 import { startup } from './startup';
 import { sleep } from './utils';
 
-export const logs = async (
+const showLogs = async (
 	container: string,
 	suffix: string,
-	type: LogType
+	type: LogType,
+	dev: boolean
 ): Promise<void> => {
 	const config = await startup();
-	const api = API(config.token as string, config.baseURL);
+	const api = API(
+		config.token as string,
+		dev ? config.devURL : config.baseURL
+	);
 
 	info(`Getting ${type} logs...`);
 
@@ -43,5 +48,23 @@ export const logs = async (
 		}
 
 		await sleep(10000);
+	}
+};
+
+export const logs = async (
+	containers: string[],
+	name: string,
+	dev: boolean
+) => {
+	try {
+		const container: string = await listSelection(
+			[...containers, 'deploy'],
+			'Select a container to get logs'
+		);
+		const type = container === 'deploy' ? LogType.Deploy : LogType.Job;
+
+		await showLogs(container, name, type, dev);
+	} catch (e) {
+		error(String(e));
 	}
 };

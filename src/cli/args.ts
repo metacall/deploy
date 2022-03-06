@@ -21,7 +21,7 @@ interface CLIArgs {
 	help?: boolean;
 	addrepo?: string;
 	workdir?: string;
-	dev?: boolean;
+	dev: boolean;
 	projectName: string;
 	email?: string;
 	password?: string;
@@ -62,7 +62,6 @@ export default parse<CLIArgs>(
 		},
 		dev: {
 			type: Boolean,
-			optional: true,
 			defaultValue: false,
 			description: cliArgsDescription.dev
 		},
