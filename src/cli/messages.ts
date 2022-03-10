@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import AxiosError from 'axios-error';
 import chalk from 'chalk';
 import { LanguageId } from 'metacall-protocol/deployment';
 import { Languages } from 'metacall-protocol/language';

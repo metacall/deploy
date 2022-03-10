@@ -75,7 +75,7 @@
 	},
 	"dependencies": {
 		"archiver": "^5.0.2",
-		"axios": "^0.21.0",
+		"axios-error": "^1.0.4",
 		"chalk": "^4.1.1",
 		"console-table-printer": "^2.10.0",
 		"gauge": "^3.0.0",

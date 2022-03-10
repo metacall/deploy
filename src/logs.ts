@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
 	Deployment,
 	DeployStatus,
@@ -44,7 +43,7 @@ const showLogs = async (
 
 			logsTill = allLogs.split('\n');
 		} catch (err) {
-			if (axios.isAxiosError(err)) continue;
+			continue;
 		}
 
 		await sleep(10000);

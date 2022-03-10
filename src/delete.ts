@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import AxiosError from 'axios-error';
 import API from 'metacall-protocol/protocol';
 import { apiError, info } from './cli/messages';
 import { startup } from './startup';

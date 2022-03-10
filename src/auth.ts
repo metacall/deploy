@@ -4,7 +4,7 @@
 	2) If there is no token present, then it asks for your loging credentials and saves the token into config.
 
 */
-import { AxiosError } from 'axios';
+import AxiosError from 'axios-error';
 import login from 'metacall-protocol/login';
 import API from 'metacall-protocol/protocol';
 import { expiresIn } from 'metacall-protocol/token';

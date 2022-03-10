@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import AxiosError from 'axios-error';
 import { promises as fs } from 'fs';
 import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
 import {
