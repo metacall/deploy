@@ -1,10 +1,9 @@
-import axios from 'axios';
 import {
 	Deployment,
 	DeployStatus,
 	LogType
 } from 'metacall-protocol/deployment';
-import API from 'metacall-protocol/protocol';
+import API, { isProtocolError } from 'metacall-protocol/protocol';
 import { error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
 import { startup } from './startup';
@@ -44,7 +43,7 @@ const showLogs = async (
 
 			logsTill = allLogs.split('\n');
 		} catch (err) {
-			if (axios.isAxiosError(err)) continue;
+			if (isProtocolError(err)) continue;
 		}
 
 		await sleep(10000);

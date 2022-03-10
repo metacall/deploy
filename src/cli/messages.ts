@@ -1,7 +1,7 @@
-import { AxiosError } from 'axios';
 import chalk from 'chalk';
 import { LanguageId } from 'metacall-protocol/deployment';
 import { Languages } from 'metacall-protocol/language';
+import { ProtocolError } from 'metacall-protocol/protocol';
 
 export const info = (message: string): void => {
 	// eslint-disable-next-line no-console
@@ -18,7 +18,7 @@ export const error = (message: string): never => {
 	console.error(chalk.redBright.bold('X') + ' ' + chalk.red(message));
 	return process.exit(1);
 };
-export const apiError = (err: AxiosError): never => {
+export const apiError = (err: ProtocolError): never => {
 	// eslint-disable-next-line no-console
 	console.error(
 		chalk.redBright.bold('X') +

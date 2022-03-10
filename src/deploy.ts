@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { promises as fs } from 'fs';
 import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
 import {
@@ -7,7 +6,7 @@ import {
 	generatePackage,
 	PackageError
 } from 'metacall-protocol/package';
-import API from 'metacall-protocol/protocol';
+import API, { ProtocolError } from 'metacall-protocol/protocol';
 import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
@@ -102,7 +101,7 @@ export const deployPackage = async (
 
 				await logs(descriptor.runners, name, args['dev']);
 			} catch (err) {
-				apiError(err as AxiosError);
+				apiError(err as ProtocolError);
 			}
 
 			// TODO: Need a TUI for logs
