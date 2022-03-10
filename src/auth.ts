@@ -4,9 +4,8 @@
 	2) If there is no token present, then it asks for your loging credentials and saves the token into config.
 
 */
-import AxiosError from 'axios-error';
 import login from 'metacall-protocol/login';
-import API from 'metacall-protocol/protocol';
+import API, { ProtocolError } from 'metacall-protocol/protocol';
 import { expiresIn } from 'metacall-protocol/token';
 import args from './cli/args';
 import { input, maskedInput } from './cli/inputs';
@@ -32,7 +31,7 @@ const authToken = async (config: Config): Promise<string> => {
 				'Token invalid' +
 					opt(
 						x => ': ' + x,
-						String((err as AxiosError).response?.data)
+						String((err as ProtocolError).response?.data)
 					)
 			);
 			token = await askToken();
@@ -73,7 +72,10 @@ const authLogin = async (config: Config): Promise<string> => {
 			break;
 		} catch (err) {
 			warn(
-				opt(x => ': ' + x, String((err as AxiosError).response?.data))
+				opt(
+					x => ': ' + x,
+					String((err as ProtocolError).response?.data)
+				)
 			);
 			await askCredentials();
 		}

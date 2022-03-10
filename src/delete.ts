@@ -1,5 +1,4 @@
-import AxiosError from 'axios-error';
-import API from 'metacall-protocol/protocol';
+import API, { ProtocolError } from 'metacall-protocol/protocol';
 import { apiError, info } from './cli/messages';
 import { startup } from './startup';
 
@@ -14,6 +13,6 @@ export const del = async (
 	try {
 		info(await api.deployDelete(prefix, suffix, version));
 	} catch (err) {
-		apiError(err as AxiosError);
+		apiError(err as ProtocolError);
 	}
 };
