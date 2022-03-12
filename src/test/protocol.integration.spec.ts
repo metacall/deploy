@@ -8,6 +8,8 @@ describe('integration protocol', function () {
 	this.timeout(200_000);
 
 	let api: ReturnType<typeof API>;
+	const url = 'https://github.com/metacall/nodejs-race-game-example';
+	let selectedBranch: string;
 
 	before(
 		'Should have a valid token',
@@ -76,7 +78,12 @@ describe('integration protocol', function () {
 			'Essential',
 			'Package'
 		);
-		strictEqual(result, '');
+
+		deepStrictEqual(result, {
+			prefix: 'josead',
+			suffix: 'python-jose',
+			version: 'v1'
+		});
 		return result;
 	});
 
@@ -119,6 +126,95 @@ describe('integration protocol', function () {
 
 		const deployIdx = inspect.findIndex(
 			deploy => deploy.suffix === 'python-jose'
+		);
+
+		ok(deployIdx !== -1);
+
+		const { prefix, suffix, version } = inspect[deployIdx];
+		const result = await api.deployDelete(prefix, suffix, version);
+
+		ok(result === 'Deploy Delete Succeed');
+	});
+
+	// List Repository Branches
+	it('Should list all the repo branches', async () => {
+		const { branches } = await api.branchList(url);
+		selectedBranch = branches[0];
+
+		ok(branches.length > 0);
+	});
+
+	it('Should list all the files', async () => {
+		const result = await api.fileList(url, selectedBranch);
+
+		ok(result.length > 0);
+	});
+
+	// Upload Repository
+	it('Should be able upload the repository', async () => {
+		const name = (await api.add(url, selectedBranch, [])).id;
+
+		ok(name === 'metacall/nodejs-race-game-example');
+	});
+
+	// Deploy Repository
+	it('Should be able to deploy the Repository', async () => {
+		const result = await api.deploy(
+			'metacall/nodejs-race-game-example',
+			[],
+			'Essential',
+			'Repository'
+		);
+
+		deepStrictEqual(result, {
+			prefix: 'josead',
+			suffix: 'metacall-nodejs-race-game-example',
+			version: 'v1'
+		});
+		return result;
+	});
+
+	// Should have deployment setup
+	// Wait for deploy
+	it('Should have the deployment set up', async () => {
+		const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
+			new Promise(resolve => setTimeout(resolve, ms));
+		let result = false,
+			wait = true;
+		while (wait) {
+			await sleep(1000);
+			const inspect = await api.inspect();
+
+			const deployIdx = inspect.findIndex(
+				deploy => deploy.suffix === 'metacall-nodejs-race-game-example'
+			);
+			if (deployIdx !== -1) {
+				switch (inspect[deployIdx].status) {
+					case 'create':
+						break;
+					case 'ready':
+						wait = false;
+						result = true;
+						break;
+					default:
+						wait = false;
+						result = false;
+						break;
+				}
+			}
+		}
+		strictEqual(result, true);
+		return result;
+	});
+
+	// Delete Deploy
+	it('Should delete the repository deployment properly', async () => {
+		const inspect = await api.inspect();
+
+		ok(inspect.length > 0);
+
+		const deployIdx = inspect.findIndex(
+			deploy => deploy.suffix === 'metacall-nodejs-race-game-example'
 		);
 
 		ok(deployIdx !== -1);
