@@ -18,33 +18,52 @@ export const Config = z.object({
 	apiURL: z.string(),
 	devURL: z.string(),
 	renewTime: z.number(),
-	token: z.string().optional(),
-	cache: z.record(z.string().optional())
+	token: z.string().optional()
 });
 
+export const Cache = z.record(
+	z.object({
+		plan: z.string()
+	})
+);
+
+export type Cache = z.infer<typeof Cache>;
+
 export type Config = z.infer<typeof Config>;
+
+const loadCache = async (path = cacheFilePath): Promise<Cache> => {
+	const caches = parse(await loadFile(path));
+	return Cache.parse({
+		...caches
+	});
+};
 
 const defaultConfig: Config = {
 	baseURL: 'https://dashboard.metacall.io',
 	apiURL: 'https://api.metacall.io',
 	devURL: 'http://localhost:9000',
-	renewTime: 1000 * 60 * 60 * 24 * 15,
-	cache: {}
+	renewTime: 1000 * 60 * 60 * 24 * 15
 };
 
-export const updateCache = async (key: string, val: string) => {
-	const config = await load(defaultPath);
-	config.cache[key] = val;
-	await save(config, defaultPath);
+export const updateCache = async (
+	key: string,
+	val: string,
+	path = cacheFilePath
+) => {
+	const cache = await loadCache(path);
+	cache[key] = { plan: val };
+	await fs.writeFile(cacheFilePath, stringify(cache));
 };
 
-export const cachePlan = async (key: string) => {
-	const config = await load(defaultPath);
-	return config.cache[key];
+export const cachePlan = async (key: string, path = cacheFilePath) => {
+	const cache = await loadCache(path);
+	return cache[key];
 };
+
 const defaultPath = configDir(join('metacall', 'deploy'));
 
 const configFilePath = (path = defaultPath) => join(path, 'config.ini');
+const cacheFilePath = join(defaultPath, 'cache.ini');
 
 export const load = async (path = defaultPath): Promise<Config> => {
 	const data = parse(

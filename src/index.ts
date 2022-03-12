@@ -51,14 +51,18 @@ void (async () => {
 	}
 
 	if (args['plan']) {
-		await updateCache(args['workdir'] || process.cwd(), args['plan']);
+		try {
+			await updateCache(args['workdir'] || process.cwd(), args['plan']);
+		} catch (err) {
+			error(String(err));
+		}
 	}
 
 	const plan =
 		Plans[
-			(await cachePlan(
-				args['workdir'] || process.cwd()
-			)) as keyof typeof Plans
+			(await cachePlan(args['workdir'] || process.cwd()))[
+				'plan'
+			] as keyof typeof Plans
 		] || planSelection('Please Select The Plan');
 
 	await updateCache(args['workdir'] || process.cwd(), plan);
