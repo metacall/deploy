@@ -1,5 +1,6 @@
-import { fail, ok } from 'assert';
-import { keys, runWithInput } from './cmd';
+import { fail, ok, strictEqual } from 'assert';
+import { join } from 'path';
+import { deployed, keys, runWithInput } from './cmd';
 
 const runCLI = (args: string[], inputs: string[]) => {
 	return runWithInput('dist/index.js', args, inputs);
@@ -7,6 +8,8 @@ const runCLI = (args: string[], inputs: string[]) => {
 
 describe('integration cli', function () {
 	this.timeout(200_000);
+
+	const url = 'https://github.com/metacall/function-mesh-example';
 
 	// Invalid Token Login
 	it('Should fail with malformed jwt', async () => {
@@ -24,5 +27,131 @@ describe('integration cli', function () {
 		} catch (err) {
 			ok(String(err) === '! Token invalid: jwt malformed\n');
 		}
+	});
+
+	// --email & --password
+	it('Should be able to login using --email & --password flag', async () => {
+		const email = process.env.EMAIL;
+		const password = process.env.PASSWORD;
+
+		if (typeof email !== 'string' || typeof password !== 'string')
+			return fail('Email or Password is not present');
+
+		const result = await runCLI(
+			[`--email=${email}`, `--password=${password}`],
+			[keys.enter, keys.enter, keys.down, keys.enter, keys.kill]
+		).promise;
+
+		ok(String(result).includes('i Login Successfull!\n'));
+
+		return result;
+	});
+
+	// --token
+	it('Should be able to login using --token flag', async () => {
+		const token = process.env.EMAIL;
+
+		if (typeof token !== 'string') return fail('Token is not present');
+
+		const result = await runCLI(
+			[`--token=${token}`],
+			[keys.enter, keys.enter, keys.enter, keys.kill]
+		).promise;
+
+		ok(String(result).includes('i Login Successfull!\n'));
+
+		return result;
+	});
+
+	// --help
+	it('Should be able to print help guide using --help flag', async () => {
+		const result = await runCLI(['--help'], [keys.enter]).promise;
+
+		ok(String(result).includes('Official CLI for metacall-deploy\n'));
+	});
+
+	// --addrepo
+	it('Should be able to deploy repository using --addrepo flag', async () => {
+		const result = await runCLI(
+			[`--addrepo=${url}`],
+			[keys.enter, keys.enter, keys.enter]
+		).promise;
+
+		ok(String(result).includes('i Deploying...\n'));
+
+		strictEqual(await deployed('metacall-function-mesh-example'), true);
+		return result;
+	});
+
+	// --delete
+	it('Should be able to delete deployed repository using --delete flag', async () => {
+		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+			.promise;
+
+		ok(String(result).includes('i Deploy Delete Succeed\n'));
+	});
+
+	// --workdir & --projectName
+	it('Should be able to deploy repository using --workdir & --projectName flag', async () => {
+		const filePath = join(
+			process.cwd(),
+			'src',
+			'test',
+			'resources',
+			'integration',
+			'time-app-web'
+		);
+
+		const result = await runCLI(
+			[`--workdir=${filePath}`, '--projectName=time-app-web'],
+			[keys.enter, keys.enter, keys.kill]
+		).promise;
+
+		ok(String(result).includes(`i Deploying ${filePath}...\n`));
+
+		strictEqual(await deployed('time-app-web'), true);
+		return result;
+	});
+
+	it('Should be able to delete deployed directory using --delete flag', async () => {
+		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+			.promise;
+
+		ok(String(result).includes('i Deploy Delete Succeed\n'));
+	});
+
+	// --workdir & --projectName & --plan
+	it('Should be able to deploy repository using --workdir & --plan flag', async () => {
+		const filePath = join(
+			process.cwd(),
+			'src',
+			'test',
+			'resources',
+			'integration',
+			'time-app-web'
+		);
+
+		const result = await runCLI(
+			[
+				`--workdir=${filePath}`,
+				'--projectName=time-app-web',
+				'--plan=Essential'
+			],
+			[keys.enter, keys.kill]
+		).promise;
+
+		ok(String(result).includes(`i Deploying ${filePath}...\n`));
+
+		strictEqual(await deployed('time-app-web'), true);
+
+		return result;
+	});
+
+	// --delete
+	it('Should be able to delete deployed directory using --delete flag', async () => {
+		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+			.promise;
+
+		ok(String(result).includes('i Deploy Delete Succeed\n'));
 	});
 });
