@@ -6,6 +6,7 @@ import {
 	generatePackage,
 	PackageError
 } from 'metacall-protocol/package';
+import { Plans } from 'metacall-protocol/plan';
 import API, { ProtocolError } from 'metacall-protocol/protocol';
 import { join } from 'path';
 import args from './cli/args';
@@ -32,7 +33,7 @@ enum ErrorCode {
 export const deployPackage = async (
 	rootPath: string,
 	config: Config,
-	plan: string
+	plan: Plans
 ) => {
 	try {
 		const name = args['projectName'].toLowerCase();
@@ -188,7 +189,7 @@ export const deployPackage = async (
 
 export const deployFromRepository = async (
 	config: Config,
-	plan: string,
+	plan: Plans,
 	url: string
 ) => {
 	const api = API(
