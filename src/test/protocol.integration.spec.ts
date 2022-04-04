@@ -1,5 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from 'assert';
 import { createReadStream } from 'fs';
+import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import { basename, join } from 'path';
 import { startup } from '../startup';
@@ -75,7 +76,7 @@ describe('integration protocol', function () {
 		const result = await api.deploy(
 			'python-jose',
 			[],
-			'Essential',
+			Plans.Essential,
 			'Package'
 		);
 
@@ -162,7 +163,7 @@ describe('integration protocol', function () {
 		const result = await api.deploy(
 			'metacall/nodejs-race-game-example',
 			[],
-			'Essential',
+			Plans.Essential,
 			'Repository'
 		);
 

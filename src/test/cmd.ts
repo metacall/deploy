@@ -1,7 +1,9 @@
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
 import { existsSync } from 'fs';
+import API from 'metacall-protocol/protocol';
 import { constants } from 'os';
+import { startup } from '../startup';
 
 const PATH = process.env.PATH;
 const HOME = process.env.HOME;
@@ -106,3 +108,35 @@ export const keys = Object.freeze({
 	space: ' ',
 	kill: '^C'
 });
+
+export const deployed = async (suffix: string): Promise<boolean> => {
+	const config = await startup();
+	const api = API(config.token as string, config.baseURL);
+
+	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
+		new Promise(resolve => setTimeout(resolve, ms));
+	let res = false,
+		wait = true;
+	while (wait) {
+		await sleep(1000);
+		const inspect = await api.inspect();
+
+		const deployIdx = inspect.findIndex(deploy => deploy.suffix === suffix);
+		if (deployIdx !== -1) {
+			switch (inspect[deployIdx].status) {
+				case 'create':
+					break;
+				case 'ready':
+					wait = false;
+					res = true;
+					break;
+				default:
+					wait = false;
+					res = false;
+					break;
+			}
+		}
+	}
+
+	return res;
+};
