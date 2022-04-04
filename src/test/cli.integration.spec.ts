@@ -30,12 +30,12 @@ describe('integration cli', function () {
 	});
 
 	// --email & --password
-	it('Should be able to login using --email & --password flag', async () => {
+	it('Should be able to login using --email & --password flag', async function () {
 		const email = process.env.EMAIL;
 		const password = process.env.PASSWORD;
 
 		if (typeof email !== 'string' || typeof password !== 'string')
-			return fail('Email or Password is not present');
+			return this.skip();
 
 		const result = await runCLI(
 			[`--email=${email}`, `--password=${password}`],
@@ -48,10 +48,10 @@ describe('integration cli', function () {
 	});
 
 	// --token
-	it('Should be able to login using --token flag', async () => {
-		const token = process.env.EMAIL;
+	it('Should be able to login using --token flag', async function () {
+		const token = process.env.TOKEN;
 
-		if (typeof token !== 'string') return fail('Token is not present');
+		if (typeof token !== 'string') return this.skip();
 
 		const result = await runCLI(
 			[`--token=${token}`],
