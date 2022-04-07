@@ -9,7 +9,7 @@ describe('integration protocol', function () {
 	this.timeout(200_000);
 
 	let api: ReturnType<typeof API>;
-	const url = 'https://github.com/metacall/nodejs-race-game-example';
+	const url = 'https://github.com/metacall/examples';
 	let selectedBranch: string;
 
 	before(
@@ -155,13 +155,13 @@ describe('integration protocol', function () {
 	it('Should be able upload the repository', async () => {
 		const name = (await api.add(url, selectedBranch, [])).id;
 
-		ok(name === 'metacall/nodejs-race-game-example');
+		ok(name === 'metacall/examples');
 	});
 
 	// Deploy Repository
 	it('Should be able to deploy the Repository', async () => {
 		const result = await api.deploy(
-			'metacall/nodejs-race-game-example',
+			'metacall/examples',
 			[],
 			Plans.Essential,
 			'Repository'
@@ -169,7 +169,7 @@ describe('integration protocol', function () {
 
 		deepStrictEqual(result, {
 			prefix: 'josead',
-			suffix: 'metacall-nodejs-race-game-example',
+			suffix: 'metacall-examples',
 			version: 'v1'
 		});
 		return result;
@@ -187,7 +187,7 @@ describe('integration protocol', function () {
 			const inspect = await api.inspect();
 
 			const deployIdx = inspect.findIndex(
-				deploy => deploy.suffix === 'metacall-nodejs-race-game-example'
+				deploy => deploy.suffix === 'metacall-examples'
 			);
 			if (deployIdx !== -1) {
 				switch (inspect[deployIdx].status) {
@@ -215,7 +215,7 @@ describe('integration protocol', function () {
 		ok(inspect.length > 0);
 
 		const deployIdx = inspect.findIndex(
-			deploy => deploy.suffix === 'metacall-nodejs-race-game-example'
+			deploy => deploy.suffix === 'metacall-examples'
 		);
 
 		ok(deployIdx !== -1);
