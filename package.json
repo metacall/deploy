@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"test": "npm run --silent build && mocha dist/test",
+		"coverage": "nyc npm run test",
 		"unit": "npm run --silent test -- --ignore **/*.integration.spec.js",
 		"prepublishOnly": "npm run --silent build",
 		"build": "npm run --silent lint && tsc",
@@ -34,6 +35,17 @@
 		"url": "https://github.com/metacall/deploy/issues"
 	},
 	"homepage": "https://github.com/metacall/deploy#readme",
+	"nyc": {
+		"extends": "@istanbuljs/nyc-config-typescript",
+		"check-coverage": true,
+		"all": true,
+		"exclude": [
+			"**/*-test",
+			"**/test",
+			"**/*.d.ts",
+			"**/src"
+		]
+	},
 	"prettier": {
 		"tabWidth": 4,
 		"useTabs": true,
@@ -85,6 +97,7 @@
 		"zod": "^1.11.10"
 	},
 	"devDependencies": {
+		"@istanbuljs/nyc-config-typescript": "^1.0.2",
 		"@types/archiver": "^3.1.1",
 		"@types/concat-stream": "^2.0.0",
 		"@types/cross-spawn": "^6.0.2",
@@ -101,6 +114,7 @@
 		"eslint-plugin-prettier": "^3.1.4",
 		"eslint-plugin-tsdoc": "^0.2.7",
 		"mocha": "^9.2.0",
+		"nyc": "^15.1.0",
 		"prettier": "^2.1.2",
 		"typescript": "^4.3.2"
 	}

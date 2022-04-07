@@ -9,7 +9,7 @@ const runCLI = (args: string[], inputs: string[]) => {
 describe('integration cli', function () {
 	this.timeout(200_000);
 
-	const url = 'https://github.com/metacall/function-mesh-example';
+	const url = 'https://github.com/metacall/nodejs-race-game-example';
 
 	// Invalid Token Login
 	it('Should fail with malformed jwt', async () => {
@@ -79,7 +79,7 @@ describe('integration cli', function () {
 
 		ok(String(result).includes('i Deploying...\n'));
 
-		strictEqual(await deployed('metacall-function-mesh-example'), true);
+		strictEqual(await deployed('metacall-nodejs-race-game-example'), true);
 		return result;
 	});
 
