@@ -19,6 +19,7 @@ import {
 	listSelection
 } from './cli/selection';
 import { Config } from './config';
+import { forceText } from './force';
 import { logs } from './logs';
 import { zip } from './utils';
 
@@ -106,9 +107,7 @@ export const deployPackage = async (
 					(err as ProtocolError).response?.data ===
 					`The ${plan} plan is not available.`
 				)
-					return warn(
-						`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`
-					);
+					return warn(forceText(plan));
 				apiError(err as ProtocolError);
 			}
 
@@ -231,9 +230,7 @@ export const deployFromRepository = async (
 			(e as ProtocolError).response?.data ===
 			`The ${plan} plan is not available.`
 		)
-			return warn(
-				`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`
-			);
+			return warn(forceText(plan));
 		error(String(e));
 	}
 };

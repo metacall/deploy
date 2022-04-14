@@ -5,7 +5,7 @@ import API from 'metacall-protocol/protocol';
 
 import args from './cli/args';
 import { inspect } from './cli/inspect';
-import { error, warn } from './cli/messages';
+import { error } from './cli/messages';
 import { listSelection, planSelection } from './cli/selection';
 import { del } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
@@ -68,11 +68,6 @@ void (async () => {
 				new URL(args['addrepo']).href
 			);
 		} catch (e) {
-			if (e === `The ${plan} plan is not available.`)
-				return warn(
-					`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`
-				);
-
 			error(String(e));
 		}
 	}

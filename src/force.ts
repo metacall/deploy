@@ -4,6 +4,9 @@ import { error } from './cli/messages';
 import { del } from './delete';
 import { startup } from './startup';
 
+export const forceText = (plan: string): string =>
+	`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`;
+
 export const force = async (name: string): Promise<string> => {
 	const config = await startup();
 	const api = API(config.token as string, config.baseURL);
