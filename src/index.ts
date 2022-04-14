@@ -2,12 +2,14 @@
 import { promises as fs } from 'fs';
 import { Deployment } from 'metacall-protocol/deployment';
 import API from 'metacall-protocol/protocol';
+
 import args from './cli/args';
 import { inspect } from './cli/inspect';
-import { error } from './cli/messages';
+import { error, warn } from './cli/messages';
 import { listSelection, planSelection } from './cli/selection';
 import { del } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
+import { force } from './force';
 import { startup } from './startup';
 
 enum ErrorCode {
@@ -56,6 +58,9 @@ void (async () => {
 	const config = await startup();
 
 	if (args['addrepo']) {
+		if (args['force'])
+			await force(args['addrepo']?.split('com/')[1].split('/').join('-'));
+
 		try {
 			return await deployFromRepository(
 				config,
@@ -63,6 +68,11 @@ void (async () => {
 				new URL(args['addrepo']).href
 			);
 		} catch (e) {
+			if (e === `The ${plan} plan is not available.`)
+				return warn(
+					`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`
+				);
+
 			error(String(e));
 		}
 	}
@@ -82,6 +92,8 @@ void (async () => {
 		}
 
 		try {
+			if (args['force']) await force(args['projectName'].toLowerCase());
+
 			await deployPackage(rootPath, config, plan);
 		} catch (e) {
 			error(String(e));

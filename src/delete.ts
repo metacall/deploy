@@ -6,13 +6,19 @@ export const del = async (
 	prefix: string,
 	suffix: string,
 	version: string
-): Promise<void> => {
+): Promise<string> => {
 	const config = await startup();
 	const api = API(config.token as string, config.baseURL);
 
+	let res = '';
+
 	try {
-		info(await api.deployDelete(prefix, suffix, version));
+		res = await api.deployDelete(prefix, suffix, version);
+
+		info(res);
 	} catch (err) {
 		apiError(err as ProtocolError);
 	}
+
+	return res;
 };

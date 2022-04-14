@@ -102,6 +102,13 @@ export const deployPackage = async (
 
 				await logs(descriptor.runners, name, args['dev']);
 			} catch (err) {
+				if (
+					(err as ProtocolError).response?.data ===
+					`The ${plan} plan is not available.`
+				)
+					return warn(
+						`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`
+					);
 				apiError(err as ProtocolError);
 			}
 
@@ -220,6 +227,13 @@ export const deployFromRepository = async (
 
 		info('Repository deployed');
 	} catch (e) {
+		if (
+			(e as ProtocolError).response?.data ===
+			`The ${plan} plan is not available.`
+		)
+			return warn(
+				`There is already a deployment on ${plan} plan. If you still wanted to deploy, Wirte the previous command with --force flag.`
+			);
 		error(String(e));
 	}
 };
