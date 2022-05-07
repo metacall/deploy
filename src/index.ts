@@ -90,8 +90,8 @@ void (async () => {
 	}
 
 	// If configdir is passed call than add its value to the load operation
-	if (args['configdir']) {
-		const configPath = args['configdir'];
+	if (args['confDir']) {
+		const configPath = args['confDir'];
 		try {
 			await load(configPath);
 		} catch (e) {

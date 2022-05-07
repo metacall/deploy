@@ -6,7 +6,6 @@ const cliArgsDescription: { [k: string]: string } = {
 	help: 'Prints help.',
 	addrepo: 'Deploy from repository.',
 	workdir: 'Accepts path to application directory.',
-	configdir: 'Accepts path to Configuration directory.',
 	dev: 'Run CLI in dev mode (deploy locally to metacall/faas).',
 	projectName: 'Accepts name of the application.',
 	email: 'Accepts email id for authentication.',
@@ -22,7 +21,6 @@ interface CLIArgs {
 	help?: boolean;
 	addrepo?: string;
 	workdir?: string;
-	configdir?: string;
 	dev: boolean;
 	projectName: string;
 	email?: string;
@@ -60,13 +58,6 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		alias: 'w',
 		defaultValue: process.cwd(),
 		description: cliArgsDescription.workdir
-	},
-	configdir: {
-		type: String,
-		optional: true,
-		alias: 'd',
-		defaultValue: process.cwd(),
-		description: cliArgsDescription.configdir
 	},
 	dev: {
 		type: Boolean,
