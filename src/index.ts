@@ -99,4 +99,13 @@ void (async () => {
 			return process.exit(ErrorCode.NotFoundRootPath);
 		}
 	}
+
+	if (args['serverUrl']) {
+		const serverUrl = args['serverUrl'];
+		try {
+			config.baseURL = serverUrl;
+		} catch (e) {
+			error(String(e));
+		}
+	}
 })();
