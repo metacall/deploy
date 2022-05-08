@@ -102,10 +102,6 @@ void (async () => {
 
 	if (args['serverUrl']) {
 		const serverUrl = args['serverUrl'];
-		try {
-			config.baseURL = serverUrl;
-		} catch (e) {
-			error(String(e));
-		}
+		config.baseURL = serverUrl;
 	}
 })();
