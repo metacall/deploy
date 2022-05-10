@@ -4,6 +4,7 @@ import {
 	LogType
 } from 'metacall-protocol/deployment';
 import API, { isProtocolError } from 'metacall-protocol/protocol';
+import args from './cli/args';
 import { error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
 import { startup } from './startup';
@@ -15,7 +16,7 @@ const showLogs = async (
 	type: LogType,
 	dev: boolean
 ): Promise<void> => {
-	const config = await startup();
+	const config = await startup(args['confDir']);
 	const api = API(
 		config.token as string,
 		dev ? config.devURL : config.baseURL
