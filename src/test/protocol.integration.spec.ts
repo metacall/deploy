@@ -4,6 +4,7 @@ import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import { basename, join } from 'path';
 import { startup } from '../startup';
+import args from './../cli/args';
 
 describe('integration protocol', function () {
 	this.timeout(200_000);
@@ -18,7 +19,7 @@ describe('integration protocol', function () {
 			// This assumes that the user (token) has:
 			//	1) Deploy Enabled
 			//	2) One empty (and only one) launchpad with Essential Plan
-			const { token, baseURL } = await startup();
+			const { token, baseURL } = await startup(args['confDir']);
 			ok(token);
 			ok(baseURL === 'https://dashboard.metacall.io');
 			api = API(token, baseURL);

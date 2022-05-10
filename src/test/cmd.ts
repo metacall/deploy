@@ -3,6 +3,7 @@ import spawn from 'cross-spawn';
 import { existsSync } from 'fs';
 import API from 'metacall-protocol/protocol';
 import { constants } from 'os';
+import args from '../cli/args';
 import { startup } from '../startup';
 
 const PATH = process.env.PATH;
@@ -110,7 +111,7 @@ export const keys = Object.freeze({
 });
 
 export const deployed = async (suffix: string): Promise<boolean> => {
-	const config = await startup();
+	const config = await startup(args['confDir']);
 	const api = API(config.token as string, config.baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
