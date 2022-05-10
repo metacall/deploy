@@ -1,14 +1,16 @@
 import { deepStrictEqual, ok, strictEqual } from 'assert';
 import { createReadStream } from 'fs';
+import { Plans } from 'metacall-protocol/plan';
 import API from 'metacall-protocol/protocol';
 import { basename, join } from 'path';
 import { startup } from '../startup';
+import args from './../cli/args';
 
 describe('integration protocol', function () {
 	this.timeout(200_000);
 
 	let api: ReturnType<typeof API>;
-	const url = 'https://github.com/metacall/nodejs-race-game-example';
+	const url = 'https://github.com/metacall/examples';
 	let selectedBranch: string;
 
 	before(
@@ -17,7 +19,7 @@ describe('integration protocol', function () {
 			// This assumes that the user (token) has:
 			//	1) Deploy Enabled
 			//	2) One empty (and only one) launchpad with Essential Plan
-			const { token, baseURL } = await startup();
+			const { token, baseURL } = await startup(args['confDir']);
 			ok(token);
 			ok(baseURL === 'https://dashboard.metacall.io');
 			api = API(token, baseURL);
@@ -75,7 +77,7 @@ describe('integration protocol', function () {
 		const result = await api.deploy(
 			'python-jose',
 			[],
-			'Essential',
+			Plans.Essential,
 			'Package'
 		);
 
@@ -154,21 +156,21 @@ describe('integration protocol', function () {
 	it('Should be able upload the repository', async () => {
 		const name = (await api.add(url, selectedBranch, [])).id;
 
-		ok(name === 'metacall/nodejs-race-game-example');
+		ok(name === 'metacall/examples');
 	});
 
 	// Deploy Repository
 	it('Should be able to deploy the Repository', async () => {
 		const result = await api.deploy(
-			'metacall/nodejs-race-game-example',
+			'metacall/examples',
 			[],
-			'Essential',
+			Plans.Essential,
 			'Repository'
 		);
 
 		deepStrictEqual(result, {
 			prefix: 'josead',
-			suffix: 'metacall-nodejs-race-game-example',
+			suffix: 'metacall-examples',
 			version: 'v1'
 		});
 		return result;
@@ -186,7 +188,7 @@ describe('integration protocol', function () {
 			const inspect = await api.inspect();
 
 			const deployIdx = inspect.findIndex(
-				deploy => deploy.suffix === 'metacall-nodejs-race-game-example'
+				deploy => deploy.suffix === 'metacall-examples'
 			);
 			if (deployIdx !== -1) {
 				switch (inspect[deployIdx].status) {
@@ -214,7 +216,7 @@ describe('integration protocol', function () {
 		ok(inspect.length > 0);
 
 		const deployIdx = inspect.findIndex(
-			deploy => deploy.suffix === 'metacall-nodejs-race-game-example'
+			deploy => deploy.suffix === 'metacall-examples'
 		);
 
 		ok(deployIdx !== -1);
