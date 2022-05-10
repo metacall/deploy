@@ -93,7 +93,7 @@ void (async () => {
 	if (args['confDir']) {
 		const configPath = args['confDir'];
 		try {
-			await load(configPath);
+			const new_config = await load(configPath);
 		} catch (e) {
 			error(`Invalid config path, ${configPath} not found.`);
 			return process.exit(ErrorCode.NotFoundRootPath);
