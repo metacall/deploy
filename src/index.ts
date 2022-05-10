@@ -87,4 +87,11 @@ void (async () => {
 			error(String(e));
 		}
 	}
+
+	// If configdir is passed call than add its value to the load operation
+
+	if (args['serverUrl']) {
+		const serverUrl = args['serverUrl'];
+		config.baseURL = serverUrl;
+	}
 })();
