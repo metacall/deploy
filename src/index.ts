@@ -6,7 +6,6 @@ import args from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';
 import { listSelection, planSelection } from './cli/selection';
-import { load } from './config';
 import { del } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
 import { startup } from './startup';
@@ -90,15 +89,6 @@ void (async () => {
 	}
 
 	// If configdir is passed call than add its value to the load operation
-	if (args['confDir']) {
-		const configPath = args['confDir'];
-		try {
-			const new_config = await load(configPath);
-		} catch (e) {
-			error(`Invalid config path, ${configPath} not found.`);
-			return process.exit(ErrorCode.NotFoundRootPath);
-		}
-	}
 
 	if (args['serverUrl']) {
 		const serverUrl = args['serverUrl'];
