@@ -87,4 +87,9 @@ void (async () => {
 			error(String(e));
 		}
 	}
+
+	if (args['serverUrl']) {
+		const serverUrl = args['serverUrl'];
+		config.baseURL = serverUrl;
+	}
 })();
