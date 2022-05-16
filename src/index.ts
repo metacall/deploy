@@ -89,7 +89,6 @@ void (async () => {
 	}
 
 	if (args['serverUrl']) {
-		const serverUrl = args['serverUrl'];
-		config.baseURL = serverUrl;
+		config.baseURL = args['serverUrl'];
 	}
 })();
