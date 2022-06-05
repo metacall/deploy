@@ -24,7 +24,7 @@ void (async () => {
 	if (args['inspect']) return await inspect();
 
 	if (args['delete']) {
-		const config = await startup();
+		const config = await startup(args['confDir']);
 		const api = API(config.token as string, config.baseURL);
 
 		try {
@@ -55,7 +55,7 @@ void (async () => {
 		args['plan'] ||
 		(await planSelection('Please select plan from the list'));
 
-	const config = await startup();
+	const config = await startup(args['confDir']);
 
 	if (args['addrepo']) {
 		if (args['force'])
@@ -93,5 +93,9 @@ void (async () => {
 		} catch (e) {
 			error(String(e));
 		}
+	}
+
+	if (args['serverUrl']) {
+		config.baseURL = args['serverUrl'];
 	}
 })();

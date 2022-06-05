@@ -31,6 +31,7 @@ interface CLIArgs {
 	confDir?: string;
 	inspect?: boolean;
 	delete?: boolean;
+	serverUrl?: string;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -113,6 +114,11 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		defaultValue: false,
 		optional: true,
 		description: cliArgsDescription.delete
+	},
+	serverUrl: {
+		type: String,
+		alias: 'u',
+		optional: true
 	},
 	confDir: { type: String, alias: 'd', optional: true }
 };

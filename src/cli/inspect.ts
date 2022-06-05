@@ -4,6 +4,7 @@ import { Deployment } from 'metacall-protocol/deployment';
 import API from 'metacall-protocol/protocol';
 import { startup } from './../startup';
 import { sleep } from './../utils';
+import args from './args';
 
 interface row {
 	Deployments: string;
@@ -76,7 +77,7 @@ const genAllURL = (
 };
 
 export const inspect = async (): Promise<void> => {
-	const config = await startup();
+	const config = await startup(args['confDir']);
 	const api = API(config.token as string, config.baseURL);
 
 	for (;;) {
