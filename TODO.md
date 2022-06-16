@@ -1,29 +1,29 @@
 # TODO
 
 -   [x] Move the `./src/lib` to a new repo so it can be reused in https://github.com/metacall/faas -> https://github.com/metacall/protocol
--   [ ] Implement the deployment in case of `PackageError.None` in `index.ts`:
-    -   [ ] It should ask for a plan in the user (we should store this in the configuration, in a list of projects mapped to plans) or reuse an existent plan if it has been already selected.
-    -   [ ] Use the protocol integration test and the descriptor in order to deploy it, we can implement a function which wraps all the behavior into a simple function or implement it directly in the `index.ts`
+-   [x] Implement the deployment in case of `PackageError.None` in `index.ts`:
+    -   [x] It should ask for a plan in the user (we should store this in the configuration, in a list of projects mapped to plans) or reuse an existent plan if it has been already selected.
+    -   [x] Use the protocol integration test and the descriptor in order to deploy it, we can implement a function which wraps all the behavior into a simple function or implement it directly in the `index.ts`
 -   [ ] Implement command-line arguments:
     -   [x] Take a command-line argument to specify project dir (-w, --workdir, default to process.cwd())
-    -   [ ] Take a command-line flag to specify email (-e, --email)
-    -   [ ] Take a command-line flag to specify password (-p, --password)
-    -   [ ] Take a command-line flag to specify token (-t, --token)
+    -   [x] Take a command-line flag to specify email (-e, --email)
+    -   [x] Take a command-line flag to specify password (-p, --password)
+    -   [x] Take a command-line flag to specify token (-t, --token) --> --email, --password & --token flags do not work independently, if we try to do so then --workdir will be set to default value and it will try to push it (check it again).
     -   [ ] Take a command-line flag to specify force [if there is a deploy already deployed on a existing plan, delete it and deploy again] (-f, --force)
-    -   [ ] Take a command-line flag to specify plan [define the plan to deploy the project: `Essential`, `Standard`, `Premium`, also we should implement an enum type for this and replace in in places like: https://github.com/metacall/deploy/blob/97951f907c166b856c9952ddf89b778a9fdc7fb1/src/lib/protocol.ts#L23 , https://github.com/metacall/deploy/blob/97951f907c166b856c9952ddf89b778a9fdc7fb1/src/lib/protocol.ts#L116 , ] (-P, --plan)
+    -   [x] Take a command-line flag to specify plan [define the plan to deploy the project: `Essential`, `Standard`, `Premium`, also we should implement an enum type for this and replace in in places like: https://github.com/metacall/deploy/blob/97951f907c166b856c9952ddf89b778a9fdc7fb1/src/lib/protocol.ts#L23 , https://github.com/metacall/deploy/blob/97951f907c166b856c9952ddf89b778a9fdc7fb1/src/lib/protocol.ts#L116 , ] (-P, --plan)
     -   [ ] Take a command-line flag to specify plan ID [same as before but indicating the plan ID which is a SHA like ID, this will need the modification of the backend because this feature is not implemented yet] (-d, --plan-id)
-    -   [ ] Take a command-line flag to specify use without token [avoiding auth for https://github.com/metacall/faas] (-i, --insecure)
-    -   [ ] Take a command-line flag to specify config dir (-d, --config-dir)
+    -   [ ] Take a command-line flag to specify use without token [avoiding auth for https://github.com/metacall/faas] (-i, --insecure) -> Planned to implement once metacall/faas is ready.
+    -   [x] Take a command-line flag to specify config dir (-d, --config-dir)
     -   [ ] Take a command-line flag to specify base URL of server (-u, --server-url)
-    -   [ ] Take a command-line flag to specify name to deploy as (-n, --project-name, default to dirname)
+    -   [x] Take a command-line flag to specify name to deploy as (-n, --project-name, default to dirname)
     -   [ ] Take a command-line flag to specify ignore pattern for the bundle (-i, --ignore-pattern, default to project type default)
 -   [x] Figure out how to detect project type
     -   [x] Only detect if argument wasn't passed
 -   [x] Figure out how to properly zip a folder
 -   [x] Stream zip file to disk, then read off disk for sending (Can we do this better?)
--   [ ] Finish the wizard in case of `PackageError.JsonNotFound` in `index.ts`:
+-   [x] Finish the wizard in case of `PackageError.JsonNotFound` in `index.ts`:
     -   [ ] Ask for environment variables (store them in a secret on the client on the configuration? or implement a way to reuse them in the deploy on the FaaS?)
     -   [ ] Ask for the plan (store them in the client on the configuration? or implement a way to reuse them in the deploy on the FaaS?)
-    -   [ ] Store the `metacall-${lang_id}.json`s once the wizard finishes so it can be reused on the next run of the deploy
+    -   [x] Store the `metacall-${lang_id}.json`s once the wizard finishes so it can be reused on the next run of the deploy
 -   [ ] Clean code and unused comments left for implementing the rest of options
 -   [ ] Style all error messages and input requests everything looks uniform, clear and with the same appearence (for example, add ':' when needed, or dot / exclamations/question marks at the end of a sentence).
