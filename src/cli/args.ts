@@ -1,4 +1,4 @@
-import { Plans } from 'metacall-protocol/plan';
+import { Plans } from '@metacall/protocol/plan';
 import { basename } from 'path';
 import { ArgumentConfig, parse, ParseOptions } from 'ts-command-line-args';
 

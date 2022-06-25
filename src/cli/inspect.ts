@@ -1,7 +1,7 @@
+import { Deployment } from '@metacall/protocol/deployment';
+import API from '@metacall/protocol/protocol';
 import chalk from 'chalk';
 import { Table } from 'console-table-printer';
-import { Deployment } from 'metacall-protocol/deployment';
-import API from 'metacall-protocol/protocol';
 import { startup } from './../startup';
 import { sleep } from './../utils';
 import args from './args';

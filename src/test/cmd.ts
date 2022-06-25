@@ -1,7 +1,7 @@
+import API from '@metacall/protocol/protocol';
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
 import { existsSync } from 'fs';
-import API from 'metacall-protocol/protocol';
 import { constants } from 'os';
 import args from '../cli/args';
 import { startup } from '../startup';

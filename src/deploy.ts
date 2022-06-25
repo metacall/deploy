@@ -1,13 +1,13 @@
-import { promises as fs } from 'fs';
-import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
+import { LanguageId, MetaCallJSON } from '@metacall/protocol/deployment';
 import {
 	findRunners,
 	generateJsonsFromFiles,
 	generatePackage,
 	PackageError
-} from 'metacall-protocol/package';
-import { Plans } from 'metacall-protocol/plan';
-import API, { ProtocolError } from 'metacall-protocol/protocol';
+} from '@metacall/protocol/package';
+import { Plans } from '@metacall/protocol/plan';
+import API, { ProtocolError } from '@metacall/protocol/protocol';
+import { promises as fs } from 'fs';
 import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
