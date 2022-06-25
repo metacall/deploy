@@ -1,4 +1,4 @@
-import API, { ProtocolError } from 'metacall-protocol/protocol';
+import API, { ProtocolError } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { apiError, info } from './cli/messages';
 import { startup } from './startup';

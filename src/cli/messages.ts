@@ -1,7 +1,7 @@
+import { LanguageId } from '@metacall/protocol/deployment';
+import { Languages } from '@metacall/protocol/language';
+import { ProtocolError } from '@metacall/protocol/protocol';
 import chalk from 'chalk';
-import { LanguageId } from 'metacall-protocol/deployment';
-import { Languages } from 'metacall-protocol/language';
-import { ProtocolError } from 'metacall-protocol/protocol';
 
 export const info = (message: string): void => {
 	// eslint-disable-next-line no-console

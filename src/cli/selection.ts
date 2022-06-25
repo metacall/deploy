@@ -1,7 +1,10 @@
+import { LanguageId } from '@metacall/protocol/deployment';
+import {
+	DisplayNameToLanguageId,
+	Languages
+} from '@metacall/protocol/language';
+import { Plans } from '@metacall/protocol/plan';
 import { prompt } from 'inquirer';
-import { LanguageId } from 'metacall-protocol/deployment';
-import { DisplayNameToLanguageId, Languages } from 'metacall-protocol/language';
-import { Plans } from 'metacall-protocol/plan';
 
 export const loginSelection = (methods: string[]): Promise<string> =>
 	prompt<{ method: string }>([

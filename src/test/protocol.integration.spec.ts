@@ -1,7 +1,7 @@
+import { Plans } from '@metacall/protocol/plan';
+import API from '@metacall/protocol/protocol';
 import { deepStrictEqual, ok, strictEqual } from 'assert';
 import { createReadStream } from 'fs';
-import { Plans } from 'metacall-protocol/plan';
-import API from 'metacall-protocol/protocol';
 import { basename, join } from 'path';
 import { startup } from '../startup';
 import args from './../cli/args';

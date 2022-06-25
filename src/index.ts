@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+import { Deployment } from '@metacall/protocol/deployment';
+import API from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
-import { Deployment } from 'metacall-protocol/deployment';
-import API from 'metacall-protocol/protocol';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';

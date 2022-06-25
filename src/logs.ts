@@ -2,8 +2,8 @@ import {
 	Deployment,
 	DeployStatus,
 	LogType
-} from 'metacall-protocol/deployment';
-import API, { isProtocolError } from 'metacall-protocol/protocol';
+} from '@metacall/protocol/deployment';
+import API, { isProtocolError } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
