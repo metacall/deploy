@@ -6,7 +6,7 @@ This tool is not currently working for uploading projects yet, but you can test 
 
 ```bash
 npm i -g @metacall/deploy
-@metacall/deploy
+metacall-deploy
 ```
 
 ## Configuration
