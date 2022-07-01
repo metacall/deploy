@@ -8,7 +8,7 @@
 import archiver, { Archiver } from 'archiver';
 import { promises as fs } from 'fs';
 import { platform } from 'os';
-import { basename, join } from 'path';
+import { basename, join, relative } from 'path';
 import { error } from './cli/messages';
 
 const missing = (name: string): string =>
@@ -59,30 +59,38 @@ export const filter = (
 export const zip = async (
 	source: string,
 	files: string[],
-	progress: (text: string, bytes: number) => void,
-	pulse: (name: string) => void,
-	hide: () => void
+	progress?: (text: string, bytes: number) => void,
+	pulse?: (name: string) => void,
+	hide?: () => void
 ): Promise<Archiver> => {
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
 	});
-	archive.on('progress', data =>
-		progress(
-			'Compressing and deploying...',
-			data.fs.processedBytes / data.fs.totalBytes
-		)
-	);
-	archive.on('entry', entry => pulse(entry.name));
+
+	if (progress) {
+		archive.on('progress', data =>
+			progress(
+				'Compressing and deploying...',
+				data.fs.processedBytes / data.fs.totalBytes
+			)
+		);
+	}
+
+	if (pulse) {
+		archive.on('entry', (entry: archiver.EntryData) => pulse(entry.name));
+	}
 
 	files = files.map(file => join(source, file));
 
 	for (const file of files) {
 		(await fs.stat(file)).isDirectory()
 			? archive.directory(file, basename(file))
-			: archive.file(file, { name: basename(file) });
+			: archive.file(file, { name: relative(source, file) });
 	}
 
-	archive.on('finish', () => hide());
+	if (hide) {
+		archive.on('finish', () => hide());
+	}
 
 	await archive.finalize();
 
