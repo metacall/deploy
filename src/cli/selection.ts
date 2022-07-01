@@ -43,13 +43,16 @@ export const languageSelection = (
 		res.langs.map(lang => DisplayNameToLanguageId[lang])
 	);
 
-export const planSelection = (message: string): Promise<Plans> =>
+export const planSelection = (
+	message: string,
+	availablePlans: string[]
+): Promise<Plans> =>
 	prompt<{ plan: Plans }>([
 		{
 			type: 'list',
 			name: 'plan',
 			message,
-			choices: Object.keys(Plans)
+			choices: availablePlans
 		}
 	]).then((res: { plan: Plans }) => res.plan);
 
