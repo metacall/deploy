@@ -206,7 +206,7 @@ export const deployFromRepository = async (
 		const selectedBranch =
 			branches.length === 1
 				? branches[0]
-				: await listSelection(branches, 'Select branch :');
+				: await listSelection(branches, 'Select branch:');
 
 		const runners = Array.from(
 			findRunners(await api.fileList(url, selectedBranch))

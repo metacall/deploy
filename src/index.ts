@@ -34,7 +34,7 @@ void (async () => {
 
 			const project: string = await listSelection(
 				[...deployments.map(el => `${el.suffix} ${el.version}`)],
-				'Select the deployment to delete :-'
+				'Select the deployment to delete:'
 			);
 
 			const app = deployments.filter(
