@@ -155,3 +155,7 @@ describe('integration cli', function () {
 		ok(String(result).includes('i Deploy Delete Succeed\n'));
 	});
 });
+
+// test to Add
+// if there is one branch -> select it
+// if there is only one log file -> select it
