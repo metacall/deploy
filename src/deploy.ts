@@ -203,8 +203,10 @@ export const deployFromRepository = async (
 		if (!branches.length) return error('Invalid Repository URL');
 
 		// TODO: API response type should be created in protocol, it is string as of now
-
-		const selectedBranch = await listSelection(branches, 'Select branch :');
+		const selectedBranch =
+			branches.length === 1
+				? branches[0]
+				: await listSelection(branches, 'Select branch :');
 
 		const runners = Array.from(
 			findRunners(await api.fileList(url, selectedBranch))
