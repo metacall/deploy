@@ -156,6 +156,6 @@ describe('integration cli', function () {
 	});
 });
 
-// test to Add
+// TODO: Tests to add
 // if there is one branch -> select it
-// if there is only one log file -> select it
+// if there is only one log file -> select it (TODO: This must be reviewed in case we use TUI)
