@@ -8,7 +8,7 @@
 This modules demonstrates a basic example of a python backend that serves
 an html index and returns the current hour in just two functions.
 
-""" 
+"""
 
 from os import path
 from datetime import datetime

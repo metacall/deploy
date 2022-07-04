@@ -57,7 +57,7 @@ export const planSelection = (
 	]).then((res: { plan: Plans }) => res.plan);
 
 export const listSelection = (
-	list: string[],
+	list: string[] | { name: string; value: string }[],
 	message: string
 ): Promise<string> =>
 	prompt<{ container: string }>([

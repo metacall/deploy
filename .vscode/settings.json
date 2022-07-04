@@ -5,9 +5,11 @@
 		"source.organizeImports": true,
 		"source.fixAll": true
 	},
-	"editor.rulers": [
-		80
-	],
-	"editor.quickSuggestions": true,
+	"editor.rulers": [80],
+	"editor.quickSuggestions": {
+		"comments": "on",
+		"strings": "on",
+		"other": "on"
+	},
 	"editor.suggestOnTriggerCharacters": true
 }

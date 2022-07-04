@@ -3,6 +3,7 @@ import {
 	DeployStatus,
 	LogType
 } from '@metacall/protocol/deployment';
+import { RunnerToDisplayName } from '@metacall/protocol/language';
 import API, { isProtocolError } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { error, info } from './cli/messages';
@@ -58,7 +59,21 @@ export const logs = async (
 ) => {
 	try {
 		const container: string = await listSelection(
-			[...containers, 'deploy'],
+			containers.reduce(
+				(choices, runner) => [
+					...choices,
+					{
+						name: RunnerToDisplayName(runner),
+						value: runner
+					}
+				],
+				[
+					{
+						name: 'Deploy',
+						value: 'deploy'
+					}
+				]
+			),
 			'Select a container to get logs'
 		);
 		const type = container === 'deploy' ? LogType.Deploy : LogType.Job;
