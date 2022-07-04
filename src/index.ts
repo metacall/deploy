@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Deployment } from '@metacall/protocol/deployment';
+import { Plans } from '@metacall/protocol/plan';
 import API from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import args from './cli/args';
@@ -19,12 +20,12 @@ enum ErrorCode {
 }
 
 void (async () => {
+	const config = await startup(args['confDir']);
+	const api = API(config.token as string, config.baseURL);
+
 	if (args['inspect']) return await inspect();
 
 	if (args['delete']) {
-		const config = await startup(args['confDir']);
-		const api = API(config.token as string, config.baseURL);
-
 		try {
 			const deployments: Deployment[] = (await api.inspect()).filter(
 				dep => dep.status === 'ready'
@@ -49,17 +50,23 @@ void (async () => {
 	}
 
 	// TODO: We should cache the plan and ask for it only once
-	const plan =
-		args['plan'] ||
-		(await planSelection('Please select plan from the list'));
+	const plan = async (): Promise<Plans> => {
+		const availPlans: string[] = Object.keys(await api.listSubscriptions());
 
-	const config = await startup(args['confDir']);
+		return (
+			args['plan'] ||
+			(await planSelection(
+				'Please select plan from the list',
+				availPlans
+			))
+		);
+	};
 
 	if (args['addrepo']) {
 		try {
 			return await deployFromRepository(
 				config,
-				plan,
+				await plan(),
 				new URL(args['addrepo']).href
 			);
 		} catch (e) {
@@ -82,7 +89,7 @@ void (async () => {
 		}
 
 		try {
-			await deployPackage(rootPath, config, plan);
+			await deployPackage(rootPath, config, await plan());
 		} catch (e) {
 			error(String(e));
 		}
