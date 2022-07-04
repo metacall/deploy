@@ -158,4 +158,5 @@ describe('integration cli', function () {
 
 // TODO: Tests to add
 // if there is one branch -> select it
+// test successful login with email and password with an empty folder created by fs.mkdtemp
 // if there is only one log file -> select it (TODO: This must be reviewed in case we use TUI)
