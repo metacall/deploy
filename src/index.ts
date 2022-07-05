@@ -5,7 +5,7 @@ import API from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
-import { error } from './cli/messages';
+import { error, info, warn } from './cli/messages';
 import { listSelection, planSelection } from './cli/selection';
 import { del } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
@@ -52,6 +52,29 @@ void (async () => {
 	// TODO: We should cache the plan and ask for it only once
 	const plan = async (): Promise<Plans> => {
 		const availPlans: string[] = Object.keys(await api.listSubscriptions());
+
+		if (!availPlans.length) {
+			const deployedAppsCount = (await api.listSubscriptionsDeploys())
+				.length;
+
+			if (!deployedAppsCount) {
+				info(
+					'There are no active plans associated with your account. Please purchase a new plan at https://dashboard.metacall.io.'
+				);
+				return process.exit(ErrorCode.Ok);
+			} else {
+				info(
+					'Every plan on your account has apps installed on it. A new plan can be purchased at https://dashboard.metacall.io.'
+				);
+				warn(
+					'Use the --force flag when wiring the preceding command if you still wished to deploy.'
+				);
+				warn(
+					'Be aware that —force will arbitrarily destroy apps and continue the deployment process.'
+				);
+				return process.exit(ErrorCode.Ok);
+			}
+		}
 
 		return (
 			args['plan'] ||
