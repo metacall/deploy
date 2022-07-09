@@ -11,6 +11,7 @@
 		"coverage": "nyc npm run test",
 		"unit": "npm run --silent test -- --ignore **/*.integration.spec.js",
 		"prepublishOnly": "npm run --silent build",
+		"postinstall": "git config --local core.hooksPath githooks",
 		"build": "npm run --silent lint && tsc",
 		"lint": "eslint . --ignore-pattern dist",
 		"fix": "eslint . --ignore-pattern dist --fix",

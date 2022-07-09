@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+const { debugLog } = require('./common');
+
+const PREFIX = 'pre-push';
+
+const hooks = [
+	'update-version'
+];
+
+if (require.main === module) {
+	for (const hook of hooks) {
+		const filename = PREFIX + '-' + hook;
+		debugLog('Executing hook:', filename);
+		const { main } = require('./' + filename);
+		main(process.argv.slice(2));
+	}
+}
