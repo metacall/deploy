@@ -84,7 +84,10 @@
 		},
 		"rules": {
 			"tsdoc/syntax": "warn"
-		}
+		},
+		"ignorePatterns": [
+			"githooks/common.js"
+		]
 	},
 	"dependencies": {
 		"@metacall/protocol": "^0.1.14",
