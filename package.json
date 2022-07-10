@@ -1,6 +1,6 @@
 {
 	"name": "@metacall/deploy",
-	"version": "0.1.6",
+	"version": "0.1.2",
 	"description": "Tool for deploying into MetaCall FaaS platform.",
 	"main": "dist/index.js",
 	"bin": {
@@ -84,7 +84,10 @@
 		},
 		"rules": {
 			"tsdoc/syntax": "warn"
-		}
+		},
+		"ignorePatterns": [
+			"githooks/common.js"
+		]
 	},
 	"dependencies": {
 		"@metacall/protocol": "^0.1.14",
