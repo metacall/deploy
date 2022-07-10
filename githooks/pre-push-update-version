@@ -76,6 +76,7 @@ const main = async args => {
 					'Updating package-lock.json with version from latest tag...'
 				);
 				lockfile.version = latestVersion;
+				lockfile.packages[''].version = latestVersion;
 				fs.writeFileSync(
 					path.join(root, 'package-lock.json'),
 					JSON.stringify(lockfile, null, '\t')
