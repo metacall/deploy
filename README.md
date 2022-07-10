@@ -5,8 +5,8 @@
 <p  align="center">Tool for deploying into MetaCall FaaS platform.</p>
 <br>
 
-<img src="https://img.shields.io/npm/v/@metacall/deploy?color=blue">
-![CI](https://github.com/metacall/deploy/actions/workflows/ci.yml/badge.svg)
+[![NPM](https://img.shields.io/npm/v/@metacall/deploy?color=blue)](https://www.npmjs.com/package/@metacall/deploy)
+[![Workflow](https://github.com/metacall/deploy/actions/workflows/ci.yml/badge.svg)](https://github.com/metacall/deploy/actions)
 
 This tool is not currently working for uploading projects yet, but you can test basic login using the following commands:
 
