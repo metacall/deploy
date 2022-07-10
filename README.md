@@ -6,7 +6,7 @@
 <br>
 
 <img src="https://img.shields.io/npm/v/@metacall/deploy?color=blue">
-<img src="https://github.com/metacall/deploy/actions/workflows/ci.yml/badge.svg")
+![CI](https://github.com/metacall/deploy/actions/workflows/ci.yml/badge.svg)
 
 This tool is not currently working for uploading projects yet, but you can test basic login using the following commands:
 
