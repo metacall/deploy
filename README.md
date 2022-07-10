@@ -8,7 +8,17 @@
 [![NPM](https://img.shields.io/npm/v/@metacall/deploy?color=blue)](https://www.npmjs.com/package/@metacall/deploy)
 [![Workflow](https://github.com/metacall/deploy/actions/workflows/ci.yml/badge.svg)](https://github.com/metacall/deploy/actions)
 [![install size](https://packagephobia.com/badge?p=@metacall/deploy)](https://packagephobia.com/result?p=@metacall/deploy)
-[![chat](https://img.shields.io/discord/781987805974757426?color=purple&style=plastic)](https://discord.com/channels/781987805974757426/)
+[![discord](https://img.shields.io/discord/781987805974757426?color=purple&style=plastic)](https://discord.com/channels/781987805974757426/)
+
+## Table of Contents
+
+-   [About](#about)
+    -   [How to install](#how-to-install)
+-   [Supported arguments and commands](#supported-arguments-and-commands)
+-   [Getting started](#getting-started)
+-   [Exit codes and their meanings](#exit-codes-and-their-meanings)
+-   [Contributing and Internal Documentation](#contributing-and-internal-documentation)
+-   [Code of Conduct](#contributing-and-internal-documentation)
 
 This tool is not currently working for uploading projects yet, but you can test basic login using the following commands:
 
