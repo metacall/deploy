@@ -20,17 +20,11 @@ export enum ErrorCode {
 void (async () => {
 	const config = await startup(args['confDir']);
 
-	if (args['inspect']) return await inspect();
+	if (args['inspect']) return await inspect(config);
 
-	if (args['delete']) return await deleteBySelection();
+	if (args['delete']) return await deleteBySelection(config);
 
-	if (args['force'])
-		await force(
-			config,
-			args['addrepo']
-				? args['addrepo']?.split('com/')[1].split('/').join('-')
-				: args['projectName'].toLowerCase()
-		);
+	if (args['force']) await force(config);
 
 	if (args['addrepo']) {
 		try {

@@ -1,17 +1,19 @@
 import { Deployment } from '@metacall/protocol/deployment';
 import API, { ProtocolError } from '@metacall/protocol/protocol';
-import args from './cli/args';
 import { apiError, error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
-import { startup } from './startup';
+import { Config } from './config';
+
+const generateAPI = (config: Config) =>
+	API(config.token as string, config.baseURL);
 
 export const del = async (
 	prefix: string,
 	suffix: string,
-	version: string
+	version: string,
+	config: Config
 ): Promise<string> => {
-	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const api = generateAPI(config);
 
 	let res = '';
 
@@ -24,9 +26,8 @@ export const del = async (
 	return res;
 };
 
-export const deleteBySelection = async (): Promise<void> => {
-	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+export const deleteBySelection = async (config: Config): Promise<void> => {
+	const api = generateAPI(config);
 
 	try {
 		const deployments: Deployment[] = (await api.inspect()).filter(
@@ -45,7 +46,7 @@ export const deleteBySelection = async (): Promise<void> => {
 				dep.version === project.split(' ')[1]
 		)[0];
 
-		info(await del(app.prefix, app.suffix, app.version));
+		info(await del(app.prefix, app.suffix, app.version, config));
 	} catch (err) {
 		error(String(err));
 	}
