@@ -5,13 +5,13 @@ import { error, info } from './cli/messages';
 import { Config } from './config';
 import { del } from './delete';
 
-export const force = async (
-	config: Config,
-	suffix: string
-): Promise<string> => {
+export const force = async (config: Config): Promise<string> => {
 	info('Trying to deploy forcefully!');
 
 	const api = API(config.token as string, config.baseURL);
+	const suffix = args['addrepo']
+		? args['addrepo']?.split('com/')[1].split('/').join('-')
+		: args['projectName'].toLowerCase();
 
 	let res = '';
 
@@ -25,7 +25,12 @@ export const force = async (
 		);
 
 		if (repo) {
-			res = await del(repo[0].prefix, repo[0].suffix, repo[0].version);
+			res = await del(
+				repo[0].prefix,
+				repo[0].suffix,
+				repo[0].version,
+				config
+			);
 			args['plan'] = repoSubscriptionDetails[0].plan;
 		}
 	} catch (e) {
