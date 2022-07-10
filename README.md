@@ -19,6 +19,7 @@
 -   [Supported arguments and commands](#supported-arguments-and-commands)
 -   [Exit codes and their meanings](#exit-codes-and-their-meanings)
 -   [Contribute](#Contribute)
+-   [License](#License)
 
 ## About
 
@@ -79,3 +80,7 @@ metacall-deploy --[args=value]
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/metacall/deploy)
 
 To use it on your forked repo, edit the 'Open in Gitpod' button url to `https://gitpod.io/#https://github.com/<my-github-username>/deploy`
+
+## License
+
+This project is currently licensed under the [Apache License version 2.0](LICENSE).
