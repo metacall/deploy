@@ -1,4 +1,6 @@
-# MetaCall FaaS Deploy
+<p align="center"><a href="https://metacall.io/" target="_blank"><img src="https://github.com/metacall.png" width="28%"></a></p>
+
+<h1 align="center"> <b> MetaCall Faas Deploy </b> </h1>
 
 Tool for deploying into MetaCall FaaS platform.
 
