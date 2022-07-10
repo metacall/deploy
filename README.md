@@ -14,13 +14,17 @@
 
 -   [About](#about)
     -   [How to install](#how-to-install)
+    -   [Configuration](#Configuration)
+    -   [Token](#Token)
 -   [Supported arguments and commands](#supported-arguments-and-commands)
--   [Getting started](#getting-started)
 -   [Exit codes and their meanings](#exit-codes-and-their-meanings)
--   [Contributing and Internal Documentation](#contributing-and-internal-documentation)
--   [Code of Conduct](#contributing-and-internal-documentation)
+-   [Contribute](#Contribute)
 
-This tool is not currently working for uploading projects yet, but you can test basic login using the following commands:
+## About
+
+metacall-deploy provides the interface of options to deploy functions on Metacall FaaS platform. You can deploy your serverless functions within a few clicks without interacting with [Dashboard](https://dashboard.metacall.io/)
+
+## How to install
 
 ```bash
 npm i -g @metacall/deploy
@@ -34,6 +38,39 @@ The configuration is stored in: - Unix: `$HOME/.metacall/deploy/config.ini` - Wi
 ## Token
 
 The token is stored in the configuration and can be overwritten at any time with `METACALL_API_KEY` environment variable.
+
+## Supported arguments and commands
+
+The metacall-deploy offers many commands for a variety of typical operations.
+
+```bash
+metacall-deploy --[args=value]
+```
+
+| CLI Args        | Description                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| `--help`        | Prints a user manual to assist you in using the cli.                                           |
+| `--workdir`     | Accepts relative path to application directory, Defaults to `cwd`                              |
+| `--addrepo`     | Accepts url of repository to deploy                                                            |
+| `--projectName` | Accepts a string indicating the name of your project                                           |
+| `--email`       | Accepts email id for authentication                                                            |
+| `--password`    | Accepts password for authentication                                                            |
+| `--token`       | Accepts token for authentication, either pass email & password or token.                       |
+| `--force`       | Accepts boolean value: it deletes the deployment present on an existing plan and deploys again |
+| `--plan`        | Accepts type of plan: "Essential", "Standard", "Premium"                                       |
+| `--inspect`     | Lists out all the deployments with specifications.                                             |
+| `--delete`      | Accepts boolean value: it provides you all the available deployment options to delete          |
+| `--confDir`     | Accepts relative path for changing default config directory                                    |
+
+## Exit codes and their meanings
+
+| Exit Code | Description          |
+| --------- | -------------------- |
+| `0`       | Success              |
+| `1`       | NotDirectoryRootPath |
+| `2`       | EmptyRootPath        |
+| `3`       | NotFoundRootPath     |
+| `4`       | AccountDisabled      |
 
 ## Contribute
 
