@@ -9,12 +9,12 @@
     -   [x] Take a command-line flag to specify email (-e, --email)
     -   [x] Take a command-line flag to specify password (-p, --password)
     -   [x] Take a command-line flag to specify token (-t, --token) --> --email, --password & --token flags do not work independently, if we try to do so then --workdir will be set to default value and it will try to push it (check it again).
-    -   [ ] Take a command-line flag to specify force [if there is a deploy already deployed on a existing plan, delete it and deploy again] (-f, --force)
+    -   [x] Take a command-line flag to specify force [if there is a deploy already deployed on a existing plan, delete it and deploy again] (-f, --force)
     -   [x] Take a command-line flag to specify plan [define the plan to deploy the project: `Essential`, `Standard`, `Premium`, also we should implement an enum type for this and replace in in places like: https://github.com/metacall/deploy/blob/97951f907c166b856c9952ddf89b778a9fdc7fb1/src/lib/protocol.ts#L23 , https://github.com/metacall/deploy/blob/97951f907c166b856c9952ddf89b778a9fdc7fb1/src/lib/protocol.ts#L116 , ] (-P, --plan)
     -   [ ] Take a command-line flag to specify plan ID [same as before but indicating the plan ID which is a SHA like ID, this will need the modification of the backend because this feature is not implemented yet] (-d, --plan-id)
     -   [ ] Take a command-line flag to specify use without token [avoiding auth for https://github.com/metacall/faas] (-i, --insecure) -> Planned to implement once metacall/faas is ready.
     -   [x] Take a command-line flag to specify config dir (-d, --config-dir)
-    -   [ ] Take a command-line flag to specify base URL of server (-u, --server-url)
+    -   [x] Take a command-line flag to specify base URL of server (-u, --server-url) -- needs some more info
     -   [x] Take a command-line flag to specify name to deploy as (-n, --project-name, default to dirname)
     -   [ ] Take a command-line flag to specify ignore pattern for the bundle (-i, --ignore-pattern, default to project type default)
 -   [x] Figure out how to detect project type
