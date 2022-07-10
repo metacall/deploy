@@ -52,7 +52,7 @@ metacall-deploy --[args=value]
 | `--help`        | Prints a user manual to assist you in using the cli.                                           |
 | `--workdir`     | Accepts relative path to application directory, Defaults to `cwd`                              |
 | `--addrepo`     | Accepts url of repository to deploy                                                            |
-| `--projectName` | Accepts a string indicating the name of your project                                           |
+| `--projectName`   | Accepts a string indicating the name of your project                                           |
 | `--email`       | Accepts email id for authentication                                                            |
 | `--password`    | Accepts password for authentication                                                            |
 | `--token`       | Accepts token for authentication, either pass email & password or token.                       |
