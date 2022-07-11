@@ -25,7 +25,7 @@ void (async () => {
 				(await import(
 					join(
 						require.main
-							? dirname(require.main.filename)
+							? join(dirname(require.main.filename), '..')
 							: process.cwd(),
 						'package.json'
 					)
