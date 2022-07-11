@@ -2,9 +2,8 @@ import { Deployment } from '@metacall/protocol/deployment';
 import API from '@metacall/protocol/protocol';
 import chalk from 'chalk';
 import { Table } from 'console-table-printer';
-import { startup } from './../startup';
+import { Config } from '../config';
 import { sleep } from './../utils';
-import args from './args';
 
 interface row {
 	Deployments: string;
@@ -76,8 +75,7 @@ const genAllURL = (
 	return urls;
 };
 
-export const inspect = async (): Promise<void> => {
-	const config = await startup(args['confDir']);
+export const inspect = async (config: Config): Promise<void> => {
 	const api = API(config.token as string, config.baseURL);
 
 	for (;;) {
