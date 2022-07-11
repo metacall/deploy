@@ -50,10 +50,12 @@ const main = async (args) => {
 		const lockfile = require('../package-lock.json');
 		const { version: packageVersion } = package;
 		const { version: lockfileVersion } = lockfile;
+		const { packages: { '': { version: lockfileVersion2 } } } = lockfile;
 		debugLog('package.json version:', packageVersion);
 		debugLog('package-lock.json version:', lockfileVersion);
+		debugLog('package-lock.json version (repeated):', lockfileVersion2);
 		
-		let success = latestVersion === packageVersion && latestVersion === lockfileVersion;
+		let success = latestVersion === packageVersion && latestVersion === lockfileVersion && latestVersion === lockfileVersion2;
 
 		if (success) {
 			debugLog('Versions match. No update needed.');
@@ -70,6 +72,12 @@ const main = async (args) => {
 				lockfile.version = latestVersion;
 				fs.writeFileSync(path.join(root, 'package-lock.json'), JSON.stringify(lockfile, null, '\t'));
 				debugLog('Updated package-lock.json.');
+			}
+			if (lockfileVersion2 !== latestVersion) {
+				console.log('Updating package-lock.json (repeated) with version from latest tag...');
+				lockfile.packages[''].version = latestVersion;
+				fs.writeFileSync(path.join(root, 'package-lock.json'), JSON.stringify(lockfile, null, '\t'));
+				debugLog('Updated package-lock.json (repeated).');
 			}
 			debugLog('Updated versions.');
 			await run('git', ['add', 'package.json']);
