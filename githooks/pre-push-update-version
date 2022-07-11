@@ -60,6 +60,7 @@ const main = async (args) => {
 		if (success) {
 			debugLog('Versions match. No update needed.');
 		} else {
+			await run('git', ['tag', '-d', latestTag]);
 			debugLog('Versions donn\'t match. Updating versions.');
 			if (packageVersion !== latestVersion) {
 				console.log('Updating package.json with version from latest tag...');
@@ -83,6 +84,7 @@ const main = async (args) => {
 			await run('git', ['add', 'package.json']);
 			await run('git', ['add', 'package-lock.json']);
 			await run('git', ['commit', '-m', 'Updating version to ' + latestTag]);
+			await run('git', ['tag', latestTag]);
 
 			resp = await run('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
 			const currentBranch = resp.stdout.trim();
