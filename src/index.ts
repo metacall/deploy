@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { promises as fs } from 'fs';
+import { dirname, join } from 'path';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';
@@ -18,6 +19,21 @@ export enum ErrorCode {
 }
 
 void (async () => {
+	if (args['version']) {
+		return console.log(
+			(
+				(await import(
+					join(
+						require.main
+							? dirname(require.main.filename)
+							: process.cwd(),
+						'package.json'
+					)
+				)) as { version: string }
+			).version
+		);
+	}
+
 	const config = await startup(args['confDir']);
 
 	if (args['inspect']) return await inspect(config);

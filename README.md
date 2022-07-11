@@ -51,6 +51,7 @@ metacall-deploy --[args=value]
 | CLI Args        | Description                                                                                    |
 | --------------- | ---------------------------------------------------------------------------------------------- |
 | `--help`        | Prints a user manual to assist you in using the cli.                                           |
+| `--version`     | Prints current version of the cli.                                                             |
 | `--workdir`     | Accepts relative path to application directory, Defaults to `cwd`                              |
 | `--addrepo`     | Accepts url of repository to deploy                                                            |
 | `--projectName` | Accepts a string indicating the name of your project                                           |

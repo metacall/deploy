@@ -3,7 +3,8 @@ import { basename } from 'path';
 import { ArgumentConfig, parse, ParseOptions } from 'ts-command-line-args';
 
 const cliArgsDescription: { [k: string]: string } = {
-	help: 'Prints help.',
+	help: 'Prints a user manual to assist you in using the cli.',
+	version: 'Prints current version of the cli.',
 	addrepo: 'Deploy from repository.',
 	workdir: 'Accepts path to application directory.',
 	dev: 'Run CLI in dev mode (deploy locally to metacall/faas).',
@@ -19,6 +20,7 @@ const cliArgsDescription: { [k: string]: string } = {
 
 interface CLIArgs {
 	help?: boolean;
+	version?: boolean;
 	addrepo?: string;
 	workdir?: string;
 	dev: boolean;
@@ -46,6 +48,12 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		optional: true,
 		alias: 'h',
 		description: cliArgsDescription.help
+	},
+	version: {
+		type: Boolean,
+		optional: true,
+		alias: 'v',
+		description: cliArgsDescription.version
 	},
 	addrepo: {
 		type: String,
