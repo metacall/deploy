@@ -51,3 +51,5 @@ export const deleteBySelection = async (config: Config): Promise<void> => {
 		error(String(err));
 	}
 };
+
+// This can be better
