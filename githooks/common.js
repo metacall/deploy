@@ -32,7 +32,6 @@ const run = (cmd, args = [], config = {}) =>
 	});
 
 module.exports = {
-	debug,
-	debugLog,
-	run
+	run,
+	debugLog
 };
