@@ -90,9 +90,17 @@ const authSelection = async (config: Config): Promise<string> => {
 		'Login by email and password': authLogin
 	};
 
-	const token = await methods[await loginSelection(Object.keys(methods))](
-		config
-	);
+	let token: string;
+
+	if (args['email'] || args['password']) {
+		token = await methods['Login by email and password'](config);
+	} else if (args['token']) {
+		token = await methods['Login by token'](config);
+	} else {
+		token = await methods[await loginSelection(Object.keys(methods))](
+			config
+		);
+	}
 
 	await save({ token });
 
