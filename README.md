@@ -63,6 +63,8 @@ metacall-deploy --[args=value]
 | `--inspect`     | Lists out all the deployments with specifications.                                             |
 | `--delete`      | Accepts boolean value: it provides you all the available deployment options to delete          |
 | `--confDir`     | Accepts relative path for changing default config directory                                    |
+| `--logout`      | Accepts boolean value: use it in order to expire your current session.                         |
+| `--listPlans`   | Accepts boolean value: list all the plans that are offered in your account using it.           |
 
 ## Exit codes and their meanings
 

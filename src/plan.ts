@@ -7,12 +7,14 @@ import { Config } from './config';
 import { ErrorCode } from './index';
 // TODO: We should cache the plan and ask for it only once
 
-export const plan = async (config: Config): Promise<Plans> => {
+export const planFetch = async (
+	config: Config
+): Promise<Record<string, number>> => {
 	const api = API(config.token as string, config.baseURL);
 
-	const availPlans: string[] = Object.keys(await api.listSubscriptions());
+	const availPlans: Record<string, number> = await api.listSubscriptions();
 
-	if (!availPlans.length) {
+	if (!Object.keys(availPlans).length) {
 		const deployedAppsCount = (await api.listSubscriptionsDeploys()).length;
 
 		if (!deployedAppsCount) {
@@ -33,6 +35,12 @@ export const plan = async (config: Config): Promise<Plans> => {
 			return process.exit(ErrorCode.Ok);
 		}
 	}
+
+	return availPlans;
+};
+
+export const plan = async (config: Config): Promise<Plans> => {
+	const availPlans = Object.keys(await planFetch(config));
 
 	return (
 		(args['plan'] && availPlans.includes(args['plan']) && args['plan']) ||
