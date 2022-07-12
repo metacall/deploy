@@ -15,7 +15,8 @@ const cliArgsDescription: { [k: string]: string } = {
 	force: 'Accepts boolean value: it deletes the deployment present on an existing plan and deploys again.',
 	plan: 'Accepts type of plan: "Essential", "Standard", "Premium".',
 	inspect: 'Lists out all the deployments with specifications.',
-	delete: 'Accepts boolean value: it provides you all the available deployment options to delete.'
+	delete: 'Accepts boolean value: it provides you all the available deployment options to delete.',
+	logout: 'Accepts boolean value: use it inorder to logged out.'
 };
 
 interface CLIArgs {
@@ -34,6 +35,7 @@ interface CLIArgs {
 	inspect?: boolean;
 	delete?: boolean;
 	serverUrl?: string;
+	logout?: boolean;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -122,6 +124,13 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		defaultValue: false,
 		optional: true,
 		description: cliArgsDescription.delete
+	},
+	logout: {
+		type: Boolean,
+		alias: 'l',
+		defaultValue: false,
+		optional: true,
+		description: cliArgsDescription.logout
 	},
 	serverUrl: {
 		type: String,

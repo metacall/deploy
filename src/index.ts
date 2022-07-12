@@ -7,6 +7,7 @@ import { error } from './cli/messages';
 import { deleteBySelection } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
 import { force } from './force';
+import { logout } from './logout';
 import { plan } from './plan';
 import { startup } from './startup';
 
@@ -33,6 +34,8 @@ void (async () => {
 			).version
 		);
 	}
+
+	if (args['logout']) return logout();
 
 	const config = await startup(args['confDir']);
 
@@ -79,3 +82,9 @@ void (async () => {
 		config.baseURL = args['serverUrl'];
 	}
 })();
+
+// for log out
+// we need to execute command in sync
+// we need the path of metacall
+// if path not present we through error no such path available
+// we delete it
