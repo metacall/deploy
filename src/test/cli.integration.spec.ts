@@ -249,6 +249,11 @@ describe('integration cli', function () {
 
 		strictEqual(await deleted(workDirSuffix), true);
 
+		strictEqual(
+			await runCLI(['--listPlans'], [keys.enter]).promise,
+			'i Essential : 1\n'
+		);
+
 		const resultDeploy = await runCLI(
 			[
 				`--workdir=${filePath}`,
