@@ -57,7 +57,28 @@ describe('integration cli', function () {
 		}
 	});
 
-	// ! : Invalid account email or password.
+	// no credentials provided
+	it('Should fail with no credentials with --tokem', async () => {
+		await clearCache();
+
+		try {
+			const result = await runCLI(
+				['--token='],
+				[keys.enter, keys.enter, keys.kill]
+			).promise;
+
+			fail(
+				`The CLI passed without errors and it should have failed. Result: ${String(
+					result
+				)}`
+			);
+		} catch (err) {
+			ok(
+				String(err) ===
+					'! Token invalid: Invalid authorization header, no credentials provided.\n'
+			);
+		}
+	});
 
 	// Invalid login credentials
 	it('Should fail with invalid login credentials', async () => {
