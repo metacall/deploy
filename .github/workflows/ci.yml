@@ -29,9 +29,12 @@ jobs:
             - name: Build
               run: npm run build
 
-            - name: Run Unit + Integration Tests
+            - name: Run Tests
+              env:
+                METACALL_AUTH_EMAIL: ${{ secrets.METACALL_AUTH_EMAIL }}
+                METACALL_AUTH_PASSWORD: ${{ secrets.METACALL_AUTH_PASSWORD }}
               run: |
-                  npm run unit-integration
+                  npm run test
 
             - name: Publish
               uses: JS-DevTools/npm-publish@v1
