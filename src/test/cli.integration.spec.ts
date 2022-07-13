@@ -92,6 +92,9 @@ describe('integration cli', function () {
 		const email = process.env.METACALL_AUTH_EMAIL;
 		const password = process.env.METACALL_AUTH_PASSWORD;
 
+		console.log(email);
+		console.log(password);
+
 		if (typeof email !== 'string' || typeof password !== 'string')
 			return this.skip();
 
