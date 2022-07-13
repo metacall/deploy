@@ -1,5 +1,4 @@
 name: CI
-RANDOM_ENV_VAR: Env variables are working
 on:
     pull_request:
     push:
@@ -31,12 +30,11 @@ jobs:
               run: npm run build
 
             - name: Run Tests
-              run: echo $RANDOM_ENV_VAR
-              # env:
-              #     METACALL_AUTH_EMAIL: ${{ secrets.METACALL_AUTH_EMAIL }}
-              #     METACALL_AUTH_PASSWORD: ${{ secrets.METACALL_AUTH_PASSWORD }}
-              # run: |
-              #     npm run test
+              env:
+                  METACALL_AUTH_EMAIL: ${{ secrets.METACALL_AUTH_EMAIL }}
+                  METACALL_AUTH_PASSWORD: ${{ secrets.METACALL_AUTH_PASSWORD }}
+              run: |
+                  npm run test
 
             - name: Publish
               uses: JS-DevTools/npm-publish@v1
