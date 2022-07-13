@@ -141,3 +141,25 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 
 	return res;
 };
+
+export const deleted = async (suffix: string): Promise<boolean> => {
+	const config = await startup(args['confDir']);
+	const api = API(config.token as string, config.baseURL);
+
+	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
+		new Promise(resolve => setTimeout(resolve, ms));
+	let res = false,
+		wait = true;
+	while (wait) {
+		await sleep(1000);
+		const inspect = await api.inspect();
+
+		const deployIdx = inspect.findIndex(deploy => deploy.suffix === suffix);
+		if (deployIdx === -1) {
+			wait = false;
+			res = true;
+		}
+	}
+
+	return res;
+};
