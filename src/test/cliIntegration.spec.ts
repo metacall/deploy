@@ -226,6 +226,8 @@ describe('integration cli', function () {
 
 		ok(String(resultDel).includes('Trying to deploy forcefully!'));
 
+		strictEqual(await deleted(workDirSuffix), true);
+
 		const resultDeploy = await runCLI(
 			[
 				`--workdir=${filePath}`,
