@@ -89,11 +89,8 @@ describe('integration cli', function () {
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
 
-		// const email = process.env.METACALL_AUTH_EMAIL;
-		// const password = process.env.METACALL_AUTH_PASSWORD;
-
-		const email = 'jose@metacall.io';
-		const password = 'parratest';
+		const email = process.env.METACALL_AUTH_EMAIL;
+		const password = process.env.METACALL_AUTH_PASSWORD;
 
 		if (typeof email !== 'string' || typeof password !== 'string')
 			return this.skip();
