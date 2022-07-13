@@ -32,7 +32,7 @@ const defaultConfig: Config = {
 
 export const defaultPath = configDir(join('metacall', 'deploy'));
 
-const configFilePath = (path = defaultPath) => join(path, 'config.ini');
+export const configFilePath = (path = defaultPath) => join(path, 'config.ini');
 
 export const load = async (path = defaultPath): Promise<Config> => {
 	const data = parse(

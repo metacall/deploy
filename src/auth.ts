@@ -18,7 +18,7 @@ const authToken = async (config: Config): Promise<string> => {
 	const askToken = (): Promise<string> =>
 		maskedInput('Please enter your metacall token');
 
-	let token: string = await askToken();
+	let token: string = args['token'] || (await askToken());
 
 	const api = API(token, config.baseURL);
 
@@ -77,6 +77,7 @@ const authLogin = async (config: Config): Promise<string> => {
 					String((err as ProtocolError).response?.data)
 				)
 			);
+			args['email'] = args['password'] = undefined;
 			await askCredentials();
 		}
 	}

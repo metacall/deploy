@@ -44,7 +44,8 @@
 			"**/*-test",
 			"**/test",
 			"**/*.d.ts",
-			"**/src"
+			"**/src",
+			"githooks/**"
 		]
 	},
 	"prettier": {
