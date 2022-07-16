@@ -42,8 +42,16 @@ export const planFetch = async (
 export const plan = async (config: Config): Promise<Plans> => {
 	const availPlans = Object.keys(await planFetch(config));
 
-	return (
-		(args['plan'] && availPlans.includes(args['plan']) && args['plan']) ||
-		(await planSelection('Please select plan from the list', availPlans))
-	);
+	let plan =
+		args['plan'] && availPlans.includes(args['plan']) && args['plan'];
+
+	plan =
+		plan || availPlans.length === 1
+			? (availPlans[0] as Plans)
+			: await planSelection(
+					'Please select plan from the list',
+					availPlans
+			  );
+
+	return plan;
 };
