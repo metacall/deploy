@@ -85,3 +85,7 @@ void (async () => {
 		config.baseURL = args['serverUrl'];
 	}
 })();
+
+// change all flag names to toUpperCase
+// what's the useCase if we show, python files in static file language
+// If we have metacall.json file saved, then deployer directly deploys the application based on that json, but it should be asked
