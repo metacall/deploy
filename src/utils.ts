@@ -5,11 +5,13 @@
 
 */
 
+import { MetaCallJSON } from '@metacall/protocol/deployment';
 import archiver, { Archiver } from 'archiver';
 import { promises as fs } from 'fs';
 import { platform } from 'os';
 import { basename, join, relative } from 'path';
-import { error } from './cli/messages';
+import { error, printLanguage } from './cli/messages';
+import { fileSelection } from './cli/selection';
 
 const missing = (name: string): string =>
 	`Missing ${name} environment variable! Unable to load config`;
@@ -55,6 +57,17 @@ export const filter = (
 		(acc, [k, v]) => (a[k] === v ? acc : { ...acc, [k]: v }),
 		{}
 	);
+
+export const loadFilesToRun = async (
+	packages: MetaCallJSON[]
+): Promise<void> => {
+	for (const pkg of packages) {
+		pkg.scripts = await fileSelection(
+			`Select files to load with ${printLanguage(pkg.language_id)}`,
+			pkg.scripts
+		);
+	}
+};
 
 export const zip = async (
 	source: string,

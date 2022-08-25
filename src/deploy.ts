@@ -13,14 +13,10 @@ import args from './cli/args';
 import { input } from './cli/inputs';
 import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
-import {
-	fileSelection,
-	languageSelection,
-	listSelection
-} from './cli/selection';
+import { languageSelection, listSelection } from './cli/selection';
 import { Config } from './config';
 import { logs } from './logs';
-import { zip } from './utils';
+import { loadFilesToRun, zip } from './utils';
 
 enum ErrorCode {
 	Ok = 0,
@@ -109,35 +105,77 @@ export const deployPackage = async (
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
-			const potentialPackages = generateJsonsFromFiles(descriptor.files);
-			const potentialLanguages = Array.from(
-				new Set<LanguageId>(
-					potentialPackages.reduce<LanguageId[]>(
-						(langs, pkg) => [...langs, pkg.language_id],
-						[]
-					)
-				)
-			);
+			let languages: LanguageId[] = [];
+			let packages: MetaCallJSON[] = [];
 
-			const languages = await languageSelection(potentialLanguages);
-			const packages = potentialPackages.filter(pkg =>
-				languages.includes(pkg.language_id)
-			);
+			let wait = true;
 
-			for (const pkg of packages) {
-				pkg.scripts = await fileSelection(
-					`Select files to load with ${printLanguage(
-						pkg.language_id
-					)}`,
-					pkg.scripts
+			do {
+				const potentialPackages = generateJsonsFromFiles(
+					descriptor.files
 				);
-			}
+				const potentialLanguages = Array.from(
+					new Set<LanguageId>(
+						potentialPackages.reduce<LanguageId[]>(
+							(langs, pkg) => [...langs, pkg.language_id],
+							[]
+						)
+					)
+				);
+
+				languages = await languageSelection(potentialLanguages);
+
+				if (languages.length == 0) {
+					warn(
+						'You must choose a language in order to proceed with the deployment procedure, do not continue without doing so.'
+					);
+					wait = false;
+					continue;
+				}
+
+				packages = potentialPackages.filter(pkg =>
+					languages.includes(pkg.language_id)
+				);
+
+				await loadFilesToRun(packages);
+
+				const langId: LanguageId[] = [];
+
+				for (const pkg of packages) {
+					pkg.scripts.length === 0 && langId.push(pkg.language_id);
+				}
+
+				if (!langId.length) break;
+
+				if (langId.length === packages.length) {
+					warn(
+						'You must choose a file to continue the deployment procedure, do not continue without doing so.'
+					);
+					wait = false;
+					continue;
+				}
+
+				const deployConsent = (
+					await input(
+						`You selected language${
+							langId.length > 1 ? 's' : ''
+						} ${langId
+							.map(el => printLanguage(el))
+							.join(
+								', '
+							)} but you didn't select any file, do you want to continue? (Y/N): `
+					)
+				).toUpperCase();
+
+				wait = deployConsent === 'Y' || deployConsent === 'YES';
+			} while (!wait);
 
 			const cacheJsons = saveConsent === 'Y' || saveConsent === 'YES';
 
 			const additionalPackages = cacheJsons
 				? await (async () => {
 						for (const pkg of packages) {
+							if (pkg.scripts.length === 0) continue;
 							await fs.writeFile(
 								join(
 									rootPath,
