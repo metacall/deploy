@@ -2,27 +2,7 @@ import { Plans } from '@metacall/protocol/plan';
 import { basename } from 'path';
 import { ArgumentConfig, parse, ParseOptions } from 'ts-command-line-args';
 
-const cliArgsDescription: { [k: string]: string } = {
-	help: 'Prints a user manual to assist you in using the cli.',
-	version: 'Prints current version of the cli.',
-	addrepo: 'Deploy from repository.',
-	workdir: 'Accepts path to application directory.',
-	dev: 'Run CLI in dev mode (deploy locally to metacall/faas).',
-	projectName: 'Accepts name of the application.',
-	email: 'Accepts email id for authentication.',
-	password: 'Accepts password for authentication.',
-	token: 'Accepts token for authentication, either pass email & password or token.',
-	force: 'Accepts boolean value: it deletes the deployment present on an existing plan and deploys again.',
-	plan: 'Accepts type of plan: "Essential", "Standard", "Premium".',
-	inspect: 'Lists out all the deployments with specifications.',
-	delete: 'Accepts boolean value: it provides you all the available deployment options to delete.',
-	logout: 'Accepts boolean value: use it in order to expire your current session.',
-	listPlans:
-		'Accepts boolean value: list all the plans that are offered in your account using it.'
-};
-
 interface CLIArgs {
-	help?: boolean;
 	version?: boolean;
 	addrepo?: string;
 	workdir?: string;
@@ -41,6 +21,13 @@ interface CLIArgs {
 	listPlans?: boolean;
 }
 
+interface optionDefinition {
+	type: BooleanConstructor | StringConstructor;
+	optional?: true;
+	alias: String;
+	defaultValue: boolean | string;
+}
+
 const parsePlan = (planType: string): Plans | undefined => {
 	if (Object.keys(Plans).includes(planType)) {
 		return Plans[planType as keyof typeof Plans];
@@ -48,106 +35,87 @@ const parsePlan = (planType: string): Plans | undefined => {
 };
 
 const optionsDefinition: ArgumentConfig<CLIArgs> = {
-	help: {
-		type: Boolean,
-		optional: true,
-		alias: 'h',
-		description: cliArgsDescription.help
-	},
 	version: {
 		type: Boolean,
 		optional: true,
-		alias: 'v',
-		description: cliArgsDescription.version
+		alias: 'v'
 	},
 	addrepo: {
 		type: String,
 		optional: true,
-		alias: 'a',
-		description: cliArgsDescription.addrepo
+		alias: 'a'
 	},
 	workdir: {
 		type: String,
 		optional: true,
 		alias: 'w',
-		defaultValue: process.cwd(),
-		description: cliArgsDescription.workdir
+		defaultValue: process.cwd()
 	},
 	dev: {
 		type: Boolean,
 		defaultValue: false,
-		description: cliArgsDescription.dev
+		alias: 'd'
 	},
 	projectName: {
 		type: String,
 		alias: 'n',
-		defaultValue: basename(process.cwd()),
-		description: cliArgsDescription.projectName
+		defaultValue: basename(process.cwd())
 	},
 	email: {
 		type: String,
 		alias: 'e',
-		optional: true,
-		description: cliArgsDescription.email
+		optional: true
 	},
 	password: {
 		type: String,
 		alias: 'p',
-		optional: true,
-		description: cliArgsDescription.password
+		optional: true
 	},
 	token: {
 		type: String,
 		alias: 't',
-		optional: true,
-		description: cliArgsDescription.token
+		optional: true
 	},
 	force: {
 		type: Boolean,
 		alias: 'f',
-		defaultValue: false,
-		description: cliArgsDescription.force
+		defaultValue: false
 	},
 	plan: {
 		type: parsePlan,
 		alias: 'P',
-		optional: true,
-		description: cliArgsDescription.plan
+		optional: true
 	},
 	inspect: {
 		type: Boolean,
 		alias: 'i',
 		defaultValue: false,
-		optional: true,
-		description: cliArgsDescription.inspect
+		optional: true
 	},
 	delete: {
 		type: Boolean,
 		alias: 'D',
 		defaultValue: false,
-		optional: true,
-		description: cliArgsDescription.delete
+		optional: true
 	},
 	logout: {
 		type: Boolean,
 		alias: 'l',
 		defaultValue: false,
-		optional: true,
-		description: cliArgsDescription.logout
+		optional: true
 	},
 	listPlans: {
 		type: Boolean,
 		alias: 'r',
 		defaultValue: false,
-		optional: true,
-		description: cliArgsDescription.listPlans
+		optional: true
 	},
 	serverUrl: {
 		type: String,
 		alias: 'u',
 		optional: true
 	},
-	confDir: { type: String, alias: 'd', optional: true }
+	confDir: { type: String, alias: 'c', optional: true }
 };
 
 const parseOptions: ParseOptions<CLIArgs> = {
@@ -157,28 +125,10 @@ const parseOptions: ParseOptions<CLIArgs> = {
 			header: 'Official CLI for metacall-deploy',
 			content: 'Usage: metacall-deploy [--args]'
 		}
-	]
+	],
+	partial: true
 };
 
-const parsingOptions = (): ParseOptions<CLIArgs> => {
-	const MochaVarsArray = [
-		'afterEach',
-		'after',
-		'beforeEach',
-		'before',
-		'describe',
-		'it'
-	] as const;
+const args = parse<CLIArgs>(optionsDefinition, parseOptions);
 
-	type MochaVars = typeof MochaVarsArray[number];
-
-	// Prevents UNKNOWN_OPTION exception #45 (https://github.com/75lb/command-line-args/wiki/Mocha-test-script-example)
-
-	return MochaVarsArray.every(
-		(f: string): boolean => global[f as MochaVars] instanceof Function
-	)
-		? { ...parseOptions, partial: true }
-		: parseOptions;
-};
-
-export default parse<CLIArgs>(optionsDefinition, parsingOptions());
+export default { _unknown: [], ...args };
