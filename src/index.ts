@@ -4,6 +4,7 @@ import { dirname, join } from 'path';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';
+import { handleUnknownArgs } from './cli/unknown';
 import { deleteBySelection } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
 import { force } from './force';
@@ -21,6 +22,8 @@ export enum ErrorCode {
 }
 
 void (async () => {
+	if (args['_unknown'].length) handleUnknownArgs();
+
 	if (args['version']) {
 		return console.log(
 			(
@@ -87,5 +90,4 @@ void (async () => {
 })();
 
 // change all flag names to toUpperCase
-// what's the useCase if we show, python files in static file language
 // If we have metacall.json file saved, then deployer directly deploys the application based on that json, but it should be asked
