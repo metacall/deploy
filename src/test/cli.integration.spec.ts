@@ -165,6 +165,21 @@ describe('integration cli', function () {
 		ok(String(result).includes('Official CLI for metacall-deploy\n'));
 	});
 
+	// --help
+	it('Should be able to handle unknown flag', async () => {
+		try {
+			const result = await runCLI(['--yeet'], [keys.enter]).promise;
+
+			fail(
+				`The CLI passed without errors and it should have failed. Result: ${String(
+					result
+				)}`
+			);
+		} catch (err) {
+			ok(String(err) === '! --yeet does not exist.\n');
+		}
+	});
+
 	// --addrepo
 	it('Should be able to deploy repository using --addrepo flag', async () => {
 		const result = await runCLI(

@@ -21,13 +21,6 @@ interface CLIArgs {
 	listPlans?: boolean;
 }
 
-interface optionDefinition {
-	type: BooleanConstructor | StringConstructor;
-	optional?: true;
-	alias: String;
-	defaultValue: boolean | string;
-}
-
 const parsePlan = (planType: string): Plans | undefined => {
 	if (Object.keys(Plans).includes(planType)) {
 		return Plans[planType as keyof typeof Plans];
