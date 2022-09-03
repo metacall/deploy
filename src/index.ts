@@ -5,6 +5,7 @@ import args from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';
 import { handleUnknownArgs } from './cli/unknown';
+import { validateToken } from './cli/validateToken';
 import { deleteBySelection } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
 import { force } from './force';
@@ -42,6 +43,7 @@ void (async () => {
 	if (args['logout']) return logout();
 
 	const config = await startup(args['confDir']);
+	await validateToken(config);
 
 	if (args['listPlans']) return await listPlans(config);
 
@@ -91,3 +93,4 @@ void (async () => {
 
 // change all flag names to toUpperCase
 // If we have metacall.json file saved, then deployer directly deploys the application based on that json, but it should be asked
+// add test for user should not deploy without selecting files
