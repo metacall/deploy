@@ -1,6 +1,6 @@
 {
 	"name": "@metacall/deploy",
-	"version": "0.1.13",
+	"version": "0.1.14",
 	"description": "Tool for deploying into MetaCall FaaS platform.",
 	"main": "dist/index.js",
 	"bin": {
@@ -111,6 +111,7 @@
 		"@typescript-eslint/parser": "^5.11.0",
 		"concat-stream": "^2.0.0",
 		"cross-spawn": "^7.0.3",
+		"dotenv": "^16.0.3",
 		"eslint": "^7.13.0",
 		"eslint-config-prettier": "^6.15.0",
 		"eslint-plugin-prettier": "^3.1.4",
