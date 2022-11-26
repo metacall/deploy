@@ -1,10 +1,12 @@
 import API from '@metacall/protocol/protocol';
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
+import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { constants } from 'os';
 import args from '../cli/args';
 import { startup } from '../startup';
+dotenv.config();
 
 const PATH = process.env.PATH;
 const HOME = process.env.HOME;
