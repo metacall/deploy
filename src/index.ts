@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
-import { error } from './cli/messages';
+import { error, info } from './cli/messages';
 import { handleUnknownArgs } from './cli/unknown';
 import { validateToken } from './cli/validateToken';
 import { deleteBySelection } from './delete';
@@ -43,7 +43,15 @@ void (async () => {
 	if (args['logout']) return logout();
 
 	const config = await startup(args['confDir']);
-	await validateToken(config);
+
+	try {
+		await validateToken(config);
+	} catch (err) {
+		info('Try login again!');
+		error(
+			`Token Validation Failed, Potential Causes Include:-\n1) The JWT may be mistranslated (Invalid Signature).\n2) JWT might have expired.`
+		);
+	}
 
 	if (args['listPlans']) return await listPlans(config);
 
