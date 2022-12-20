@@ -68,3 +68,13 @@ export const listSelection = (
 			choices: list
 		}
 	]).then((res: { container: string }) => res.container);
+
+export const consentSelection = (message: string): Promise<boolean> =>
+	prompt<{ consent: boolean }>([
+		{
+			type: 'confirm',
+			name: 'consent',
+			message,
+			default: false
+		}
+	]).then((res: { consent: boolean }) => res.consent);

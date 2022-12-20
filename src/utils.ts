@@ -8,10 +8,11 @@
 import { MetaCallJSON } from '@metacall/protocol/deployment';
 import archiver, { Archiver } from 'archiver';
 import { promises as fs } from 'fs';
+import { prompt } from 'inquirer';
 import { platform } from 'os';
 import { basename, join, relative } from 'path';
 import { error, printLanguage } from './cli/messages';
-import { fileSelection } from './cli/selection';
+import { consentSelection, fileSelection } from './cli/selection';
 
 const missing = (name: string): string =>
 	`Missing ${name} environment variable! Unable to load config`;
@@ -108,4 +109,35 @@ export const zip = async (
 	await archive.finalize();
 
 	return archive;
+};
+
+// TODO  Look for the .env file in user's code and fetch it so that user don't have to write all the vars again in the CLI
+
+export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
+	const enableEnv = await consentSelection('Wanna add env vars?');
+
+	const env = enableEnv
+		? await prompt<{ env: string }>([
+				{
+					type: 'input',
+					name: 'env',
+					message: 'Type env vars in the format: K1=V1, K2=V2'
+				}
+		  ]).then(({ env }) =>
+				env
+					.split(',')
+					.map(kv => {
+						const [k, v] = kv.trim().split('=');
+						return { [k]: v };
+					})
+					.reduce((obj, kv) => Object.assign(obj, kv), {})
+		  )
+		: {};
+
+	const envArr = Object.entries(env).map(el => {
+		const [k, v] = el;
+		return { name: k, value: v };
+	});
+
+	return envArr;
 };

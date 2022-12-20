@@ -16,7 +16,7 @@ import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { Config } from './config';
 import { logs } from './logs';
-import { loadFilesToRun, zip } from './utils';
+import { getEnv, loadFilesToRun, zip } from './utils';
 
 enum ErrorCode {
 	Ok = 0,
@@ -63,38 +63,12 @@ export const deployPackage = async (
 			);
 
 			// TODO: We can ask for environment variables here too and cache them
-			/*
-        const { enableEnv } = await prompt<{ enableEnv: boolean }>([
-            {
-                type: 'confirm',
-                name: 'enableEnv',
-                message: 'Add env vars?',
-                default: false
-            }
-        ]);
-        const env = enableEnv
-            ? await prompt<{ env: string }>([
-                    {
-                        type: 'input',
-                        name: 'env',
-                        message: 'Type env vars in the format: K1=V1, K2=V2'
-                    }
-            ]).then(({ env }) =>
-                    env
-                        .split(',')
-                        .map(kv => {
-                            const [k, v] = kv.trim().split('=');
-                            return { [k]: v };
-                        })
-                        .reduce((obj, kv) => Object.assign(obj, kv), {})
-            )
-            : {};
-        */
+			const env = await getEnv();
 
 			info(`Deploying ${rootPath}...\n`);
 
 			try {
-				await api.deploy(name, [], plan, 'Package');
+				await api.deploy(name, env, plan, 'Package');
 
 				await logs(descriptor.runners, name, args['dev']);
 			} catch (err) {
@@ -252,7 +226,9 @@ export const deployFromRepository = async (
 
 		const name = (await api.add(url, selectedBranch, [])).id;
 
-		const deploy = await api.deploy(name, [], plan, 'Repository');
+		const env = await getEnv();
+
+		const deploy = await api.deploy(name, env, plan, 'Repository');
 
 		info('Deploying...');
 

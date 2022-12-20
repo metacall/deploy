@@ -6,6 +6,7 @@ import { existsSync } from 'fs';
 import { constants } from 'os';
 import args from '../cli/args';
 import { startup } from '../startup';
+
 dotenv.config();
 
 const PATH = process.env.PATH;
