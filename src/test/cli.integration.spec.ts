@@ -1,10 +1,13 @@
 import { fail, ok, strictEqual } from 'assert';
+import * as dotenv from 'dotenv';
 import { promises } from 'fs';
 import os from 'os';
 import { join } from 'path';
 import { configFilePath } from '../config';
 import { exists, loadFile } from '../utils';
 import { deleted, deployed, keys, runWithInput } from './cmd';
+
+dotenv.config();
 
 const runCLI = (args: string[], inputs: string[]) => {
 	return runWithInput('dist/index.js', args, inputs);
@@ -184,7 +187,7 @@ describe('integration cli', function () {
 	it('Should be able to deploy repository using --addrepo flag', async () => {
 		const result = await runCLI(
 			[`--addrepo=${url}`],
-			[keys.enter, keys.enter, keys.enter]
+			[keys.enter, 'n', keys.enter, keys.enter]
 		).promise;
 
 		ok(String(result).includes('i Deploying...\n'));
@@ -209,12 +212,37 @@ describe('integration cli', function () {
 	it('Should be able to deploy repository using --workdir & --projectName flag', async () => {
 		const result = await runCLI(
 			[`--workdir=${filePath}`, `--projectName=${workDirSuffix}`],
-			[keys.enter, keys.enter, keys.kill]
+			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
 		ok(String(result).includes(`i Deploying ${filePath}...\n`));
 
 		strictEqual(await deployed(workDirSuffix), true);
+		return result;
+	});
+
+	// --delete
+	it('Should be able to delete deployed repository using --delete flag', async () => {
+		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+			.promise;
+
+		ok(String(result).includes('i Deploy Delete Succeed\n'));
+
+		strictEqual(await deleted(workDirSuffix), true);
+
+		return result;
+	});
+
+	// with env vars
+	it('Should be able to deploy repository using --addrepo flag with environment vars', async () => {
+		const result = await runCLI(
+			[`--addrepo=${url}`],
+			[keys.enter, 'y', 'PORT=1000, ENV=PROD', keys.enter, keys.enter]
+		).promise;
+
+		ok(String(result).includes('i Deploying...\n'));
+
+		strictEqual(await deployed(addRepoSuffix), true);
 		return result;
 	});
 
@@ -238,7 +266,7 @@ describe('integration cli', function () {
 				'--projectName=time-app-web',
 				'--plan=Essential'
 			],
-			[keys.enter, keys.kill]
+			[keys.enter, 'n', keys.kill]
 		).promise;
 
 		ok(String(result).includes(`i Deploying ${filePath}...\n`));
@@ -307,3 +335,5 @@ describe('integration cli', function () {
 
 // TODO: Tests to add
 // if there is only one log file -> select it (TODO: This must be reviewed in case we use TUI)
+
+// test for mangled token, expired
