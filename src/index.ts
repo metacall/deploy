@@ -105,5 +105,3 @@ void (async () => {
 })();
 
 // change all flag names to toUpperCase
-// If we have metacall.json file saved, then deployer directly deploys the application based on that json, but it should be asked
-// add test for user should not deploy without selecting files
