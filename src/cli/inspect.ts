@@ -1,5 +1,5 @@
 import { Deployment } from '@metacall/protocol/deployment';
-import API from '@metacall/protocol/protocol';
+import { API as APIInterface } from '@metacall/protocol/protocol';
 import chalk from 'chalk';
 import { Table } from 'console-table-printer';
 import { Config } from '../config';
@@ -75,9 +75,10 @@ const genAllURL = (
 	return urls;
 };
 
-export const inspect = async (config: Config): Promise<void> => {
-	const api = API(config.token as string, config.baseURL);
-
+export const inspect = async (
+	config: Config,
+	api: APIInterface
+): Promise<void> => {
 	for (;;) {
 		const res = await api.inspect();
 

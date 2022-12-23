@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import API, { API as APIInterface } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 import args from './cli/args';
@@ -43,9 +44,13 @@ void (async () => {
 	if (args['logout']) return logout();
 
 	const config = await startup(args['confDir']);
+	const api: APIInterface = API(
+		config.token as string,
+		args['dev'] ? config.devURL : config.baseURL
+	);
 
 	try {
-		await validateToken(config);
+		await validateToken(api);
 	} catch (err) {
 		info('Try login again!');
 		error(
@@ -53,19 +58,21 @@ void (async () => {
 		);
 	}
 
-	if (args['listPlans']) return await listPlans(config);
+	console.log('token is getting validated');
 
-	if (args['inspect']) return await inspect(config);
+	if (args['listPlans']) return await listPlans(api);
 
-	if (args['delete']) return await deleteBySelection(config);
+	if (args['inspect']) return await inspect(config, api);
 
-	if (args['force']) await force(config);
+	if (args['delete']) return await deleteBySelection(api);
+
+	if (args['force']) await force(api);
 
 	if (args['addrepo']) {
 		try {
 			return await deployFromRepository(
-				config,
-				await plan(config),
+				api,
+				await plan(api),
 				new URL(args['addrepo']).href
 			);
 		} catch (e) {
@@ -88,7 +95,7 @@ void (async () => {
 		}
 
 		try {
-			await deployPackage(rootPath, config, await plan(config));
+			await deployPackage(rootPath, api, await plan(api));
 		} catch (e) {
 			error(String(e));
 		}
@@ -102,3 +109,6 @@ void (async () => {
 // change all flag names to toUpperCase
 // If we have metacall.json file saved, then deployer directly deploys the application based on that json, but it should be asked
 // add test for user should not deploy without selecting files
+
+// New
+// in dev mode, token should be string and api url for every place should be devURL

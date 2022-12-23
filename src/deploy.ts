@@ -1,12 +1,15 @@
 import { LanguageId, MetaCallJSON } from '@metacall/protocol/deployment';
 import {
+	PackageError,
 	findRunners,
 	generateJsonsFromFiles,
-	generatePackage,
-	PackageError
+	generatePackage
 } from '@metacall/protocol/package';
 import { Plans } from '@metacall/protocol/plan';
-import API, { ProtocolError } from '@metacall/protocol/protocol';
+import {
+	API as APIInterface,
+	ProtocolError
+} from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import args from './cli/args';
@@ -14,7 +17,6 @@ import { input } from './cli/inputs';
 import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
-import { Config } from './config';
 import { logs } from './logs';
 import { getEnv, loadFilesToRun, zip } from './utils';
 
@@ -28,7 +30,7 @@ enum ErrorCode {
 
 export const deployPackage = async (
 	rootPath: string,
-	config: Config,
+	api: APIInterface,
 	plan: Plans
 ) => {
 	try {
@@ -37,10 +39,7 @@ export const deployPackage = async (
 
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
 			// TODO: We should cache the plan and ask for it only once
-			const api = API(
-				config.token as string,
-				args['dev'] ? config.devURL : config.baseURL
-			);
+
 			const descriptor = await generatePackage(rootPath);
 
 			const { progress, pulse, hide } = Progress();
@@ -200,15 +199,10 @@ export const deployPackage = async (
 };
 
 export const deployFromRepository = async (
-	config: Config,
+	api: APIInterface,
 	plan: Plans,
 	url: string
 ) => {
-	const api = API(
-		config.token as string,
-		args['dev'] ? config.devURL : config.baseURL
-	);
-
 	try {
 		const { branches } = await api.branchList(url);
 
