@@ -58,8 +58,6 @@ void (async () => {
 		);
 	}
 
-	console.log('token is getting validated');
-
 	if (args['listPlans']) return await listPlans(api);
 
 	if (args['inspect']) return await inspect(config, api);
