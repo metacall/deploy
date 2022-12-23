@@ -1,20 +1,17 @@
 import { Deployment } from '@metacall/protocol/deployment';
-import API, { ProtocolError } from '@metacall/protocol/protocol';
+import {
+	API as APIInterface,
+	ProtocolError
+} from '@metacall/protocol/protocol';
 import { apiError, error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
-import { Config } from './config';
-
-const generateAPI = (config: Config) =>
-	API(config.token as string, config.baseURL);
 
 export const del = async (
 	prefix: string,
 	suffix: string,
 	version: string,
-	config: Config
+	api: APIInterface
 ): Promise<string> => {
-	const api = generateAPI(config);
-
 	let res = '';
 
 	try {
@@ -26,9 +23,7 @@ export const del = async (
 	return res;
 };
 
-export const deleteBySelection = async (config: Config): Promise<void> => {
-	const api = generateAPI(config);
-
+export const deleteBySelection = async (api: APIInterface): Promise<void> => {
 	try {
 		const deployments: Deployment[] = (await api.inspect()).filter(
 			dep => dep.status === 'ready'
@@ -46,7 +41,7 @@ export const deleteBySelection = async (config: Config): Promise<void> => {
 				dep.version === project.split(' ')[1]
 		)[0];
 
-		info(await del(app.prefix, app.suffix, app.version, config));
+		info(await del(app.prefix, app.suffix, app.version, api));
 	} catch (err) {
 		error(String(err));
 	}

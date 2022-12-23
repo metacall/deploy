@@ -1,9 +1,7 @@
-import API from '@metacall/protocol/protocol';
-import { Config, save } from '../config';
+import { API as APIInterface } from '@metacall/protocol/protocol';
+import { save } from '../config';
 
-export const validateToken = async (config: Config): Promise<void> => {
-	const api = API(config.token as string, config.baseURL);
-
+export const validateToken = async (api: APIInterface): Promise<void> => {
 	const validToken = await api.validate();
 	if (!validToken) {
 		const token = await api.refresh();

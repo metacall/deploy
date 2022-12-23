@@ -187,7 +187,7 @@ describe('integration cli', function () {
 	it('Should be able to deploy repository using --addrepo flag', async () => {
 		const result = await runCLI(
 			[`--addrepo=${url}`],
-			[keys.enter, 'n', keys.enter, keys.enter]
+			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
 		ok(String(result).includes('i Deploying...\n'));
@@ -237,7 +237,14 @@ describe('integration cli', function () {
 	it('Should be able to deploy repository using --addrepo flag with environment vars', async () => {
 		const result = await runCLI(
 			[`--addrepo=${url}`],
-			[keys.enter, 'y', 'PORT=1000, ENV=PROD', keys.enter, keys.enter]
+			[
+				keys.enter,
+				'y',
+				keys.enter,
+				'PORT=1000, ENV=PROD',
+				keys.enter,
+				keys.kill
+			]
 		).promise;
 
 		ok(String(result).includes('i Deploying...\n'));
@@ -266,7 +273,7 @@ describe('integration cli', function () {
 				'--projectName=time-app-web',
 				'--plan=Essential'
 			],
-			[keys.enter, 'n', keys.kill]
+			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
 		ok(String(result).includes(`i Deploying ${filePath}...\n`));

@@ -1,17 +1,14 @@
 import { Plans } from '@metacall/protocol/plan';
-import API from '@metacall/protocol/protocol';
+import { API as APIInterface } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { info, warn } from './cli/messages';
 import { planSelection } from './cli/selection';
-import { Config } from './config';
 import { ErrorCode } from './index';
 // TODO: We should cache the plan and ask for it only once
 
 export const planFetch = async (
-	config: Config
+	api: APIInterface
 ): Promise<Record<string, number>> => {
-	const api = API(config.token as string, config.baseURL);
-
 	const availPlans: Record<string, number> = await api.listSubscriptions();
 
 	if (!Object.keys(availPlans).length) {
@@ -39,8 +36,8 @@ export const planFetch = async (
 	return availPlans;
 };
 
-export const plan = async (config: Config): Promise<Plans> => {
-	const availPlans = Object.keys(await planFetch(config));
+export const plan = async (api: APIInterface): Promise<Plans> => {
+	const availPlans = Object.keys(await planFetch(api));
 
 	let plan =
 		args['plan'] && availPlans.includes(args['plan']) && args['plan'];

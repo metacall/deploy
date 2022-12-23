@@ -1,9 +1,9 @@
+import { API as APIInterface } from '@metacall/protocol/protocol';
 import { info } from './cli/messages';
-import { Config } from './config';
 import { planFetch } from './plan';
 
-export const listPlans = async (config: Config): Promise<void> => {
-	const availPlans = await planFetch(config);
+export const listPlans = async (api: APIInterface): Promise<void> => {
+	const availPlans = await planFetch(api);
 
 	Object.keys(availPlans).forEach(el => {
 		info(`${el} : ${availPlans[el]}`);
