@@ -25,11 +25,18 @@
 
 metacall-deploy provides the interface of options to deploy functions on Metacall FaaS platform. You can deploy your serverless functions within a few clicks without interacting with [Dashboard](https://dashboard.metacall.io/)
 
+![metacall-deploy-1](https://user-images.githubusercontent.com/5884889/209703544-9df5d62f-c284-403d-a4f6-4f054c235203.gif)
+
 ## How to install
 
 ```bash
 npm i -g @metacall/deploy
-metacall-deploy
+```
+
+## Check installation
+
+```bash
+metacall-deploy --help
 ```
 
 ## Configuration
@@ -75,6 +82,10 @@ metacall-deploy --[args=value]
 | `2`       | EmptyRootPath        |
 | `3`       | NotFoundRootPath     |
 | `4`       | AccountDisabled      |
+
+## New to MetaCall? Create account and buy a plan
+
+> Go to https://dashboard.metacall.io, signin and buy a plan. [Learn more...](https://metacall.io/doc.html#/faas/subs-plans)
 
 ## Contribute
 
