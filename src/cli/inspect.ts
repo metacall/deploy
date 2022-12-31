@@ -66,7 +66,6 @@ const genAllURL = (
 		urls[el.suffix] = [];
 
 		Object.entries(el.packages).forEach(pack => {
-			console.log(pack[0]);
 			if (languageSupported.includes(pack[0])) {
 				return pack[1].forEach(ele =>
 					ele.scope.funcs.forEach(f =>
