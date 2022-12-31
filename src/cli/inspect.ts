@@ -1,4 +1,5 @@
 import { Deployment } from '@metacall/protocol/deployment';
+import { Languages } from '@metacall/protocol/language';
 import { API as APIInterface } from '@metacall/protocol/protocol';
 import chalk from 'chalk';
 import { Table } from 'console-table-printer';
@@ -59,17 +60,23 @@ const genAllURL = (
 	apiURL: string
 ): { [k: string]: string[] } => {
 	const urls: { [k: string]: string[] } = {};
+	const languageSupported = Object.keys(Languages);
 
 	res.forEach(el => {
 		urls[el.suffix] = [];
 
-		Object.entries(el.packages).forEach(pack =>
-			pack[1].forEach(ele =>
-				ele.scope.funcs.forEach(f =>
-					urls[el.suffix].push(genSingleURL(pack[0], apiURL, el, f))
-				)
-			)
-		);
+		Object.entries(el.packages).forEach(pack => {
+			console.log(pack[0]);
+			if (languageSupported.includes(pack[0])) {
+				return pack[1].forEach(ele =>
+					ele.scope.funcs.forEach(f =>
+						urls[el.suffix].push(
+							genSingleURL(pack[0], apiURL, el, f)
+						)
+					)
+				);
+			}
+		});
 	});
 
 	return urls;
