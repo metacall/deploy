@@ -116,7 +116,7 @@ describe('integration cli', function () {
 		const email = process.env.METACALL_AUTH_EMAIL;
 		const password = process.env.METACALL_AUTH_PASSWORD;
 
-		if (typeof email !== 'string' || typeof password !== 'string')
+		if (typeof email === 'undefined' || typeof password === 'undefined')
 			return this.skip();
 
 		const workdir = await createTmpDirectory();
