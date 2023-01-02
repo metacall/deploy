@@ -30,10 +30,10 @@ jobs:
               run: npm run build
 
             - name: Run Tests
-              env:
-                  METACALL_AUTH_EMAIL: ${{ secrets.METACALL_AUTH_EMAIL }}
-                  METACALL_AUTH_PASSWORD: ${{ secrets.METACALL_AUTH_PASSWORD }}
               run: |
+                  touch .env
+                  echo METACALL_AUTH_EMAIL=${{ secrets.METACALL_AUTH_EMAIL }} >> .env
+                  echo METACALL_AUTH_PASSWORD=${{ secrets.METACALL_AUTH_PASSWORD }} >> .env
                   npm run test
 
             - name: Publish
