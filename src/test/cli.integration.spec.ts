@@ -123,15 +123,10 @@ describe('integration cli', function () {
 
 		const workdir = await createTmpDirectory();
 
+		const argsStr = `--email=${email} --password=${password} --workdir=${workdir}`;
+
 		try {
-			await runCLI(
-				[
-					`--email=${email}`,
-					`--password=${password}`,
-					`--workdir=${workdir}`
-				],
-				[keys.enter, keys.enter]
-			).promise;
+			await runCLI([argsStr], [keys.enter, keys.enter]).promise;
 		} catch (err) {
 			strictEqual(
 				err,
