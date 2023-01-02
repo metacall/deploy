@@ -65,17 +65,17 @@ const genAllURL = (
 	res.forEach(el => {
 		urls[el.suffix] = [];
 
-		Object.entries(el.packages).forEach(pack => {
-			if (languageSupported.includes(pack[0])) {
-				return pack[1].forEach(ele =>
+		Object.entries(el.packages).forEach(
+			pack =>
+				languageSupported.includes(pack[0]) &&
+				pack[1].forEach(ele =>
 					ele.scope.funcs.forEach(f =>
 						urls[el.suffix].push(
 							genSingleURL(pack[0], apiURL, el, f)
 						)
 					)
-				);
-			}
-		});
+				)
+		);
 	});
 
 	return urls;
