@@ -124,8 +124,8 @@ describe('integration cli', function () {
 		try {
 			await runCLI(
 				[
-					`--email=${email}`,
-					`--password=${password}`,
+					`--email=${process.env.METACALL_AUTH_EMAIL}`,
+					`--password=${process.env.METACALL_AUTH_PASSWORD}`,
 					`--workdir=${workdir}`
 				],
 				[keys.enter, keys.enter]
