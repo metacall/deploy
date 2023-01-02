@@ -113,19 +113,23 @@ describe('integration cli', function () {
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
 
-		const envEmail = process.env.METACALL_AUTH_EMAIL;
-		const envPassword = process.env.METACALL_AUTH_PASSWORD;
+		const email = process.env.METACALL_AUTH_EMAIL;
+		const password = process.env.METACALL_AUTH_PASSWORD;
 
-		if (typeof envEmail !== 'string' || typeof envPassword !== 'string')
+		if (typeof email === 'undefined' || typeof password === 'undefined')
 			return this.skip();
 
-		const email = `--email=${envEmail}`;
-		const password = `--password=${envPassword}`;
-		const workdir = `--workdir=${await createTmpDirectory()}`;
+		const workdir = await createTmpDirectory();
 
 		try {
-			await runCLI([email, password, workdir], [keys.enter, keys.enter])
-				.promise;
+			await runCLI(
+				[
+					`--email=${email}`,
+					`--password=${password}`,
+					`--workdir=${workdir}`
+				],
+				[keys.enter, keys.enter]
+			).promise;
 		} catch (err) {
 			strictEqual(
 				err,
