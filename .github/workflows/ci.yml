@@ -34,9 +34,6 @@ jobs:
                   touch .env
                   echo METACALL_AUTH_EMAIL=${{ secrets.METACALL_AUTH_EMAIL }} >> .env
                   echo METACALL_AUTH_PASSWORD=${{ secrets.METACALL_AUTH_PASSWORD }} >> .env
-                  echo CHECK=this-is-reading-values >> .env
-                  echo FAKE_EMAIL=ABC@ABC.COM >> .env
-                  echo FAKE_PASSWORD=12334556 >> .env
                   npm run test
 
             - name: Publish

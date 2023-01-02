@@ -9,8 +9,6 @@ import { deleted, deployed, keys, runWithInput } from './cmd';
 
 dotenv.config();
 
-console.log(process.env.CHECK);
-
 const runCLI = (args: string[], inputs: string[]) => {
 	return runWithInput('dist/index.js', args, inputs);
 };
@@ -115,16 +113,13 @@ describe('integration cli', function () {
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
 
-		const email = process.env.FAKE_EMAIL;
-		const password = process.env.FAKE_PASSWORD;
+		const email = process.env.METACALL_AUTH_EMAIL;
+		const password = process.env.METACALL_AUTH_PASSWORD;
 
 		if (typeof email !== 'string' || typeof password !== 'string')
 			return this.skip();
 
 		const workdir = await createTmpDirectory();
-
-		console.log(email);
-		console.log(password);
 
 		try {
 			await runCLI(
