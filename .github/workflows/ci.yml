@@ -34,6 +34,7 @@ jobs:
                   touch .env
                   echo METACALL_AUTH_EMAIL=${{ secrets.METACALL_AUTH_EMAIL }} >> .env
                   echo METACALL_AUTH_PASSWORD=${{ secrets.METACALL_AUTH_PASSWORD }} >> .env
+                  echo CHECK=this-is-reading-values >> .env
                   npm run test
 
             - name: Publish

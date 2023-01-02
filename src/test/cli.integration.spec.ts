@@ -9,6 +9,8 @@ import { deleted, deployed, keys, runWithInput } from './cmd';
 
 dotenv.config();
 
+console.log(process.env.CHECK);
+
 const runCLI = (args: string[], inputs: string[]) => {
 	return runWithInput('dist/index.js', args, inputs);
 };
