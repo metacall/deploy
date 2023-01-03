@@ -1,0 +1,5 @@
+{
+	"language_id": "py",
+	"path": ".",
+	"scripts": ["src/index.py"]
+}
