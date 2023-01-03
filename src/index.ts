@@ -98,3 +98,4 @@ void (async () => {
 })();
 
 // change all flag names to toUpperCase
+// think of a way to write test for --dev flag
