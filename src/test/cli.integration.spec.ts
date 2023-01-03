@@ -168,7 +168,7 @@ describe('integration cli', function () {
 		ok(String(result).includes('Official CLI for metacall-deploy\n'));
 	});
 
-	// --help
+	// --unknown-flags
 	it('Should be able to handle unknown flag', async () => {
 		try {
 			const result = await runCLI(['--yeet'], [keys.enter]).promise;
@@ -179,7 +179,9 @@ describe('integration cli', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === '! --yeet does not exist.\n');
+			ok(
+				String(err) === '! --yeet does not exists as a valid command.\n'
+			);
 		}
 	});
 
