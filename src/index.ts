@@ -4,9 +4,9 @@ import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 import args from './cli/args';
 import { inspect } from './cli/inspect';
-import { error, info } from './cli/messages';
+import { error } from './cli/messages';
 import { handleUnknownArgs } from './cli/unknown';
-import { validateToken } from './cli/validateToken';
+import validateToken from './cli/validateToken';
 import { deleteBySelection } from './delete';
 import { deployFromRepository, deployPackage } from './deploy';
 import { force } from './force';
@@ -49,14 +49,7 @@ void (async () => {
 		args['dev'] ? config.devURL : config.baseURL
 	);
 
-	try {
-		await validateToken(api);
-	} catch (err) {
-		info('Try login again!');
-		error(
-			`Token Validation Failed, Potential Causes Include:-\n1) The JWT may be mistranslated (Invalid Signature).\n2) JWT might have expired.`
-		);
-	}
+	await validateToken(api);
 
 	if (args['listPlans']) return await listPlans(api);
 
