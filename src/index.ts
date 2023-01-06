@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { Plans } from '@metacall/protocol/plan';
 import API, { API as APIInterface } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
@@ -59,11 +60,18 @@ void (async () => {
 
 	if (args['force']) await force(api);
 
+	// On line 63, we passed Essential to the FAAS in dev environment,
+	// the thing is there is no need of plans in Local Faas (--dev),
+	// this could have been handlled neatly if we created deploy as a State Machine,
+	// think about a better way
+
+	const planSelected: Plans = args['dev'] ? Plans.Essential : await plan(api);
+
 	if (args['addrepo']) {
 		try {
 			return await deployFromRepository(
 				api,
-				await plan(api),
+				planSelected,
 				new URL(args['addrepo']).href
 			);
 		} catch (e) {
@@ -86,7 +94,7 @@ void (async () => {
 		}
 
 		try {
-			await deployPackage(rootPath, api, await plan(api));
+			await deployPackage(rootPath, api, planSelected);
 		} catch (e) {
 			error(String(e));
 		}
