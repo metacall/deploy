@@ -67,9 +67,14 @@ export const deployPackage = async (
 			info(`Deploying ${rootPath}...\n`);
 
 			try {
-				await api.deploy(name, env, plan, 'Package');
+				const deploy = await api.deploy(name, env, plan, 'Package');
 
 				await logs(descriptor.runners, name, args['dev']);
+
+				if (deploy)
+					info(
+						'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
+					);
 			} catch (err) {
 				apiError(err as ProtocolError);
 			}
@@ -214,6 +219,11 @@ export const deployFromRepository = async (
 				? branches[0]
 				: await listSelection(branches, 'Select branch:');
 
+		if (branches.length === 1)
+			info(
+				`Only one branch found : ${selectedBranch}, Selecting it automatically.`
+			);
+
 		const runners = Array.from(
 			findRunners(await api.fileList(url, selectedBranch))
 		);
@@ -228,7 +238,10 @@ export const deployFromRepository = async (
 
 		await logs(runners, deploy.suffix, args['dev']);
 
-		info('Repository deployed');
+		if (deploy)
+			info(
+				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
+			);
 	} catch (e) {
 		error(String(e));
 	}

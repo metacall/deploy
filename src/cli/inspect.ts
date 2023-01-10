@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import { Table } from 'console-table-printer';
 import { Config } from '../config';
 import { sleep } from './../utils';
+import args from './args';
 
 interface row {
 	Deployments: string;
@@ -100,7 +101,10 @@ export const inspect = async (
 			]
 		});
 
-		const urls = genAllURL(res, config.apiURL);
+		const urls = genAllURL(
+			res,
+			args['dev'] ? config.devURL : config.apiURL
+		);
 
 		const allApps = res.map(el => {
 			const suffix = el.suffix;
