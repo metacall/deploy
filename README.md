@@ -73,6 +73,10 @@ metacall-deploy --[args=value]
 | `--logout`      | Accepts boolean value: use it in order to expire your current session.                         |
 | `--listPlans`   | Accepts boolean value: list all the plans that are offered in your account using it.           |
 
+## Ignore Files
+
+If you don't want to deploy node modules or any other file, simply put it inside the .gitignore file as we use for ignoring files.
+
 ## Exit codes and their meanings
 
 | Exit Code | Description          |
