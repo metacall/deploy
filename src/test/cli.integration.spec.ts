@@ -109,6 +109,17 @@ describe('integration cli', function () {
 		}
 	});
 
+	// test for env variables
+	it('Should have required env variables for testing', async function () {
+		await clearCache();
+		const email = process.env.METACALL_AUTH_EMAIL;
+		const password = process.env.METACALL_AUTH_PASSWORD;
+
+		if (typeof email === 'undefined' || typeof password === 'undefined')
+			fail(`No env files present to test the below flags`);
+		else ok('All env variables are present');
+	});
+
 	// --email & --password
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
