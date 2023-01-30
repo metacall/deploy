@@ -22,8 +22,21 @@ const createTmpDirectory = async (): Promise<string> => {
 	return await promises.mkdtemp(join(os.tmpdir(), `dep-`));
 };
 
-describe('integration cli', function () {
-	this.timeout(200_0000);
+// Test for env variables before running tests
+before(function () {
+	await clearCache();
+	const email = process.env.METACALL_AUTH_EMAIL;
+	const password = process.env.METACALL_AUTH_PASSWORD;
+
+	if (typeof email === 'undefined' || typeof password === 'undefined') {
+		fail(`No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD`);
+	} else {
+		ok('All environment variables are present');
+	}
+});
+
+describe('Integration CLI', function () {
+	this.timeout(200_000);
 
 	const url = 'https://github.com/metacall/examples';
 	const addRepoSuffix = 'metacall-examples';
@@ -38,7 +51,7 @@ describe('integration cli', function () {
 		'time-app-web'
 	);
 
-	// Invalid Token Login
+	// Invalid token login
 	it('Should fail with malformed jwt', async () => {
 		await clearCache();
 
@@ -60,7 +73,7 @@ describe('integration cli', function () {
 		}
 	});
 
-	// no credentials provided
+	// No credentials provided
 	it('Should fail with no credentials with --tokem', async () => {
 		await clearCache();
 
@@ -107,17 +120,6 @@ describe('integration cli', function () {
 		} catch (err) {
 			ok(String(err) === '! : Invalid account email or password.\n');
 		}
-	});
-
-	// test for env variables
-	it('Should have required env variables for testing', async function () {
-		await clearCache();
-		const email = process.env.METACALL_AUTH_EMAIL;
-		const password = process.env.METACALL_AUTH_PASSWORD;
-
-		if (typeof email === 'undefined' || typeof password === 'undefined')
-			fail(`No env files present to test the below flags`);
-		else ok('All env variables are present');
 	});
 
 	// --email & --password
