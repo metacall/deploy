@@ -9,10 +9,10 @@ import API, { ProtocolError } from '@metacall/protocol/protocol';
 import { expiresIn } from '@metacall/protocol/token';
 import args from './cli/args';
 import { input, maskedInput } from './cli/inputs';
-import { info, warn } from './cli/messages';
+import { error, info, warn } from './cli/messages';
 import { loginSelection } from './cli/selection';
 import { Config, save } from './config';
-import { forever, opt } from './utils';
+import { forever } from './utils';
 
 const authToken = async (config: Config): Promise<string> => {
 	const askToken = (): Promise<string> =>
@@ -22,19 +22,29 @@ const authToken = async (config: Config): Promise<string> => {
 
 	const api = API(token, config.baseURL);
 
-	while (forever) {
+	if (process.stdout.isTTY) {
+		while (forever) {
+			try {
+				await api.validate();
+				break;
+			} catch (err) {
+				warn(
+					`Token invalid: ${String(
+						(err as ProtocolError).response?.data
+					)}`
+				);
+				token = await askToken();
+			}
+		}
+	} else {
 		try {
 			await api.validate();
-			break;
 		} catch (err) {
-			warn(
-				'Token invalid' +
-					opt(
-						x => ': ' + x,
-						String((err as ProtocolError).response?.data)
-					)
+			error(
+				`Token invalid: ${String(
+					(err as ProtocolError).response?.data
+				)}`
 			);
-			token = await askToken();
 		}
 	}
 
@@ -66,19 +76,22 @@ const authLogin = async (config: Config): Promise<string> => {
 	// Now we got email and password let's call login api endpoint and get the token and store it int somewhere else
 	let token = '';
 
-	while (forever) {
+	if (process.stdout.isTTY) {
+		while (forever) {
+			try {
+				token = await login(email, password, config.baseURL);
+				break;
+			} catch (err) {
+				warn(String((err as ProtocolError).response?.data));
+				args['email'] = args['password'] = undefined;
+				await askCredentials();
+			}
+		}
+	} else {
 		try {
 			token = await login(email, password, config.baseURL);
-			break;
 		} catch (err) {
-			warn(
-				opt(
-					x => ': ' + x,
-					String((err as ProtocolError).response?.data)
-				)
-			);
-			args['email'] = args['password'] = undefined;
-			await askCredentials();
+			error(String((err as ProtocolError).response?.data));
 		}
 	}
 

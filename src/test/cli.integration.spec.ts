@@ -118,7 +118,7 @@ describe('Integration CLI', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === '! : Invalid account email or password.\n');
+			ok(String(err) === '! Invalid account email or password.\n');
 		}
 	});
 
@@ -316,7 +316,7 @@ describe('Integration CLI', function () {
 
 	// 	strictEqual(
 	// 		await runCLI(['--listPlans'], [keys.enter]).promise,
-	// 		'i Essential : 1\n'
+	// 		'i Essential: 1\n'
 	// 	);
 
 	// 	const resultDeploy = await runCLI(
@@ -351,7 +351,7 @@ describe('Integration CLI', function () {
 	it("Should be able to list all the plans in user's account", async () =>
 		strictEqual(
 			await runCLI(['--listPlans'], [keys.enter]).promise,
-			'i Essential : 1\n'
+			'i Essential: 1\n'
 		));
 });
 

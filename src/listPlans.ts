@@ -10,7 +10,7 @@ export const listPlans = async (api: APIInterface): Promise<void> => {
 		const availPlans = await planFetch(api);
 
 		Object.keys(availPlans).forEach(el => {
-			info(`${el} : ${availPlans[el]}`);
+			info(`${el}: ${availPlans[el]}`);
 		});
 	} catch (err) {
 		apiError(err as ProtocolError);
