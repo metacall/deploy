@@ -22,19 +22,6 @@ const createTmpDirectory = async (): Promise<string> => {
 	return await promises.mkdtemp(join(os.tmpdir(), `dep-`));
 };
 
-// Test for env variables before running tests
-before(function () {
-	await clearCache();
-	const email = process.env.METACALL_AUTH_EMAIL;
-	const password = process.env.METACALL_AUTH_PASSWORD;
-
-	if (typeof email === 'undefined' || typeof password === 'undefined') {
-		fail(`No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD`);
-	} else {
-		ok('All environment variables are present');
-	}
-});
-
 describe('Integration CLI', function () {
 	this.timeout(200_000);
 
@@ -50,6 +37,17 @@ describe('Integration CLI', function () {
 		'integration',
 		'time-app-web'
 	);
+
+	// Test for env variables before running tests
+	before(function () {
+		await clearCache();
+		const email = process.env.METACALL_AUTH_EMAIL;
+		const password = process.env.METACALL_AUTH_PASSWORD;
+
+		if (typeof email === 'undefined' || typeof password === 'undefined') {
+			fail('No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD');
+		}
+	});
 
 	// Invalid token login
 	it('Should fail with malformed jwt', async () => {
