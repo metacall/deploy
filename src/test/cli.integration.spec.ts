@@ -39,13 +39,15 @@ describe('Integration CLI', function () {
 	);
 
 	// Test for env variables before running tests
-	before(function () {
+	before(async function () {
 		await clearCache();
 		const email = process.env.METACALL_AUTH_EMAIL;
 		const password = process.env.METACALL_AUTH_PASSWORD;
 
 		if (typeof email === 'undefined' || typeof password === 'undefined') {
-			fail('No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD');
+			fail(
+				'No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD'
+			);
 		}
 	});
 
