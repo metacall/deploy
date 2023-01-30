@@ -17,14 +17,16 @@ const validateToken = async (api: APIInterface): Promise<void> => {
 	} catch (err) {
 		if (args['dev']) {
 			info(
-				'Please visit https://github.com/metacall/faas to learn how to set up FAAS locally.'
+				'Please visit https://github.com/metacall/faas to learn how to set up FaaS locally.'
 			);
-			return error('FAAS is not serving locally.');
+
+			return error('FaaS is not serving locally.');
 		}
 
-		info('Try login again!');
-		error(
-			`Token Validation Failed, Potential Causes Include:-\n1) The JWT may be mistranslated (Invalid Signature).\n2) JWT might have expired.`
+		info('Try to login again!');
+
+		return error(
+			`Token validation failed, potential causes include:\n\t1) The JWT may be mistranslated (Invalid Signature).\n\t2) JWT might have expired.`
 		);
 	}
 };

@@ -86,22 +86,23 @@ const authLogin = async (config: Config): Promise<string> => {
 };
 
 const authSelection = async (config: Config): Promise<string> => {
-	const methods: Record<string, (config: Config) => Promise<string>> = {
-		'Login by token': authToken,
-		'Login by email and password': authLogin
-	};
+	const token = await (async () => {
+		if (args['email'] || args['password']) {
+			return await authLogin(config);
+		} else if (args['token']) {
+			return await authToken(config);
+		} else {
+			const methods: Record<string, (config: Config) => Promise<string>> =
+				{
+					'Login by token': authToken,
+					'Login by email and password': authLogin
+				};
 
-	let token: string;
-
-	if (args['email'] || args['password']) {
-		token = await methods['Login by email and password'](config);
-	} else if (args['token']) {
-		token = await methods['Login by token'](config);
-	} else {
-		token = await methods[await loginSelection(Object.keys(methods))](
-			config
-		);
-	}
+			return await methods[await loginSelection(Object.keys(methods))](
+				config
+			);
+		}
+	})();
 
 	await save({ token });
 

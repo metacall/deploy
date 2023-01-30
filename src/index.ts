@@ -3,7 +3,7 @@ import { Plans } from '@metacall/protocol/plan';
 import API, { API as APIInterface } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
-import args from './cli/args';
+import args, { InspectFormat } from './cli/args';
 import { inspect } from './cli/inspect';
 import { error } from './cli/messages';
 import { handleUnknownArgs } from './cli/unknown';
@@ -54,7 +54,10 @@ void (async () => {
 
 	if (args['listPlans']) return await listPlans(api);
 
-	if (args['inspect']) return await inspect(config, api);
+	if (args['inspect'] === null) {
+		args['inspect'] = InspectFormat.Table;
+	}
+	if (args['inspect']) return await inspect(args['inspect'], config, api);
 
 	if (args['delete']) return await deleteBySelection(api);
 

@@ -2,6 +2,12 @@ import { Plans } from '@metacall/protocol/plan';
 import { basename } from 'path';
 import { ArgumentConfig, parse, ParseOptions } from 'ts-command-line-args';
 
+export enum InspectFormat {
+	Table = 'Table',
+	Raw = 'Raw',
+	OpenAPIv3 = 'OpenAPIv3'
+}
+
 interface CLIArgs {
 	version?: boolean;
 	addrepo?: string;
@@ -14,7 +20,7 @@ interface CLIArgs {
 	force: boolean;
 	plan?: Plans;
 	confDir?: string;
-	inspect?: boolean;
+	inspect?: InspectFormat;
 	delete?: boolean;
 	serverUrl?: string;
 	logout?: boolean;
@@ -25,6 +31,14 @@ const parsePlan = (planType: string): Plans | undefined => {
 	if (Object.keys(Plans).includes(planType)) {
 		return Plans[planType as keyof typeof Plans];
 	}
+};
+
+const parseInspectFormat = (inspectFormatType: string): InspectFormat => {
+	if (Object.keys(InspectFormat).includes(inspectFormatType)) {
+		return InspectFormat[inspectFormatType as keyof typeof InspectFormat];
+	}
+
+	return InspectFormat.Table;
 };
 
 const optionsDefinition: ArgumentConfig<CLIArgs> = {
@@ -80,9 +94,8 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		optional: true
 	},
 	inspect: {
-		type: Boolean,
+		type: parseInspectFormat,
 		alias: 'i',
-		defaultValue: false,
 		optional: true
 	},
 	delete: {
