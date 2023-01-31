@@ -9,20 +9,12 @@ import { error } from './cli/messages';
 import { handleUnknownArgs } from './cli/unknown';
 import validateToken from './cli/validateToken';
 import { deleteBySelection } from './delete';
-import { deployFromRepository, deployPackage } from './deploy';
+import { deployFromRepository, deployPackage, ErrorCode } from './deploy';
 import { force } from './force';
 import { listPlans } from './listPlans';
 import { logout } from './logout';
 import { plan } from './plan';
 import { startup } from './startup';
-
-export enum ErrorCode {
-	Ok = 0,
-	NotDirectoryRootPath = 1,
-	EmptyRootPath = 2,
-	NotFoundRootPath = 3,
-	AccountDisabled = 4
-}
 
 void (async () => {
 	if (args['_unknown'].length) handleUnknownArgs();
@@ -88,12 +80,16 @@ void (async () => {
 
 		try {
 			if (!(await fs.stat(rootPath)).isDirectory()) {
-				error(`Invalid root path, ${rootPath} is not a directory.`);
-				return process.exit(ErrorCode.NotDirectoryRootPath);
+				return error(
+					`Invalid root path, ${rootPath} is not a directory.`,
+					ErrorCode.NotDirectoryRootPath
+				);
 			}
 		} catch (e) {
-			error(`Invalid root path, ${rootPath} not found.`);
-			return process.exit(ErrorCode.NotFoundRootPath);
+			return error(
+				`Invalid root path, ${rootPath} not found.`,
+				ErrorCode.NotFoundRootPath
+			);
 		}
 
 		try {

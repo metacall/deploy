@@ -23,7 +23,7 @@ const showLogs = async (
 		dev ? config.devURL : config.baseURL
 	);
 
-	info(`Getting ${type} logs...`);
+	info(`Getting ${type} logs for ${suffix}...`);
 
 	let logsTill: string[] = [''];
 
@@ -54,7 +54,7 @@ const showLogs = async (
 
 export const logs = async (
 	containers: string[],
-	name: string,
+	suffix: string,
 	dev: boolean
 ) => {
 	try {
@@ -78,7 +78,7 @@ export const logs = async (
 		);
 		const type = container === 'deploy' ? LogType.Deploy : LogType.Job;
 
-		await showLogs(container, name, type, dev);
+		await showLogs(container, suffix, type, dev);
 	} catch (e) {
 		error(String(e));
 	}

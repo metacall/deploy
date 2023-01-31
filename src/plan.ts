@@ -3,7 +3,7 @@ import { API as APIInterface } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { info, warn } from './cli/messages';
 import { planSelection } from './cli/selection';
-import { ErrorCode } from './index';
+import { ErrorCode } from './deploy';
 // TODO: We should cache the plan and ask for it only once
 
 export const planFetch = async (

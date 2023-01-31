@@ -1,4 +1,4 @@
-import { fail, ok, strictEqual } from 'assert';
+import { fail, notStrictEqual, ok, strictEqual } from 'assert';
 import * as dotenv from 'dotenv';
 import { promises } from 'fs';
 import os from 'os';
@@ -38,9 +38,7 @@ describe('Integration CLI', function () {
 		'time-app-web'
 	);
 
-	// Test for env variables before running tests
-	before(async function () {
-		await clearCache();
+	const checkEnvVars = (): { email: string; password: string } | never => {
 		const email = process.env.METACALL_AUTH_EMAIL;
 		const password = process.env.METACALL_AUTH_PASSWORD;
 
@@ -49,6 +47,14 @@ describe('Integration CLI', function () {
 				'No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD'
 			);
 		}
+
+		return { email, password };
+	};
+
+	// Test for env variables before running tests
+	before(async function () {
+		await clearCache();
+		checkEnvVars();
 	});
 
 	// Invalid token login
@@ -69,12 +75,12 @@ describe('Integration CLI', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === '! Token invalid: jwt malformed\n');
+			ok(String(err) === 'X Token invalid: jwt malformed\n');
 		}
 	});
 
 	// No credentials provided
-	it('Should fail with no credentials with --tokem', async () => {
+	it('Should fail with no credentials with --token', async () => {
 		await clearCache();
 
 		try {
@@ -91,7 +97,7 @@ describe('Integration CLI', function () {
 		} catch (err) {
 			ok(
 				String(err) ===
-					'! Token invalid: Invalid authorization header, no credentials provided.\n'
+					'X Token invalid: Invalid authorization header, no credentials provided.\n'
 			);
 		}
 	});
@@ -118,20 +124,14 @@ describe('Integration CLI', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === '! Invalid account email or password.\n');
+			ok(String(err) === 'X Invalid account email or password.\n');
 		}
 	});
 
 	// --email & --password
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
-
-		const email = process.env.METACALL_AUTH_EMAIL;
-		const password = process.env.METACALL_AUTH_PASSWORD;
-
-		if (typeof email === 'undefined' || typeof password === 'undefined')
-			return this.skip();
-
+		const { email, password } = checkEnvVars();
 		const workdir = await createTmpDirectory();
 
 		try {
@@ -141,23 +141,24 @@ describe('Integration CLI', function () {
 					`--password=${password}`,
 					`--workdir=${workdir}`
 				],
-				[keys.enter, keys.enter]
+				[keys.enter]
 			).promise;
 		} catch (err) {
 			strictEqual(
 				err,
-				`X The directory you specified (${workdir}) is empty\n`
+				`X The directory you specified (${workdir}) is empty.\n`
 			);
 		}
 	});
 
 	// --token
 	it('Should be able to login using --token flag', async function () {
-		const token = (await loadFile(configFilePath())).split('=')[1];
+		const file = await loadFile(configFilePath());
+		const token = file.split('=')[1];
 
 		await clearCache();
 
-		if (typeof token !== 'string') return this.skip();
+		notStrictEqual(token, undefined);
 
 		const workdir = await createTmpDirectory();
 
@@ -169,7 +170,7 @@ describe('Integration CLI', function () {
 		} catch (err) {
 			strictEqual(
 				err,
-				`X The directory you specified (${workdir}) is empty\n`
+				`X The directory you specified (${workdir}) is empty.\n`
 			);
 		}
 	});

@@ -3,7 +3,7 @@ import { deepStrictEqual } from 'assert';
 import { join } from 'path';
 import { zip } from '../utils';
 
-describe('integration package', function () {
+describe('Integration Package', function () {
 	// Folder hierarchy bug
 	it('Should generate a zip respecting the folder hierarchy instead of flattening it', async () => {
 		const rootPath = join(

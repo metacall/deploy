@@ -1,4 +1,4 @@
-import { ErrorCode } from './index';
+import { ErrorCode } from './deploy';
 
 const helpText = `
 Official CLI for metacall-deploy

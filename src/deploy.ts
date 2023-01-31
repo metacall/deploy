@@ -1,9 +1,9 @@
 import { LanguageId, MetaCallJSON } from '@metacall/protocol/deployment';
 import {
-	PackageError,
 	findRunners,
 	generateJsonsFromFiles,
-	generatePackage
+	generatePackage,
+	PackageError
 } from '@metacall/protocol/package';
 import { Plans } from '@metacall/protocol/plan';
 import {
@@ -20,12 +20,14 @@ import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
 import { getEnv, loadFilesToRun, zip } from './utils';
 
-enum ErrorCode {
+export enum ErrorCode {
 	Ok = 0,
 	NotDirectoryRootPath = 1,
 	EmptyRootPath = 2,
 	NotFoundRootPath = 3,
-	AccountDisabled = 4
+	AccountDisabled = 4,
+	DeployPackageFailed = 5,
+	DeployRepositoryFailed = 6
 }
 
 export const deployPackage = async (
@@ -141,7 +143,7 @@ export const deployPackage = async (
 							.map(el => printLanguage(el))
 							.join(
 								', '
-							)} but you didn't select any file, do you want to continue? (Y/N): `
+							)} but you didn't select any file, do you want to continue? (Y/N):`
 					)
 				).toUpperCase();
 
@@ -181,16 +183,18 @@ export const deployPackage = async (
 				break;
 			}
 			case PackageError.Empty: {
-				error(`The directory you specified (${rootPath}) is empty`);
-				return process.exit(ErrorCode.EmptyRootPath);
+				return error(
+					`The directory you specified (${rootPath}) is empty.`,
+					ErrorCode.EmptyRootPath
+				);
 			}
 			case PackageError.JsonNotFound: {
 				warn(
-					`No metacall.json was found in ${rootPath}, launching the wizard`
+					`No metacall.json was found in ${rootPath}, launching the wizard...`
 				);
 
 				const askToCachePackagesFile = (): Promise<string> =>
-					input('Do you want to save metacall.json file? (Y/N): ');
+					input('Do you want to save metacall.json file? (Y/N):');
 
 				await createJsonAndDeploy(
 					(await askToCachePackagesFile()).toUpperCase()
@@ -199,7 +203,7 @@ export const deployPackage = async (
 			}
 		}
 	} catch (e) {
-		error(String(e));
+		error(String(e), ErrorCode.DeployPackageFailed);
 	}
 };
 
@@ -243,6 +247,6 @@ export const deployFromRepository = async (
 				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
 			);
 	} catch (e) {
-		error(String(e));
+		error(String(e), ErrorCode.DeployRepositoryFailed);
 	}
 };

@@ -18,11 +18,13 @@ const authToken = async (config: Config): Promise<string> => {
 	const askToken = (): Promise<string> =>
 		maskedInput('Please enter your metacall token');
 
+	const shouldKeepAsking = args['token'] === undefined;
+
 	let token: string = args['token'] || (await askToken());
 
 	const api = API(token, config.baseURL);
 
-	if (process.stdout.isTTY) {
+	if (process.stdout.isTTY && shouldKeepAsking) {
 		while (forever) {
 			try {
 				await api.validate();
@@ -58,13 +60,16 @@ const authToken = async (config: Config): Promise<string> => {
 
 const authLogin = async (config: Config): Promise<string> => {
 	const askEmail = (): Promise<string> =>
-		input('Please enter your email id: ');
+		input('Please enter your email id:');
 
 	const askPassword = (): Promise<string> =>
-		maskedInput('Please enter your password: ');
+		maskedInput('Please enter your password:');
 
 	let email = '';
 	let password = '';
+
+	const shouldKeepAsking =
+		args['email'] === undefined || args['password'] === undefined;
 
 	const askCredentials = async (): Promise<void> => {
 		email = args['email'] || (await askEmail());
@@ -76,7 +81,7 @@ const authLogin = async (config: Config): Promise<string> => {
 	// Now we got email and password let's call login api endpoint and get the token and store it int somewhere else
 	let token = '';
 
-	if (process.stdout.isTTY) {
+	if (process.stdout.isTTY && shouldKeepAsking) {
 		while (forever) {
 			try {
 				token = await login(email, password, config.baseURL);

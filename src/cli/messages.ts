@@ -13,10 +13,10 @@ export const warn = (message: string): void => {
 	console.warn(chalk.yellowBright.bold('!') + ' ' + chalk.yellow(message));
 };
 
-export const error = (message: string): never => {
+export const error = (message: string, exitCode = 1): never => {
 	// eslint-disable-next-line no-console
 	console.error(chalk.redBright.bold('X') + ' ' + chalk.red(message));
-	return process.exit(1);
+	return process.exit(exitCode);
 };
 export const apiError = (err: ProtocolError): never => {
 	// eslint-disable-next-line no-console
