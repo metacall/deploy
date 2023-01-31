@@ -32,7 +32,7 @@ jobs:
             - name: Run Tests
               run: |
                   touch .env
-                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}' >> .env
+                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' >> .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run test
 
