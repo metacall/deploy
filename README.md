@@ -67,7 +67,7 @@ metacall-deploy --[args=value]
 | `--token`       | Accepts token for authentication, either pass email & password or token.                       |
 | `--force`       | Accepts boolean value: it deletes the deployment present on an existing plan and deploys again |
 | `--plan`        | Accepts type of plan: "Essential", "Standard", "Premium"                                       |
-| `--inspect`     | Lists out all the deployments with specifications.                                             |
+| `--inspect`     | Accepts format of output : "Table", "Raw", "OpenAPIv3" and Lists out all the deployments with specifications.|
 | `--delete`      | Accepts boolean value: it provides you all the available deployment options to delete          |
 | `--confDir`     | Accepts relative path for changing default config directory                                    |
 | `--logout`      | Accepts boolean value: use it in order to expire your current session.                         |
