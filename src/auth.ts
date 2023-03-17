@@ -151,9 +151,12 @@ const authSignup = async (config: Config): Promise<string> => {
 
 			warn(errorMessage);
 
-			if (errorMessage.includes('exists')) {
+			if (
+				errorMessage.includes('Account already exists') ||
+				errorMessage.includes('Invalid email')
+			) {
 				email = await askEmail();
-			} else if (errorMessage.includes('alias')) {
+			} else if (errorMessage.includes('alias is already taken')) {
 				userAlias = await askAlias();
 			}
 		}
