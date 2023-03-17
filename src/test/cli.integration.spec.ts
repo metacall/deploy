@@ -354,6 +354,129 @@ describe('Integration CLI', function () {
 			await runCLI(['--listPlans'], [keys.enter]).promise,
 			'i Essential: 1\n'
 		));
+
+	// signup alreaked taken email
+	it('Should fail with taken email', async () => {
+		await clearCache();
+		try {
+			const result = await runCLI(
+				[],
+				[
+					keys.down,
+					keys.down,
+					keys.enter,
+					'diaabadr82@gmail.com',
+					keys.enter,
+					'diaa',
+					keys.enter,
+					'diaa',
+					keys.enter,
+					'diaa',
+					keys.enter
+				]
+			).promise;
+			fail(
+				`The CLI passed without errors and it should fail. Result: ${String(
+					result
+				)}`
+			);
+		} catch (error) {
+			ok(String(error).includes('Account already exists'));
+		}
+	});
+
+	// signup with invalid email
+	it('Should fail with invalid email', async () => {
+		await clearCache();
+
+		try {
+			const result = await runCLI(
+				[],
+				[
+					keys.down,
+					keys.down,
+					keys.enter,
+					'diaabadr82gmail.com',
+					keys.enter,
+					'diaa',
+					keys.enter,
+					'1234',
+					keys.enter,
+					'1234',
+					keys.enter
+				]
+			).promise;
+			fail(
+				`The CLI passed without errors and it should fail. Result: ${String(
+					result
+				)}`
+			);
+		} catch (error) {
+			ok(String(error).includes('Invalid email'));
+		}
+	});
+
+	// signup with taken alias
+	it('Should fail with taken alias', async () => {
+		await clearCache();
+
+		try {
+			const result = await runCLI(
+				[],
+				[
+					keys.down,
+					keys.down,
+					keys.enter,
+					'diaabadr82828@gmail.com',
+					keys.enter,
+					'diaa',
+					keys.enter,
+					'1234',
+					keys.enter,
+					'1234',
+					keys.enter
+				]
+			).promise;
+			fail(
+				`The CLI passed without errors and it should fail. Result: ${String(
+					result
+				)}`
+			);
+		} catch (error) {
+			ok(String(error).includes('alias is already taken'));
+		}
+	});
+
+	// success signup
+	it('Should be able to signup successfully', async () => {
+		await clearCache();
+
+		try {
+			const result = await runCLI(
+				[],
+				[
+					keys.down,
+					keys.down,
+					keys.enter,
+					'diaabadr898291912@gmail.com',
+					keys.enter,
+					'diaabadreldinmabroukahm',
+					keys.enter,
+					'1234',
+					keys.enter,
+					'1234',
+					keys.enter
+				]
+			).promise;
+			ok(String(result).includes('A verification email has been sent'));
+		} catch (error) {
+			fail(
+				`The CLI failed with error: ${String(
+					error
+				)} and it should pass.`
+			);
+		}
+	});
 });
 
 // TODO: Tests to add
