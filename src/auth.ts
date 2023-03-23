@@ -116,24 +116,32 @@ const authSignup = async (config: Config): Promise<string> => {
 		maskedInput('Please enter your password:');
 
 	const askPasswordConfirmation = (): Promise<string> =>
-		maskedInput('Confirm password');
+		maskedInput('Confirm password:');
 
 	let email = '';
 	let password = '';
 	let passwordConfirmation = '';
 	let userAlias = '';
 
+	const askCredentials = async (): Promise<void> => {
+		email = email || (await askEmail());
+		password = password || (await askPassword());
+		passwordConfirmation =
+			passwordConfirmation || (await askPasswordConfirmation());
+		userAlias = userAlias || (await askAlias());
+	};
+
 	const askData = async (): Promise<void> => {
-		email = await askEmail();
-		userAlias = await askAlias();
-
 		while (forever) {
-			password = await askPassword();
-			passwordConfirmation = await askPasswordConfirmation();
+			await askCredentials();
 
-			if (password !== passwordConfirmation)
+			if (password !== passwordConfirmation) {
 				warn('Passwords did not match.');
-			else break;
+				password = '';
+				passwordConfirmation = '';
+			} else {
+				break;
+			}
 		}
 	};
 
@@ -145,20 +153,17 @@ const authSignup = async (config: Config): Promise<string> => {
 		try {
 			res = await signup(email, password, userAlias, config.baseURL);
 			info(res);
+			info(
+				'Visit Metacall Hub directly to learn more about deployments and to purchase plans: https://metacall.io/pricing/'
+			);
 			break;
 		} catch (err) {
 			const errorMessage = String((err as ProtocolError).response?.data);
-
 			warn(errorMessage);
 
-			if (
-				errorMessage.includes('Account already exists') ||
-				errorMessage.includes('Invalid email')
-			) {
-				email = await askEmail();
-			} else if (errorMessage.includes('alias is already taken')) {
-				userAlias = await askAlias();
-			}
+			email = password = passwordConfirmation = userAlias = '';
+
+			await askData();
 		}
 	}
 	return process.exit(ErrorCode.Ok);
@@ -175,7 +180,7 @@ const authSelection = async (config: Config): Promise<string> => {
 				{
 					'Login by token': authToken,
 					'Login by email and password': authLogin,
-					'Signup ': authSignup
+					'New user, sign up': authSignup
 				};
 
 			return await methods[await loginSelection(Object.keys(methods))](

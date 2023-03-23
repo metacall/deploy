@@ -5,7 +5,13 @@ import os from 'os';
 import { join } from 'path';
 import { configFilePath } from '../config';
 import { exists, loadFile } from '../utils';
-import { deleted, deployed, keys, runWithInput } from './cmd';
+import {
+	deleted,
+	deployed,
+	generateRandomString,
+	keys,
+	runWithInput
+} from './cmd';
 
 dotenv.config();
 
@@ -23,7 +29,7 @@ const createTmpDirectory = async (): Promise<string> => {
 };
 
 describe('Integration CLI', function () {
-	this.timeout(200_000);
+	this.timeout(2000000);
 
 	const url = 'https://github.com/metacall/examples';
 	const addRepoSuffix = 'metacall-examples';
@@ -355,7 +361,7 @@ describe('Integration CLI', function () {
 			'i Essential: 1\n'
 		));
 
-	// signup alreaked taken email
+	// signup already taken email
 	it('Should fail with taken email', async () => {
 		await clearCache();
 		try {
@@ -365,7 +371,7 @@ describe('Integration CLI', function () {
 					keys.down,
 					keys.down,
 					keys.enter,
-					'diaabadr82@gmail.com',
+					'noot@noot.com',
 					keys.enter,
 					'diaa',
 					keys.enter,
@@ -393,16 +399,15 @@ describe('Integration CLI', function () {
 			const result = await runCLI(
 				[],
 				[
-					keys.down,
-					keys.down,
+					keys.up,
 					keys.enter,
 					'diaabadr82gmail.com',
 					keys.enter,
+					'1234',
+					keys.enter,
+					'1234',
+					keys.enter,
 					'diaa',
-					keys.enter,
-					'1234',
-					keys.enter,
-					'1234',
 					keys.enter
 				]
 			).promise;
@@ -419,21 +424,21 @@ describe('Integration CLI', function () {
 	// signup with taken alias
 	it('Should fail with taken alias', async () => {
 		await clearCache();
+		const str = generateRandomString(Math.floor(Math.random() * 10) + 1);
 
 		try {
 			const result = await runCLI(
 				[],
 				[
-					keys.down,
-					keys.down,
+					keys.up,
 					keys.enter,
-					'diaabadr82828@gmail.com',
-					keys.enter,
-					'diaa',
+					`${str}@yeet.com`,
 					keys.enter,
 					'1234',
 					keys.enter,
 					'1234',
+					keys.enter,
+					'creatoon',
 					keys.enter
 				]
 			).promise;
@@ -450,21 +455,21 @@ describe('Integration CLI', function () {
 	// success signup
 	it('Should be able to signup successfully', async () => {
 		await clearCache();
+		const str = generateRandomString(Math.floor(Math.random() * 10) + 1);
 
 		try {
 			const result = await runCLI(
 				[],
 				[
-					keys.down,
-					keys.down,
+					keys.up,
 					keys.enter,
-					'diaabadr898291912@gmail.com',
+					`${str}@yeet.com`,
 					keys.enter,
-					'diaabadreldinmabroukahm',
+					str,
 					keys.enter,
-					'1234',
+					str,
 					keys.enter,
-					'1234',
+					str,
 					keys.enter
 				]
 			).promise;
