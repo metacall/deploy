@@ -7,6 +7,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../config';
 import { sleep } from './../utils';
 import args, { InspectFormat } from './args';
+import { info, warn } from './messages';
 
 interface row {
 	Deployments: string;
@@ -215,6 +216,15 @@ const rawInspectToOpenAPIv3 = (
 	});
 };
 
+const ensureDeploymentsExist = (res: Deployment[]): boolean => {
+	if (res.length === 0) {
+		warn('No Active Deployments found');
+		info('You can deploy a new one with command `metacall-deploy`');
+		return false;
+	}
+	return true;
+};
+
 const inspectPrint: InspectPrint = {
 	[InspectFormat.Table]: async (
 		config: Config,
@@ -222,7 +232,9 @@ const inspectPrint: InspectPrint = {
 	): Promise<void> => {
 		for (;;) {
 			const res = await api.inspect();
-
+			if (!ensureDeploymentsExist(res)) {
+				return;
+			}
 			console.clear();
 
 			const p = new Table({
@@ -277,6 +289,9 @@ const inspectPrint: InspectPrint = {
 		api: APIInterface
 	): Promise<void> => {
 		const res = await api.inspect();
+		if (!ensureDeploymentsExist(res)) {
+			return;
+		}
 		console.log(JSON.stringify(res, null, 2));
 	},
 	[InspectFormat.OpenAPIv3]: async (
@@ -284,6 +299,9 @@ const inspectPrint: InspectPrint = {
 		api: APIInterface
 	): Promise<void> => {
 		const res = await api.inspect();
+		if (!ensureDeploymentsExist(res)) {
+			return;
+		}
 		console.log(
 			JSON.stringify(
 				rawInspectToOpenAPIv3(
