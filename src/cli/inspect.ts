@@ -217,12 +217,13 @@ const rawInspectToOpenAPIv3 = (
 };
 
 const ensureDeploymentsExist = (res: Deployment[]): boolean => {
-	if (res.length === 0) {
-		warn('No Active Deployments found');
-		info('You can deploy a new one with command `metacall-deploy`');
-		return false;
-	}
-	return true;
+	if (res.length) return true;
+        warn('Your MetaCall Hub account has no active deployments.');
+        info('`metacall-deploy` is a command you can use to deploy your application.');
+        info('`metacall-deploy --help` can be used to get more information about the aforementioned command.');
+        return false;
+	
+	
 };
 
 const inspectPrint: InspectPrint = {
