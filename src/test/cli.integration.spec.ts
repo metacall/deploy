@@ -33,6 +33,7 @@ describe('Integration CLI', function () {
 
 	const url = 'https://github.com/metacall/examples';
 	const addRepoSuffix = 'metacall-examples';
+	const inspectFormats = ['Table', 'Raw', 'OpenAPIv3'];
 
 	const workDirSuffix = 'time-app-web';
 	const filePath = join(
@@ -179,6 +180,21 @@ describe('Integration CLI', function () {
 				`X The directory you specified (${workdir}) is empty.\n`
 			);
 		}
+	});
+
+	// checking if there is no deployments throw inspect
+	it(`Should fail with inspect if there is no active deployments`, async function () {
+		for (const format of inspectFormats) {
+			try {
+				await runCLI([`--inspect ${format}}`], [keys.enter]).promise;
+				fail(
+					`It gives active deployments in ${format} format while there is none`
+				);
+			} catch (error) {
+				continue;
+			}
+		}
+		ok(`Passes in the 3 inspect formats when there is no deployments`);
 	});
 
 	// --help
