@@ -219,11 +219,22 @@ describe('Integration CLI', function () {
 	});
 
 	// --inspect with invalid parameter
-	it('Should fail --inspect command with proper output', async () =>
-		strictEqual(
-			await runCLI(['--inspect', 'yeet'], [keys.enter]).promise,
-			'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
-		));
+	it('Should fail --inspect command with proper output', async () => {
+		try {
+			const result = await runCLI(['--inspect', 'yeet'], [keys.enter])
+				.promise;
+			fail(
+				`The CLI passed without errors and it should fail. Result: ${String(
+					result
+				)}`
+			);
+		} catch (error) {
+			strictEqual(
+				String(error),
+				'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
+			);
+		}
+	});
 
 	// --inspect without parameter
 	it('Should fail --inspect command with proper output', async () =>
