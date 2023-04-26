@@ -218,6 +218,20 @@ describe('Integration CLI', function () {
 		return result;
 	});
 
+	// --inspect with invalid parameter
+	it('Should fail --inspect command with proper output', async () =>
+		strictEqual(
+			await runCLI(['--inspect', 'yeet'], [keys.enter]).promise,
+			'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
+		));
+
+	// --inspect without parameter
+	it('Should fail --inspect command with proper output', async () =>
+		notStrictEqual(
+			await runCLI(['--inspect'], [keys.enter]).promise,
+			'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
+		));
+
 	// --delete
 	it('Should be able to delete deployed repository using --delete flag', async () => {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])

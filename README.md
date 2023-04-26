@@ -55,23 +55,23 @@ The metacall-deploy offers many commands for a variety of typical operations.
 metacall-deploy --[args=value]
 ```
 
-| CLI Args        | Description                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------------------- |
-| `--help`        | Prints a user manual to assist you in using the cli.                                           |
-| `--version`     | Prints current version of the cli.                                                             |
-| `--workdir`     | Accepts relative path to application directory, Defaults to `cwd`                              |
-| `--addrepo`     | Accepts url of repository to deploy                                                            |
-| `--projectName` | Accepts a string indicating the name of your project                                           |
-| `--email`       | Accepts email id for authentication                                                            |
-| `--password`    | Accepts password for authentication                                                            |
-| `--token`       | Accepts token for authentication, either pass email & password or token.                       |
-| `--force`       | Accepts boolean value: it deletes the deployment present on an existing plan and deploys again |
-| `--plan`        | Accepts type of plan: "Essential", "Standard", "Premium"                                       |
-| `--inspect`     | Accepts format of output : "Table", "Raw", "OpenAPIv3" and Lists out all the deployments with specifications.|
-| `--delete`      | Accepts boolean value: it provides you all the available deployment options to delete          |
-| `--confDir`     | Accepts relative path for changing default config directory                                    |
-| `--logout`      | Accepts boolean value: use it in order to expire your current session.                         |
-| `--listPlans`   | Accepts boolean value: list all the plans that are offered in your account using it.           |
+| CLI Args        | Description                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| `--help`        | Prints a user manual to assist you in using the cli.                                                          |
+| `--version`     | Prints current version of the cli.                                                                            |
+| `--workdir`     | Accepts relative path to application directory, Defaults to `cwd`                                             |
+| `--addrepo`     | Accepts url of repository to deploy                                                                           |
+| `--projectName` | Accepts a string indicating the name of your project                                                          |
+| `--email`       | Accepts email id for authentication                                                                           |
+| `--password`    | Accepts password for authentication                                                                           |
+| `--token`       | Accepts token for authentication, either pass email & password or token.                                      |
+| `--force`       | Accepts boolean value: it deletes the deployment present on an existing plan and deploys again                |
+| `--plan`        | Accepts type of plan: "Essential", "Standard", "Premium"                                                      |
+| `--inspect`     | Accepts format of output : "Table", "Raw", "OpenAPIv3" and Lists out all the deployments with specifications. |
+| `--delete`      | Accepts boolean value: it provides you all the available deployment options to delete                         |
+| `--confDir`     | Accepts relative path for changing default config directory                                                   |
+| `--logout`      | Accepts boolean value: use it in order to expire your current session.                                        |
+| `--listPlans`   | Accepts boolean value: list all the plans that are offered in your account using it.                          |
 
 ## Ignore Files
 

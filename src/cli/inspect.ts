@@ -7,6 +7,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../config';
 import { sleep } from './../utils';
 import args, { InspectFormat } from './args';
+import { error } from './messages';
 
 interface row {
 	Deployments: string;
@@ -273,7 +274,7 @@ const inspectPrint: InspectPrint = {
 		}
 	},
 	[InspectFormat.Raw]: async (
-		config: Config,
+		_config: Config,
 		api: APIInterface
 	): Promise<void> => {
 		const res = await api.inspect();
@@ -294,6 +295,18 @@ const inspectPrint: InspectPrint = {
 				2
 			)
 		);
+	},
+	[InspectFormat.Invalid]: async (
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_config: Config,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_api: APIInterface
+	): Promise<void> => {
+		const values = Object.values(InspectFormat)
+			.filter(x => typeof x === 'string' && x !== 'Invalid')
+			.join(',');
+		error(`Invalid format passed to inspect, valid formats are: ${values}`);
+		await sleep(100);
 	}
 };
 

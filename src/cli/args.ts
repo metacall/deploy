@@ -3,6 +3,7 @@ import { basename } from 'path';
 import { ArgumentConfig, parse, ParseOptions } from 'ts-command-line-args';
 
 export enum InspectFormat {
+	Invalid = 'Invalid',
 	Table = 'Table',
 	Raw = 'Raw',
 	OpenAPIv3 = 'OpenAPIv3'
@@ -34,11 +35,15 @@ const parsePlan = (planType: string): Plans | undefined => {
 };
 
 const parseInspectFormat = (inspectFormatType: string): InspectFormat => {
+	if (inspectFormatType === '') {
+		return InspectFormat.Table;
+	}
+
 	if (Object.keys(InspectFormat).includes(inspectFormatType)) {
 		return InspectFormat[inspectFormatType as keyof typeof InspectFormat];
 	}
 
-	return InspectFormat.Table;
+	return InspectFormat.Invalid;
 };
 
 const optionsDefinition: ArgumentConfig<CLIArgs> = {
