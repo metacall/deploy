@@ -304,7 +304,7 @@ const inspectPrint: InspectPrint = {
 	): Promise<void> => {
 		const values = Object.values(InspectFormat)
 			.filter(x => typeof x === 'string' && x !== 'Invalid')
-			.join(',');
+			.join(', ');
 		error(`Invalid format passed to inspect, valid formats are: ${values}`);
 		await sleep(100);
 	}
