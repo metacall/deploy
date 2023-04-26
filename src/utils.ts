@@ -114,7 +114,9 @@ export const zip = async (
 // TODO  Look for the .env file in user's code and fetch it so that user don't have to write all the vars again in the CLI
 
 export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
-	const enableEnv = await consentSelection('Wanna add env vars?');
+	const enableEnv = await consentSelection(
+		'Do you want to add environment variables?'
+	);
 
 	const env = enableEnv
 		? await prompt<{ env: string }>([
