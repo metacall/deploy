@@ -341,4 +341,3 @@ export const inspect = async (
 ): Promise<void> => {
 	await inspectPrint[format](config, api);
 };
-

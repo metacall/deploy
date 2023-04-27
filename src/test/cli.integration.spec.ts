@@ -534,4 +534,3 @@ describe('Integration CLI', function () {
 // if there is only one log file -> select it (TODO: This must be reviewed in case we use TUI)
 
 // test for mangled token, expired
-
