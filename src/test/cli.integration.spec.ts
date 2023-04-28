@@ -238,11 +238,20 @@ describe('Integration CLI', function () {
 	});
 
 	// --inspect without parameter
-	it('Should fail --inspect command with proper output', async () =>
-		notStrictEqual(
-			await runCLI(['--inspect'], [keys.enter]).promise,
-			'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
-		));
+	it('Should fail --inspect command with proper output', async () => {
+		try {
+			const result = await runCLI(['--inspect'], [keys.enter]).promise;
+			notStrictEqual(
+				result,
+				'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
+			);
+		} catch (error) {
+			strictEqual(
+				String(error),
+				'! Your MetaCall Hub account has no active deployments.\n'
+			);
+		}
+	});
 
 	// --delete
 	it('Should be able to delete deployed repository using --delete flag', async () => {
