@@ -142,7 +142,7 @@ describe('Integration CLI', function () {
 		const workdir = await createTmpDirectory();
 
 		try {
-			await runCLI(
+			const result = await runCLI(
 				[
 					`--email=${email}`,
 					`--password=${password}`,
@@ -150,6 +150,7 @@ describe('Integration CLI', function () {
 				],
 				[keys.enter]
 			).promise;
+			ok(String(result).includes(`i Login Successfull!\n`));
 		} catch (err) {
 			strictEqual(
 				err,
