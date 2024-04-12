@@ -34,7 +34,8 @@ jobs:
                   touch .env
                   echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' >> .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
-                  npm run test
+                  echo 'NODE_ENV=testing' >> .env
+                  npm run coverage
 
             - name: Publish
               uses: JS-DevTools/npm-publish@v1

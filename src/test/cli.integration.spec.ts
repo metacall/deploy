@@ -15,6 +15,10 @@ import {
 
 dotenv.config();
 
+// Define tty as interactive in order to test properly the CLI
+process.env.NODE_ENV = 'testing';
+process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
+
 const runCLI = (args: string[], inputs: string[]) => {
 	return runWithInput('dist/index.js', args, inputs);
 };
