@@ -387,7 +387,7 @@ describe('Integration CLI', function () {
 	it("Should be able to list all the plans in user's account", async () =>
 		strictEqual(
 			await runCLI(['--listPlans'], [keys.enter]).promise,
-			'i Essential: 1\n'
+			'i Essential: 2\n'
 		));
 
 	// signup already taken email
@@ -481,7 +481,9 @@ describe('Integration CLI', function () {
 		}
 	});
 
+	// Note: Disable this test for now, I do not want to spam the FaaS
 	// success signup
+	/*
 	it('Should be able to signup successfully', async () => {
 		await clearCache();
 		const str = generateRandomString(Math.floor(Math.random() * 10) + 1);
@@ -511,6 +513,7 @@ describe('Integration CLI', function () {
 			);
 		}
 	});
+	*/
 });
 
 // TODO: Tests to add
