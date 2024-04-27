@@ -46,7 +46,11 @@
 			"**/*.d.ts",
 			"**/src",
 			"githooks/**"
-		]
+		],
+		"branches": 70,
+		"lines": 70,
+		"functions": 70,
+		"statements": 70
 	},
 	"prettier": {
 		"tabWidth": 4,
