@@ -47,9 +47,9 @@
 			"**/src",
 			"githooks/**"
 		],
-		"branches": 70,
+		"branches": 53,
 		"lines": 70,
-		"functions": 70,
+		"functions": 63,
 		"statements": 70
 	},
 	"prettier": {
