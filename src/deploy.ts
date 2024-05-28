@@ -1,9 +1,9 @@
 import { LanguageId, MetaCallJSON } from '@metacall/protocol/deployment';
 import {
+	PackageError,
 	findRunners,
 	generateJsonsFromFiles,
-	generatePackage,
-	PackageError
+	generatePackage
 } from '@metacall/protocol/package';
 import { Plans } from '@metacall/protocol/plan';
 import {
@@ -18,6 +18,7 @@ import { apiError, error, info, printLanguage, warn } from './cli/messages';
 import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
+import { isInteractive } from './tty';
 import { getEnv, loadFilesToRun, zip } from './utils';
 
 export enum ErrorCode {
@@ -71,17 +72,19 @@ export const deployPackage = async (
 			try {
 				const deploy = await api.deploy(name, env, plan, 'Package');
 
-				await logs(descriptor.runners, name, args['dev']);
+				if (isInteractive()) {
+					// TODO: Need a TUI for logs
+					await logs(descriptor.runners, name, args['dev']);
+				}
 
-				if (deploy)
+				if (deploy) {
 					info(
 						'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
 					);
+				}
 			} catch (err) {
 				apiError(err as ProtocolError);
 			}
-
-			// TODO: Need a TUI for logs
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
