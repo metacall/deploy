@@ -8,7 +8,8 @@ import {
 import { Plans } from '@metacall/protocol/plan';
 import {
 	API as APIInterface,
-	ProtocolError
+	ProtocolError,
+	ResourceType
 } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { join } from 'path';
@@ -70,7 +71,12 @@ export const deployPackage = async (
 			info(`Deploying ${rootPath}...\n`);
 
 			try {
-				const deploy = await api.deploy(name, env, plan, 'Package');
+				const deploy = await api.deploy(
+					name,
+					env,
+					plan,
+					ResourceType.Package
+				);
 
 				if (isInteractive()) {
 					// TODO: Need a TUI for logs
@@ -239,7 +245,12 @@ export const deployFromRepository = async (
 
 		const env = await getEnv();
 
-		const deploy = await api.deploy(name, env, plan, 'Repository');
+		const deploy = await api.deploy(
+			name,
+			env,
+			plan,
+			ResourceType.Repository
+		);
 
 		info('Deploying...');
 
