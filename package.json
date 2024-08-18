@@ -1,6 +1,6 @@
 {
 	"name": "@metacall/deploy",
-	"version": "0.1.31",
+	"version": "0.1.32",
 	"description": "Tool for deploying into MetaCall FaaS platform.",
 	"main": "dist/index.js",
 	"bin": {
