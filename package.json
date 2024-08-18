@@ -101,7 +101,7 @@
 		"inquirer": "^8.1.0",
 		"openapi-types": "^12.1.0",
 		"ts-command-line-args": "^2.2.0",
-		"zod": "^1.11.10"
+		"zod": "^3.22.3"
 	},
 	"devDependencies": {
 		"@istanbuljs/nyc-config-typescript": "^1.0.2",
