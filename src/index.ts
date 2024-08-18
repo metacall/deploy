@@ -21,16 +21,18 @@ void (async () => {
 
 	if (args['version']) {
 		return console.log(
-			(
-				(await import(
-					join(
-						require.main
-							? join(dirname(require.main.filename), '..')
-							: process.cwd(),
-						'package.json'
-					)
-				)) as { version: string }
-			).version
+			`v${
+				(
+					(await import(
+						join(
+							require.main
+								? join(dirname(require.main.filename), '..')
+								: process.cwd(),
+							'package.json'
+						)
+					)) as { version: string }
+				).version
+			}`
 		);
 	}
 
