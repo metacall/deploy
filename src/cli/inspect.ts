@@ -7,7 +7,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../config';
 import { sleep } from './../utils';
 import args, { InspectFormat } from './args';
-import { error } from './messages';
+import { error, info, warn } from './messages';
 
 interface row {
 	Deployments: string;
@@ -216,6 +216,22 @@ const rawInspectToOpenAPIv3 = (
 	});
 };
 
+const ensureDeploymentsExist = (res: Deployment[]): boolean => {
+	if (res.length) {
+		return true;
+	}
+
+	warn('Your MetaCall Hub account has no active deployments.');
+	info(
+		'`metacall-deploy` is a command you can use to deploy your application.'
+	);
+	info(
+		'`metacall-deploy --help` can be used to get more information about the aforementioned command.'
+	);
+
+	return false;
+};
+
 const inspectPrint: InspectPrint = {
 	[InspectFormat.Table]: async (
 		config: Config,
@@ -224,6 +240,9 @@ const inspectPrint: InspectPrint = {
 		for (;;) {
 			const res = await api.inspect();
 
+			if (!ensureDeploymentsExist(res)) {
+				return;
+			}
 			console.clear();
 
 			const p = new Table({
@@ -278,6 +297,10 @@ const inspectPrint: InspectPrint = {
 		api: APIInterface
 	): Promise<void> => {
 		const res = await api.inspect();
+
+		if (!ensureDeploymentsExist(res)) {
+			return;
+		}
 		console.log(JSON.stringify(res, null, 2));
 	},
 	[InspectFormat.OpenAPIv3]: async (
@@ -285,6 +308,11 @@ const inspectPrint: InspectPrint = {
 		api: APIInterface
 	): Promise<void> => {
 		const res = await api.inspect();
+
+		if (!ensureDeploymentsExist(res)) {
+			return;
+		}
+
 		console.log(
 			JSON.stringify(
 				rawInspectToOpenAPIv3(

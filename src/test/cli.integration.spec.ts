@@ -37,6 +37,7 @@ describe('Integration CLI', function () {
 
 	const url = 'https://github.com/metacall/examples';
 	const addRepoSuffix = 'metacall-examples';
+	const inspectFormats = ['Table', 'Raw', 'OpenAPIv3'];
 
 	const workDirSuffix = 'time-app-web';
 	const filePath = join(
@@ -145,7 +146,7 @@ describe('Integration CLI', function () {
 		const workdir = await createTmpDirectory();
 
 		try {
-			await runCLI(
+			const result = await runCLI(
 				[
 					`--email=${email}`,
 					`--password=${password}`,
@@ -153,6 +154,7 @@ describe('Integration CLI', function () {
 				],
 				[keys.enter]
 			).promise;
+			ok(String(result).includes(`i Login Successfull!\n`));
 		} catch (err) {
 			strictEqual(
 				err,
@@ -241,11 +243,20 @@ describe('Integration CLI', function () {
 	});
 
 	// --inspect without parameter
-	it('Should fail --inspect command with proper output', async () =>
-		notStrictEqual(
-			await runCLI(['--inspect'], [keys.enter]).promise,
-			'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
-		));
+	it('Should fail --inspect command with proper output', async () => {
+		try {
+			const result = await runCLI(['--inspect'], [keys.enter]).promise;
+			notStrictEqual(
+				result,
+				'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
+			);
+		} catch (error) {
+			strictEqual(
+				String(error),
+				'! Your MetaCall Hub account has no active deployments.\n'
+			);
+		}
+	});
 
 	// --delete
 	it('Should be able to delete deployed repository using --delete flag', async () => {
@@ -334,6 +345,26 @@ describe('Integration CLI', function () {
 		return result;
 	});
 
+	// checking if there is no deployments throw inspect
+	it(`Should pass with --inspect if there is no active deployments`, async function () {
+		for (const format of inspectFormats) {
+			try {
+				await runCLI([`--inspect ${format}}`], [keys.enter]).promise;
+				fail(
+					`It gives active deployments in ${format} format while there is none`
+				);
+			} catch (error) {
+				if (
+					String(error).includes(
+						'! Your MetaCall Hub account has no active deployments.'
+					)
+				)
+					continue;
+				else fail(`Warning message is not right in ${format} format`);
+			}
+		}
+		ok(`Passes in the 3 inspect formats when there is no deployments`);
+	});
 	// --force
 	// it('Should be able to deploy forcefully using --force flag', async () => {
 	// 	const resultDel = await runCLI(
