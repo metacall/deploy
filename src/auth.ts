@@ -16,7 +16,6 @@ import { error, info, warn } from './cli/messages';
 import { loginSelection } from './cli/selection';
 import { Config, save } from './config';
 import { ErrorCode } from './deploy';
-import { logout } from './logout';
 import { forever } from './utils';
 
 const authToken = async (config: Config): Promise<string> => {
@@ -55,15 +54,8 @@ const authToken = async (config: Config): Promise<string> => {
 	}
 
 	if (expiresIn(token) < config.renewTime) {
-		try {
-			// Attempt to refresh token
-			token = await api.refresh();
-		} catch (err) {
-			// If refresh fails, force logout
-			await logout();
-			info('Session expired. Please login again with email/password.');
-			process.exit(1);
-		}
+		// Token expires in < renewTime
+		token = await api.refresh();
 	}
 
 	return token;

@@ -1,7 +1,6 @@
 import { API as APIInterface } from '@metacall/protocol/protocol';
 import { unlink } from 'fs/promises';
 import { configFilePath, save } from '../config';
-import { logout } from '../logout';
 import { exists } from '../utils';
 import args from './args';
 import { error, info } from './messages';
@@ -10,14 +9,8 @@ const handleValidateToken = async (api: APIInterface): Promise<void> => {
 	const validToken = await api.validate();
 
 	if (!validToken) {
-		try {
-			const token = await api.refresh();
-			await save({ token });
-		} catch (err) {
-			await logout();
-			info('Token expired. Please login again.');
-			process.exit(1);
-		}
+		const token = await api.refresh();
+		await save({ token });
 	}
 };
 
