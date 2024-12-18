@@ -1,7 +1,6 @@
 import { API as APIInterface } from '@metacall/protocol/protocol';
 import { unlink } from 'fs/promises';
-import { auth } from '../auth';
-import { configFilePath, defaultPath, load, save } from '../config';
+import { configFilePath, save } from '../config';
 import { exists } from '../utils';
 import args from './args';
 import { error, info } from './messages';
@@ -33,18 +32,11 @@ const validateToken = async (api: APIInterface): Promise<void> => {
 
 		(await exists(configFile)) && (await unlink(configFile));
 
-		info('Token expired, initiating token-based login...');
+		info('Try to login again!');
 
-		try {
-			const config = await load(defaultPath);
-
-			const newToken = await auth(config);
-			// Save the new token
-			await save({ token: newToken });
-			return;
-		} catch (loginErr) {
-			return error('Token validation failed. Please try again.');
-		}
+		return error(
+			`Token validation failed, potential causes include:\n\t1) The JWT may be mistranslated (Invalid Signature).\n\t2) JWT might have expired.`
+		);
 	}
 };
 
