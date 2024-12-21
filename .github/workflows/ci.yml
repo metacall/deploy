@@ -1,6 +1,6 @@
 name: CI
 on:
-    pull_request_target:
+    pull_request:
     push:
         branches:
             - master
@@ -11,38 +11,34 @@ jobs:
     ci:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout Code
+            - name: Checkout
               uses: actions/checkout@v4
-              with:
-                  ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
             - name: Setup NodeJS
               uses: actions/setup-node@v4
               with:
-                  node-version: '16'
+                  node-version: '20'
                   registry-url: https://registry.npmjs.org
 
-            - name: Install Dependencies
+            - name: Installing Dependencies
               run: npm i
 
-            - name: Lint Code
+            - name: Lint
               run: npm run lint
 
-            - name: Build Project
+            - name: Build
               run: npm run build
 
-            - name: Setup Environment Variables
+            - name: Run Tests
               run: |
                   touch .env
-                  echo "METACALL_AUTH_EMAIL=${{ secrets.METACALL_AUTH_EMAIL }}" >> .env
-                  echo "METACALL_AUTH_PASSWORD=${{ secrets.METACALL_AUTH_PASSWORD }}" >> .env
+                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' >> .env
+                  echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
+                  npm run coverage
 
-            - name: Run Tests
-              run: npm run coverage
-
-            - name: Publish to NPM
+            - name: Publish
               uses: JS-DevTools/npm-publish@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
                   access: 'public'
-                  token: ${{ secrets.NPM_AUTH_TOKEN }}
+                  token: '${{ secrets.NPM_AUTH_TOKEN }}'
