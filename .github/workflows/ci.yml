@@ -29,7 +29,16 @@ jobs:
             - name: Build
               run: npm run build
 
-            - name: Run Tests
+            - name: Run Tests (local)
+              run: |
+                  export TEST_DEPLOY_LOCAL="true"
+                  npm install -g @metacall/faas
+                  metacall-faas &
+                  sleep 10
+                  npm run coverage
+
+            - name: Run Tests (production)
+              if: github.event_name != 'pull_request'
               run: |
                   touch .env
                   echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' >> .env

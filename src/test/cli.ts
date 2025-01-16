@@ -1,13 +1,22 @@
 import API from '@metacall/protocol/protocol';
+import { fail } from 'assert';
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
-import { constants } from 'os';
+import fs from 'fs/promises';
+import os from 'os';
+import { join } from 'path';
 import args from '../cli/args';
+import { configFilePath } from '../config';
 import { startup } from '../startup';
+import { exists } from '../utils';
 
 dotenv.config();
+
+// Define tty as interactive in order to test properly the CLI
+process.env.NODE_ENV = 'testing';
+process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
 
 const PATH = process.env.PATH;
 const HOME = process.env.HOME;
@@ -59,7 +68,7 @@ export const runWithInput = (
 			child.stdin?.end();
 
 			killTimeout = setTimeout(() => {
-				child.kill(constants.signals.SIGTERM);
+				child.kill(os.constants.signals.SIGTERM);
 			}, 3000);
 
 			return;
@@ -180,4 +189,33 @@ export const generateRandomString = (length: number): string => {
 	}
 
 	return result;
+};
+
+export const runCLI = (args: string[], inputs: string[]) => {
+	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+		args.push('--dev');
+	}
+	return runWithInput('dist/index.js', args, inputs);
+};
+
+export const clearCache = async (): Promise<void> => {
+	if (await exists(configFilePath()))
+		await runCLI(['-l'], [keys.enter]).promise;
+};
+
+export const checkEnvVars = (): { email: string; password: string } | never => {
+	const email = process.env.METACALL_AUTH_EMAIL;
+	const password = process.env.METACALL_AUTH_PASSWORD;
+
+	if (typeof email === 'undefined' || typeof password === 'undefined') {
+		fail(
+			'No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD'
+		);
+	}
+
+	return { email, password };
+};
+
+export const createTmpDirectory = async (): Promise<string> => {
+	return await fs.mkdtemp(join(os.tmpdir(), `dep-`));
 };
