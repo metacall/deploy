@@ -14,6 +14,10 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            # Required for local tests
+            - name: Setup MetaCall CLI
+              run: wget -O - https://raw.githubusercontent.com/metacall/install/master/install.sh | sh
+
             - name: Setup NodeJS
               uses: actions/setup-node@v4
               with:
