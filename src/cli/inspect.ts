@@ -5,10 +5,10 @@ import chalk from 'chalk';
 import { Table } from 'console-table-printer';
 import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../config';
+import { showInteractiveMessage } from '../tty';
 import { sleep } from './../utils';
 import args, { InspectFormat } from './args';
 import { error } from './messages';
-
 interface row {
 	Deployments: string;
 	Status: string;
@@ -225,6 +225,7 @@ const inspectPrint: InspectPrint = {
 			const res = await api.inspect();
 
 			console.clear();
+			showInteractiveMessage();
 
 			const p = new Table({
 				columns: [
