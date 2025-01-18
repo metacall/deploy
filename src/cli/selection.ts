@@ -5,9 +5,11 @@ import {
 } from '@metacall/protocol/language';
 import { Plans } from '@metacall/protocol/plan';
 import { prompt } from 'inquirer';
+import { showInteractiveMessage } from '../tty';
 
-export const loginSelection = (methods: string[]): Promise<string> =>
-	prompt<{ method: string }>([
+export const loginSelection = (methods: string[]): Promise<string> => {
+	showInteractiveMessage();
+	return prompt<{ method: string }>([
 		{
 			type: 'list',
 			name: 'method',
@@ -15,12 +17,15 @@ export const loginSelection = (methods: string[]): Promise<string> =>
 			choices: methods
 		}
 	]).then((res: { method: string }) => res.method);
+};
 
 export const fileSelection = (
 	message: string,
 	files: string[] = []
-): Promise<string[]> =>
-	prompt<{ scripts: string[] }>([
+): Promise<string[]> => {
+	showInteractiveMessage();
+
+	return prompt<{ scripts: string[] }>([
 		{
 			type: 'checkbox',
 			name: 'scripts',
@@ -28,11 +33,13 @@ export const fileSelection = (
 			choices: files
 		}
 	]).then((res: { scripts: string[] }) => res.scripts);
+};
 
 export const languageSelection = (
 	languages: LanguageId[] = []
-): Promise<LanguageId[]> =>
-	prompt<{ langs: string[] }>([
+): Promise<LanguageId[]> => {
+	showInteractiveMessage();
+	return prompt<{ langs: string[] }>([
 		{
 			type: 'checkbox',
 			name: 'langs',
@@ -42,12 +49,14 @@ export const languageSelection = (
 	]).then((res: { langs: string[] }) =>
 		res.langs.map(lang => DisplayNameToLanguageId[lang])
 	);
+};
 
 export const planSelection = (
 	message: string,
 	availablePlans: string[]
-): Promise<Plans> =>
-	prompt<{ plan: Plans }>([
+): Promise<Plans> => {
+	showInteractiveMessage();
+	return prompt<{ plan: Plans }>([
 		{
 			type: 'list',
 			name: 'plan',
@@ -55,12 +64,14 @@ export const planSelection = (
 			choices: availablePlans
 		}
 	]).then((res: { plan: Plans }) => res.plan);
+};
 
 export const listSelection = (
 	list: string[] | { name: string; value: string }[],
 	message: string
-): Promise<string> =>
-	prompt<{ container: string }>([
+): Promise<string> => {
+	showInteractiveMessage();
+	return prompt<{ container: string }>([
 		{
 			type: 'list',
 			name: 'container',
@@ -68,9 +79,11 @@ export const listSelection = (
 			choices: list
 		}
 	]).then((res: { container: string }) => res.container);
+};
 
-export const consentSelection = (message: string): Promise<boolean> =>
-	prompt<{ consent: boolean }>([
+export const consentSelection = (message: string): Promise<boolean> => {
+	showInteractiveMessage();
+	return prompt<{ consent: boolean }>([
 		{
 			type: 'confirm',
 			name: 'consent',
@@ -78,3 +91,4 @@ export const consentSelection = (message: string): Promise<boolean> =>
 			default: false
 		}
 	]).then((res: { consent: boolean }) => res.consent);
+};

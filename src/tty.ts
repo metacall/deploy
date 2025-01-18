@@ -10,3 +10,12 @@ export const isInteractive = () => {
 
 	return process.stdin.isTTY === true;
 };
+
+export const showInteractiveMessage = (): void => {
+	const isTTY: boolean = process.stdout.isTTY;
+	const isInteractiveMode: boolean = isInteractive();
+
+	if (isTTY || isInteractiveMode) {
+		console.log('Press Ctrl+C to exit');
+	}
+};
