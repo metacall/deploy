@@ -48,13 +48,13 @@ jobs:
                   export TEST_DEPLOY_LOCAL="true"
                   metacall-faas &
                   sleep 10
+                  mv .env.example .env
                   npm run coverage
 
             - name: Run Tests (production)
               if: github.event_name != 'pull_request'
               run: |
-                  touch .env
-                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' >> .env
+                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' > .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run coverage
 
