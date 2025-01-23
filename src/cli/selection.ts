@@ -6,12 +6,17 @@ import {
 import { Plans } from '@metacall/protocol/plan';
 import { prompt } from 'inquirer';
 
-export const loginSelection = (methods: string[]): Promise<string> =>
+export const loginSelection = (
+	methods: string[],
+	isReLogin = false
+): Promise<string> =>
 	prompt<{ method: string }>([
 		{
 			type: 'list',
 			name: 'method',
-			message: 'Select the login method',
+			message: isReLogin
+				? 'Token expired. Select login method'
+				: 'Select the login method',
 			choices: methods
 		}
 	]).then((res: { method: string }) => res.method);

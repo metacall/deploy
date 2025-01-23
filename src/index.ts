@@ -44,7 +44,7 @@ void (async () => {
 		args['dev'] ? config.devURL : config.baseURL
 	);
 
-	await validateToken(api);
+	await validateToken(api, config);
 
 	if (args['listPlans']) return await listPlans(api);
 
