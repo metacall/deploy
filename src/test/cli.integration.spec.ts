@@ -1,38 +1,16 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
-import * as dotenv from 'dotenv';
-import { promises } from 'fs';
-import os from 'os';
 import { join } from 'path';
-import { configFilePath } from '../config';
-import { exists, loadFile } from '../utils';
 import {
+	checkEnvVars,
+	clearCache,
+	createTmpDirectory,
 	deleted,
 	deployed,
-	generateRandomString,
 	keys,
-	runWithInput
-} from './cmd';
+	runCLI
+} from './cli';
 
-dotenv.config();
-
-// Define tty as interactive in order to test properly the CLI
-process.env.NODE_ENV = 'testing';
-process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
-
-const runCLI = (args: string[], inputs: string[]) => {
-	return runWithInput('dist/index.js', args, inputs);
-};
-
-const clearCache = async (): Promise<void> => {
-	if (await exists(configFilePath()))
-		await runCLI(['-l'], [keys.enter]).promise;
-};
-
-const createTmpDirectory = async (): Promise<string> => {
-	return await promises.mkdtemp(join(os.tmpdir(), `dep-`));
-};
-
-describe('Integration CLI', function () {
+describe('Integration CLI (Deploy)', function () {
 	this.timeout(2000000);
 
 	const url = 'https://github.com/metacall/examples';
@@ -48,96 +26,6 @@ describe('Integration CLI', function () {
 		'time-app-web'
 	);
 
-	const checkEnvVars = (): { email: string; password: string } | never => {
-		const email = process.env.METACALL_AUTH_EMAIL;
-		const password = process.env.METACALL_AUTH_PASSWORD;
-
-		if (typeof email === 'undefined' || typeof password === 'undefined') {
-			fail(
-				'No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD'
-			);
-		}
-
-		return { email, password };
-	};
-
-	// Test for env variables before running tests
-	before(async function () {
-		await clearCache();
-		checkEnvVars();
-	});
-
-	// Invalid token login
-	it('Should fail with malformed jwt', async () => {
-		await clearCache();
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			const result = await runCLI(
-				['--token=yeet', `--workdir=${workdir}`],
-				[keys.enter]
-			).promise;
-
-			fail(
-				`The CLI passed without errors and it should have failed. Result: ${String(
-					result
-				)}`
-			);
-		} catch (err) {
-			ok(String(err) === 'X Token invalid: jwt malformed\n');
-		}
-	});
-
-	// No credentials provided
-	it('Should fail with no credentials with --token', async () => {
-		await clearCache();
-
-		try {
-			const result = await runCLI(
-				['--token='],
-				[keys.enter, keys.enter, keys.kill]
-			).promise;
-
-			fail(
-				`The CLI passed without errors and it should have failed. Result: ${String(
-					result
-				)}`
-			);
-		} catch (err) {
-			ok(
-				String(err) ===
-					'X Token invalid: Invalid authorization header, no credentials provided.\n'
-			);
-		}
-	});
-
-	// Invalid login credentials
-	it('Should fail with invalid login credentials', async () => {
-		await clearCache();
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			const result = await runCLI(
-				[
-					'--email=yeet@yeet.com',
-					'--password=yeetyeet',
-					`--workdir=${workdir}`
-				],
-				[keys.enter]
-			).promise;
-
-			fail(
-				`The CLI passed without errors and it should have failed. Result: ${String(
-					result
-				)}`
-			);
-		} catch (err) {
-			ok(String(err) === 'X Invalid account email or password.\n');
-		}
-	});
-
 	// --email & --password
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
@@ -152,30 +40,6 @@ describe('Integration CLI', function () {
 					`--workdir=${workdir}`
 				],
 				[keys.enter]
-			).promise;
-		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
-			);
-		}
-	});
-
-	// --token
-	it('Should be able to login using --token flag', async function () {
-		const file = await loadFile(configFilePath());
-		const token = file.split('=')[1];
-
-		await clearCache();
-
-		notStrictEqual(token, undefined);
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			await runCLI(
-				[`--token=${token}`, `--workdir=${workdir}`],
-				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
 			strictEqual(
@@ -334,6 +198,7 @@ describe('Integration CLI', function () {
 		return result;
 	});
 
+	// TODO:
 	// --force
 	// it('Should be able to deploy forcefully using --force flag', async () => {
 	// 	const resultDel = await runCLI(
@@ -389,134 +254,7 @@ describe('Integration CLI', function () {
 			await runCLI(['--listPlans'], [keys.enter]).promise,
 			'i Essential: 2\n'
 		));
-
-	// signup already taken email
-	it('Should fail with taken email', async () => {
-		await clearCache();
-		try {
-			const result = await runCLI(
-				[],
-				[
-					keys.down,
-					keys.down,
-					keys.enter,
-					'noot@noot.com',
-					keys.enter,
-					'diaa',
-					keys.enter,
-					'diaa',
-					keys.enter,
-					'diaa',
-					keys.enter
-				]
-			).promise;
-			fail(
-				`The CLI passed without errors and it should fail. Result: ${String(
-					result
-				)}`
-			);
-		} catch (error) {
-			ok(String(error).includes('Account already exists'));
-		}
-	});
-
-	// signup with invalid email
-	it('Should fail with invalid email', async () => {
-		await clearCache();
-
-		try {
-			const result = await runCLI(
-				[],
-				[
-					keys.up,
-					keys.enter,
-					'diaabadr82gmail.com',
-					keys.enter,
-					'1234',
-					keys.enter,
-					'1234',
-					keys.enter,
-					'diaa',
-					keys.enter
-				]
-			).promise;
-			fail(
-				`The CLI passed without errors and it should fail. Result: ${String(
-					result
-				)}`
-			);
-		} catch (error) {
-			ok(String(error).includes('Invalid email'));
-		}
-	});
-
-	// signup with taken alias
-	it('Should fail with taken alias', async () => {
-		await clearCache();
-		const str = generateRandomString(Math.floor(Math.random() * 10) + 1);
-
-		try {
-			const result = await runCLI(
-				[],
-				[
-					keys.up,
-					keys.enter,
-					`${str}@yeet.com`,
-					keys.enter,
-					'1234',
-					keys.enter,
-					'1234',
-					keys.enter,
-					'creatoon',
-					keys.enter
-				]
-			).promise;
-			fail(
-				`The CLI passed without errors and it should fail. Result: ${String(
-					result
-				)}`
-			);
-		} catch (error) {
-			ok(String(error).includes('alias is already taken'));
-		}
-	});
-
-	// Note: Disable this test for now, I do not want to spam the FaaS
-	// success signup
-	/*
-	it('Should be able to signup successfully', async () => {
-		await clearCache();
-		const str = generateRandomString(Math.floor(Math.random() * 10) + 1);
-
-		try {
-			const result = await runCLI(
-				[],
-				[
-					keys.up,
-					keys.enter,
-					`${str}@yeet.com`,
-					keys.enter,
-					str,
-					keys.enter,
-					str,
-					keys.enter,
-					str,
-					keys.enter
-				]
-			).promise;
-			ok(String(result).includes('A verification email has been sent'));
-		} catch (error) {
-			fail(
-				`The CLI failed with error: ${String(
-					error
-				)} and it should pass.`
-			);
-		}
-	});
-	*/
 });
 
 // TODO: Tests to add
 // if there is only one log file -> select it (TODO: This must be reviewed in case we use TUI)
-
-// test for mangled token, expired

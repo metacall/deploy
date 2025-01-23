@@ -7,12 +7,13 @@
 		"metacall-deploy": "dist/index.js"
 	},
 	"scripts": {
-		"test": "npm run --silent build && mocha dist/test",
+		"test": "npm run buildDebug && mocha dist/test",
 		"coverage": "nyc npm run test",
-		"unit-integration": "npm run --silent test -- --ignore **/*.integration.spec.js",
+		"unit": "npm run --silent test -- --ignore **/*.integration.spec.js",
 		"prepublishOnly": "npm run --silent build",
 		"postinstall": "node -e \"require('fs').existsSync('githooks') && require('./githooks/configure.js').configure()\"",
 		"build": "npm run --silent lint && tsc",
+		"buildDebug": "npm run --silent lint && tsc --sourceMap true",
 		"lint": "eslint . --ignore-pattern dist",
 		"fix": "eslint . --ignore-pattern dist --fix",
 		"start": "node dist/index.js"
@@ -27,9 +28,9 @@
 		"deploy",
 		"tool"
 	],
-	"author": "Thomas Rory Gummerson <thomas@gummerson.no> (https://trgwii.no/)",
+	"author": "Vicente Eduardo Ferrer Garcia <vic798@gmail.com> (https://metacall.io/)",
 	"contributors": [
-		"Vicente Eduardo Ferrer Garcia <vic798@gmail.com> (https://metacall.io/)"
+		"Thomas Rory Gummerson <thomas@gummerson.no> (https://trgwii.no/)"
 	],
 	"license": "Apache-2.0",
 	"bugs": {
