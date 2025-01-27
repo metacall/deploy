@@ -207,6 +207,52 @@ describeTest('Integration CLI (Login)', function () {
 		}
 	});
 
+	it('Should redirect to login when email is already associated with an account', async () => {
+		await clearCache();
+
+		let stdout = '';
+
+		try {
+			const process = runCLI(
+				[],
+				[
+					keys.down,
+					keys.down,
+					keys.enter,
+					'noot@noot.com',
+					keys.enter,
+					'password123',
+					keys.enter,
+					'password123',
+					keys.enter,
+					'non-existing-alias',
+					keys.enter
+				]
+			);
+
+			// Attach an event listener to capture stdout
+			process.child.stdout?.on('data', (data: Buffer) => {
+				stdout += data.toString();
+			});
+
+			await process.promise;
+
+			fail('The CLI did not throw an error when it should have.');
+		} catch (error) {
+			// Check the error message
+			ok(
+				String(error).includes(`Account already exists.`),
+				'Expected error message for existing account was not found.'
+			);
+
+			// Validate that the login method menu is printed after the error
+			ok(
+				String(stdout).includes('Select the login method'),
+				'The CLI did not print the login method menu after the error.'
+			);
+		}
+	});
+
 	// Note: Disable this test for now, I do not want to spam the FaaS
 	// success signup
 	/*
