@@ -167,7 +167,7 @@ const authSignup = async (config: Config): Promise<string> => {
 				await authSelection(config);
 			} else {
 				await askData();
-			}		
+			}
 		}
 	}
 	return process.exit(ErrorCode.Ok);
