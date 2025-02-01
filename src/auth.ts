@@ -19,47 +19,36 @@ import { ErrorCode } from './deploy';
 import { forever } from './utils';
 
 const authToken = async (config: Config): Promise<string> => {
-	const askToken = (): Promise<string> =>
-		maskedInput('Please enter your metacall token');
+    const askToken = async (): Promise<string> =>
+        maskedInput('Please enter your MetaCall token');
 
-	const shouldKeepAsking = args['token'] === undefined;
-	let token: string = args['token'] || (await askToken());
+    const shouldKeepAsking = args['token'] === undefined;
+    let token: string = args['token'] || (await askToken());
 
-	const api = API(token, config.baseURL);
+    const api = API(token, config.baseURL);
 
-	if (process.stdout.isTTY && shouldKeepAsking) {
-		while (forever) {
-			try {
-				await api.validate();
-				break;
-			} catch (err) {
-				warn(
-					`Token invalid: ${String(
-						(err as ProtocolError).response?.data
-					)}`
-				);
-				token = await askToken();
-			}
-		}
-	} else {
-		try {
-			await api.validate();
-		} catch (err) {
-			error(
-				`Token invalid: ${String(
-					(err as ProtocolError).response?.data
-				)}`
-			);
-		}
-	}
+    if (expiresIn(token) <= 0) {
+        warn('Your token has expired. Attempting to refresh...');
+        try {
+            token = await api.refresh();
+            info('Token refreshed successfully!');
+            await save({ token });
+        } catch (err) {
+            error('Token refresh failed. Please log in again.');
+            return await authLogin(config);
+        }
+    }
 
-	if (expiresIn(token) < config.renewTime) {
-		// Token expires in < renewTime
-		token = await api.refresh();
-	}
+    try {
+        await api.validate();
+    } catch (err) {
+        error(`Token invalid: ${(err as ProtocolError).response?.data}`);
+        return await authLogin(config);
+    }
 
-	return token;
+    return token;
 };
+
 
 const authLogin = async (config: Config): Promise<string> => {
 	const askEmail = (): Promise<string> =>
