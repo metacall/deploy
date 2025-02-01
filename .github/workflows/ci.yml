@@ -37,6 +37,9 @@ jobs:
             - name: Installing Dependencies
               run: npm i
 
+            - name: Install MetaCall Python module
+              run: pip install metacall   
+
             - name: Lint
               run: npm run lint
 
