@@ -11,9 +11,6 @@ jobs:
     ci:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-
             # Required for local tests
             - name: Setup MetaCall CLI
               run: wget -O - https://raw.githubusercontent.com/metacall/install/master/install.sh | sh
@@ -23,6 +20,19 @@ jobs:
               with:
                   node-version: '20'
                   registry-url: https://registry.npmjs.org
+
+            - name: Setup MetaCall FaaS
+              run: |
+                  git clone https://github.com/metacall/faas.git
+                  cd faas
+                  npm install
+                  npm run build
+                  npm install -g $(pwd)
+                  cd ..
+                  rm -rf faas
+
+            - name: Checkout
+              uses: actions/checkout@v4
 
             - name: Installing Dependencies
               run: npm i
@@ -36,16 +46,15 @@ jobs:
             - name: Run Tests (local)
               run: |
                   export TEST_DEPLOY_LOCAL="true"
-                  npm install -g @metacall/faas
                   metacall-faas &
                   sleep 10
+                  mv .env.example .env
                   npm run coverage
 
             - name: Run Tests (production)
               if: github.event_name != 'pull_request'
               run: |
-                  touch .env
-                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' >> .env
+                  echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' > .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run coverage
 
