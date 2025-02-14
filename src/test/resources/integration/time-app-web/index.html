@@ -1,30 +1,41 @@
 <html>
-  <head>
-    <title>MetaCall Python Time App Web Example</title>
-  </head>
-  <body>
-    <form>
-        <label>Press the button and MetaCall will give you the current time:</label>
-        <label id="current-time"></label>
-        <input type="button" onclick="get_time()" value="Get Current Time">
-    </form>
-    <script>
-      function get_time() {
-        var http = new XMLHttpRequest();
+	<head>
+		<title>MetaCall Python Time App Web Example</title>
+	</head>
+	<body>
+		<form>
+			<label
+				>Press the button and MetaCall will give you the current
+				time:</label
+			>
+			<label id="current-time"></label>
+			<input
+				type="button"
+				onclick="get_time()"
+				value="Get Current Time"
+			/>
+		</form>
+		<script>
+			function get_time() {
+				var http = new XMLHttpRequest();
 
-        // Get base URL
-        var base_url = window.location.href.split('/').slice(0, -1).join('/');
+				// Get base URL
+				var base_url = window.location.href
+					.split('/')
+					.slice(0, -1)
+					.join('/');
 
-        http.open('GET', `${base_url}/time`, true);
+				http.open('GET', `${base_url}/time`, true);
 
-        http.addEventListener('load', function() {
-          if (this.readyState == 4 && this.status == 200) {
-            document.getElementById('current-time').innerHTML = this.responseText;
-          }
-        });
+				http.addEventListener('load', function () {
+					if (this.readyState == 4 && this.status == 200) {
+						document.getElementById('current-time').innerHTML =
+							this.responseText;
+					}
+				});
 
-        http.send();
-      }
-    </script>
-  </body>
+				http.send();
+			}
+		</script>
+	</body>
 </html>

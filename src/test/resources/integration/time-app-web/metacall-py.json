@@ -1,7 +1,5 @@
 {
-  "language_id": "py",
-  "path": ".",
-  "scripts": [
-    "index.py"
-  ]
+	"language_id": "py",
+	"path": ".",
+	"scripts": ["index.py"]
 }

@@ -1,7 +1,5 @@
 {
-    "language_id": "node",
-    "path": ".",
-    "scripts": [
-        "a.js"
-    ]
+	"language_id": "node",
+	"path": ".",
+	"scripts": ["a.js"]
 }
