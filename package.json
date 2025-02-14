@@ -14,7 +14,7 @@
 		"postinstall": "node -e \"require('fs').existsSync('githooks') && require('./githooks/configure.js').configure()\"",
 		"buildDebug": "npm run format && npm run fix && tsc --sourceMap true",
 		"build": "npm run format && npm run fix && tsc",
-		"format": "prettier --write .",
+		"format": "prettier --loglevel warn --write .",
 		"lint": "eslint . --max-warnings=0 --ignore-pattern dist",
 		"fix": "eslint . --max-warnings=0 --ignore-pattern dist --fix",
 		"start": "node dist/index.js"

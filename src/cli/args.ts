@@ -140,6 +140,19 @@ const parseOptions: ParseOptions<CLIArgs> = {
 	partial: true
 };
 
-const args = parse<CLIArgs>(optionsDefinition, parseOptions);
+const args = ((): CLIArgs & { _unknown: Array<string> } => {
+	const parsedArgs = parse<CLIArgs>(optionsDefinition, parseOptions);
 
-export default { _unknown: [], ...args };
+	// Adding this here because the CLI integration tests execute API
+	// methods either from the child process (runCLI) to the parent
+	// process, the one running mocha, so if we just add --dev in the child
+	// it fails on the parent process, this is is also fine here because it
+	// is executed only once at the startup of the program
+	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+		parsedArgs.dev = true;
+	}
+
+	return { _unknown: [], ...parsedArgs };
+})();
+
+export default args;
