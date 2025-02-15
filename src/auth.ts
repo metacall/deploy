@@ -16,6 +16,7 @@ import { error, info, warn } from './cli/messages';
 import { loginSelection } from './cli/selection';
 import { Config, save } from './config';
 import { ErrorCode } from './deploy';
+import { logout } from './logout';
 import { forever } from './utils';
 
 const authToken = async (config: Config): Promise<string> => {
@@ -54,8 +55,17 @@ const authToken = async (config: Config): Promise<string> => {
 	}
 
 	if (expiresIn(token) < config.renewTime) {
-		// Token expires in < renewTime
-		token = await api.refresh();
+		try {
+			// Attempt to refresh token
+			token = await api.refresh();
+			token && (await save({ token }));
+		} catch (err) {
+			await logout();
+			info('Token expired. Please login again.');
+			// Pass isReLogin as true
+			const newToken = await authSelection(config, true);
+			await save({ token: newToken });
+		}
 	}
 
 	return token;
@@ -169,7 +179,10 @@ const authSignup = async (config: Config): Promise<string> => {
 	return process.exit(ErrorCode.Ok);
 };
 
-const authSelection = async (config: Config): Promise<string> => {
+export const authSelection = async (
+	config: Config,
+	isReLogin = false
+): Promise<string> => {
 	const token = await (async () => {
 		if (args['email'] || args['password']) {
 			return await authLogin(config);
@@ -180,7 +193,7 @@ const authSelection = async (config: Config): Promise<string> => {
 				{
 					'Login by token': authToken,
 					'Login by email and password': authLogin,
-					'New user, sign up': authSignup
+					...(isReLogin ? {} : { 'New user, sign up': authSignup })
 				};
 
 			return await methods[await loginSelection(Object.keys(methods))](

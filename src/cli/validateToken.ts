@@ -1,22 +1,38 @@
 import { API as APIInterface } from '@metacall/protocol/protocol';
 import { unlink } from 'fs/promises';
-import { configFilePath, save } from '../config';
+import { authSelection } from '../auth';
+import { Config, configFilePath, save } from '../config';
+import { logout } from '../logout';
 import { exists } from '../utils';
 import args from './args';
 import { error, info } from './messages';
 
-const handleValidateToken = async (api: APIInterface): Promise<void> => {
+const handleValidateToken = async (
+	api: APIInterface,
+	config: Config
+): Promise<void> => {
 	const validToken = await api.validate();
 
 	if (!validToken) {
-		const token = await api.refresh();
-		await save({ token });
+		try {
+			const token = await api.refresh();
+			token && (await save({ token }));
+		} catch (err) {
+			await logout();
+			info('Token expired. Please login again.');
+			// Pass isReLogin as true
+			const newToken = await authSelection(config, true);
+			await save({ token: newToken });
+		}
 	}
 };
 
-const validateToken = async (api: APIInterface): Promise<void> => {
+const validateToken = async (
+	api: APIInterface,
+	config: Config
+): Promise<void> => {
 	try {
-		await handleValidateToken(api);
+		await handleValidateToken(api, config);
 	} catch (err) {
 		if (args['dev']) {
 			info(

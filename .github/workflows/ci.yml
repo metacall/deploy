@@ -46,7 +46,7 @@ jobs:
             - name: Run Tests (local)
               run: |
                   export TEST_DEPLOY_LOCAL="true"
-                  metacall-faas &
+                  nohup metacall-faas 2>&1 &
                   sleep 10
                   mv .env.example .env
                   npm run coverage
