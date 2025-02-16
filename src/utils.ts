@@ -7,6 +7,7 @@
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
 import archiver, { Archiver } from 'archiver';
+import dotenv from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
 import { platform } from 'os';
@@ -112,10 +113,23 @@ export const zip = async (
 	return archive;
 };
 
-// TODO  Look for the .env file in user's code and fetch it so that user don't have to write all the vars again in the CLI
-
 export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
-	// TODO: Implement .env loading, if .env file is found, load it and skip the rest of the function
+	const envFilePath = join(process.cwd(), '.env');
+	if (await exists(envFilePath)) {
+		try {
+			const fileContents = await fs.readFile(envFilePath, 'utf8');
+			const parsedEnv = dotenv.parse(fileContents);
+			console.log(
+				'Detected and loaded environment variables from .env file.'
+			);
+			return Object.entries(parsedEnv).map(([name, value]) => ({
+				name,
+				value
+			}));
+		} catch (err) {
+			console.error('Error reading the .env file:', err);
+		}
+	}
 
 	// If the input is not interactive skip asking the end user
 	if (!isInteractive()) {
@@ -127,28 +141,31 @@ export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
 		'Do you want to add environment variables?'
 	);
 
-	const env = enableEnv
-		? await prompt<{ env: string }>([
-				{
-					type: 'input',
-					name: 'env',
-					message: 'Type env vars in the format: K1=V1, K2=V2'
+	if (enableEnv) {
+		const { env } = await prompt<{ env: string }>([
+			{
+				type: 'input',
+				name: 'env',
+				message: 'Type env vars in the format: K1=V1, K2=V2'
+			}
+		]);
+
+		const envObject = env
+			.split(',')
+			.map(kv => kv.trim())
+			.reduce((acc: Record<string, string>, kv) => {
+				const [key, value] = kv.split('=');
+				if (key && value) {
+					acc[key.trim()] = value.trim();
 				}
-		  ]).then(({ env }) =>
-				env
-					.split(',')
-					.map(kv => {
-						const [k, v] = kv.trim().split('=');
-						return { [k]: v };
-					})
-					.reduce((obj, kv) => Object.assign(obj, kv), {})
-		  )
-		: {};
+				return acc;
+			}, {});
 
-	const envArr = Object.entries(env).map(el => {
-		const [k, v] = el;
-		return { name: k, value: v };
-	});
+		return Object.entries(envObject).map(([name, value]) => ({
+			name,
+			value
+		}));
+	}
 
-	return envArr;
+	return [];
 };
