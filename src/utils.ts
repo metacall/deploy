@@ -128,6 +128,7 @@ export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
 			}));
 		} catch (err) {
 			console.error('Error reading the .env file:', err);
+			return [];
 		}
 	}
 
