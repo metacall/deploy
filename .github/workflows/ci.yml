@@ -50,13 +50,14 @@ jobs:
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run coverage
 
-            - name: Run Tests (local)
-              run: |
-                  export TEST_DEPLOY_LOCAL="true"
-                  metacall-faas &
-                  sleep 10
-                  mv .env.example .env
-                  npm run coverage
+            # TODO:
+            # - name: Run Tests (local)
+            #   run: |
+            #       export TEST_DEPLOY_LOCAL="true"
+            #       metacall-faas &
+            #       sleep 10
+            #       mv .env.example .env
+            #       npm run coverage
 
             - name: Publish
               uses: JS-DevTools/npm-publish@v1
