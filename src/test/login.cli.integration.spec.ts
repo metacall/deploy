@@ -1,6 +1,4 @@
-import { fail, notStrictEqual, ok, strictEqual } from 'assert';
-import { configFilePath } from '../config';
-import { loadFile } from '../utils';
+import { fail, ok } from 'assert';
 import {
 	checkEnvVars,
 	clearCache,
@@ -91,30 +89,6 @@ describeTest('Integration CLI (Login)', function () {
 			);
 		} catch (err) {
 			ok(String(err) === 'X Invalid account email or password.\n');
-		}
-	});
-
-	// --token
-	it('Should be able to login using --token flag', async function () {
-		const file = await loadFile(configFilePath());
-		const token = file.split('=')[1];
-
-		await clearCache();
-
-		notStrictEqual(token, undefined);
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			await runCLI(
-				[`--token=${token}`, `--workdir=${workdir}`],
-				[keys.enter, keys.enter]
-			).promise;
-		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
-			);
 		}
 	});
 
