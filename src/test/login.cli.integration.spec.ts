@@ -15,6 +15,8 @@ const describeTest =
 	process.env.TEST_DEPLOY_LOCAL !== 'true' ? describe : describe.skip;
 
 describeTest('Integration CLI (Login)', function () {
+	this.timeout(2000000);
+
 	// Test for env variables before running tests
 	before(async function () {
 		await clearCache();
