@@ -7,11 +7,12 @@
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
 import archiver, { Archiver } from 'archiver';
+import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
 import { platform } from 'os';
 import { basename, join, relative } from 'path';
-import { error, printLanguage } from './cli/messages';
+import { error, info, printLanguage } from './cli/messages';
 import { consentSelection, fileSelection } from './cli/selection';
 import { isInteractive } from './tty';
 
@@ -112,10 +113,26 @@ export const zip = async (
 	return archive;
 };
 
-// TODO  Look for the .env file in user's code and fetch it so that user don't have to write all the vars again in the CLI
-
 export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
-	// TODO: Implement .env loading, if .env file is found, load it and skip the rest of the function
+	const envFilePath = join(process.cwd(), '.env');
+
+	if (await exists(envFilePath)) {
+		try {
+			const source = await fs.readFile(envFilePath, 'utf8');
+			const parsedEnv = parse(source);
+			info('Detected and loaded environment variables from .env file.');
+			return Object.entries(parsedEnv).map(([name, value]) => ({
+				name,
+				value
+			}));
+		} catch (err) {
+			error(
+				`Error while reading the .env file: ${(
+					err as Error
+				).toString()}`
+			);
+		}
+	}
 
 	// If the input is not interactive skip asking the end user
 	if (!isInteractive()) {

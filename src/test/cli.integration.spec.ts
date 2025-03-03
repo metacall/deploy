@@ -180,6 +180,39 @@ describe('Integration CLI (Deploy)', function () {
 		return result;
 	});
 
+	// test .env file
+	it('Should be able to deploy repository using --workdir & getting the .env file', async () => {
+		const projectPath = join(
+			process.cwd(),
+			'src',
+			'test',
+			'resources',
+			'integration',
+			'env'
+		);
+		const result = await runCLI(
+			[`--workdir=${projectPath}`],
+			[keys.enter, keys.kill]
+		).promise;
+
+		ok(String(result).includes(`i Deploying ${projectPath}...\n`));
+
+		strictEqual(await deployed('env'), true);
+		return result;
+	});
+
+	// --delete
+	it('Should be able to delete deployed repository using --delete flag', async () => {
+		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+			.promise;
+
+		ok(String(result).includes('i Deploy Delete Succeed\n'));
+
+		strictEqual(await deleted('env'), true);
+
+		return result;
+	});
+
 	// --workdir & --projectName & --plan
 	it('Should be able to deploy repository using --workdir & --plan flag', async () => {
 		const result = await runCLI(
