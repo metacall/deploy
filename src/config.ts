@@ -11,8 +11,6 @@ import { join } from 'path';
 import * as z from 'zod';
 import { configDir, ensureFolderExists, filter, loadFile } from './utils';
 
-export const log = <T>(x: T): T => (console.log(x), x);
-
 export const Config = z.object({
 	baseURL: z.string(),
 	apiURL: z.string(),

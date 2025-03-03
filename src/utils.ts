@@ -113,24 +113,30 @@ export const zip = async (
 	return archive;
 };
 
-export const getEnv = async (): Promise<{ name: string; value: string }[]> => {
-	const envFilePath = join(process.cwd(), '.env');
+export const getEnv = async (
+	rootPath?: string
+): Promise<{ name: string; value: string }[]> => {
+	if (rootPath !== undefined) {
+		const envFilePath = join(rootPath, '.env');
 
-	if (await exists(envFilePath)) {
-		try {
-			const source = await fs.readFile(envFilePath, 'utf8');
-			const parsedEnv = parse(source);
-			info('Detected and loaded environment variables from .env file.');
-			return Object.entries(parsedEnv).map(([name, value]) => ({
-				name,
-				value
-			}));
-		} catch (err) {
-			error(
-				`Error while reading the .env file: ${(
-					err as Error
-				).toString()}`
-			);
+		if (await exists(envFilePath)) {
+			try {
+				const source = await fs.readFile(envFilePath, 'utf8');
+				const parsedEnv = parse(source);
+				info(
+					'Detected and loaded environment variables from .env file.'
+				);
+				return Object.entries(parsedEnv).map(([name, value]) => ({
+					name,
+					value
+				}));
+			} catch (err) {
+				error(
+					`Error while reading the .env file: ${(
+						err as Error
+					).toString()}`
+				);
+			}
 		}
 	}
 

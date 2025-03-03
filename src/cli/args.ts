@@ -12,7 +12,7 @@ export enum InspectFormat {
 interface CLIArgs {
 	version?: boolean;
 	addrepo?: string;
-	workdir?: string;
+	workdir: string;
 	dev: boolean;
 	projectName: string;
 	email?: string;
@@ -59,9 +59,8 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 	},
 	workdir: {
 		type: String,
-		optional: true,
-		alias: 'w',
-		defaultValue: process.cwd()
+		defaultValue: '',
+		alias: 'w'
 	},
 	dev: {
 		type: Boolean,
@@ -70,8 +69,8 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 	},
 	projectName: {
 		type: String,
-		alias: 'n',
-		defaultValue: basename(process.cwd())
+		defaultValue: '',
+		alias: 'n'
 	},
 	email: {
 		type: String,
@@ -149,7 +148,17 @@ const args = ((): CLIArgs & { _unknown: Array<string> } => {
 	// it fails on the parent process, this is is also fine here because it
 	// is executed only once at the startup of the program
 	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
-		parsedArgs.dev = true;
+		parsedArgs['dev'] = true;
+	}
+
+	// Initialize default working directory
+	if (parsedArgs['workdir'] === '') {
+		parsedArgs['workdir'] = process.cwd();
+	}
+
+	// Initialize default project name
+	if (parsedArgs['projectName'] === '') {
+		parsedArgs['projectName'] = basename(parsedArgs['workdir']);
 	}
 
 	return { _unknown: [], ...parsedArgs };

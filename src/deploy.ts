@@ -66,7 +66,7 @@ export const deployPackage = async (
 			);
 
 			// TODO: We can ask for environment variables here too and cache them
-			const env = await getEnv();
+			const env = await getEnv(rootPath);
 
 			info(`Deploying ${rootPath}...\n`);
 

@@ -5,6 +5,7 @@ import spawn from 'cross-spawn';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import fs from 'fs/promises';
+import inspector from 'inspector';
 import os from 'os';
 import { join } from 'path';
 import args from '../cli/args';
@@ -21,6 +22,8 @@ process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
 const PATH = process.env.PATH;
 const HOME = process.env.HOME;
 
+export const isInDebugMode = () => inspector.url() !== undefined;
+
 export const run = (
 	path: string,
 	args: string[] = [],
@@ -30,7 +33,10 @@ export const run = (
 		throw new Error('Invalid process path');
 	}
 
-	const child = spawn('node', [path, ...args], {
+	// TODO: Implement this properly for better debugging
+	/* const debugArgs = isInDebugMode() ? ['--inspect-brk=0'] : []; */
+
+	const child = spawn('node', [/*...debugArgs,*/ path, ...args], {
 		env: Object.assign(
 			{
 				NODE_ENV: 'test',

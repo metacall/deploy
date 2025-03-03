@@ -5,13 +5,16 @@ import { getEnv } from '../utils';
 describe('Test a basic env project', () => {
 	const previousCWD = process.cwd();
 
-	const chdir = (...args: string[]): void => {
-		process.chdir(path.resolve(previousCWD, ...args));
+	const chdir = (...args: string[]): string => {
+		const dir = path.resolve(previousCWD, ...args);
+		process.chdir(dir);
+		return dir;
 	};
 
 	it('Run getEnv in env folder', async () => {
-		chdir('src', 'test', 'resources', 'unit', 'env');
-		const env = await getEnv();
+		const env = await getEnv(
+			chdir('src', 'test', 'resources', 'unit', 'env')
+		);
 		const result = env.find(
 			element => element.name === 'TEST_VAR' && element.value === 'hello'
 		);
