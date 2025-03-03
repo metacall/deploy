@@ -1,6 +1,6 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
 import { join } from 'path';
-import { configFilePath, load } from '../config';
+import { load } from '../config';
 import {
 	checkEnvVars,
 	clearCache,
@@ -52,7 +52,7 @@ describe('Integration CLI (Deploy)', function () {
 
 	// --token
 	it('Should be able to login using --token flag', async function () {
-		const file = await load(configFilePath());
+		const file = await load();
 		const token = file.token || '';
 
 		await clearCache();
