@@ -27,7 +27,7 @@ jobs:
                   cd faas
                   npm install
                   npm run build
-                  npm install --prefix /gnu/lib $(pwd)
+                  metacall npm install --prefix /gnu/lib $(pwd)
                   cd ..
                   rm -rf faas
                   find / -name "*metacall-faas*"
