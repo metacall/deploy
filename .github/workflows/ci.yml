@@ -33,28 +33,28 @@ jobs:
             - name: Build
               run: npm run build
 
-            # TODO:
-            - name: Run Tests (local)
-              run: |
-                  cd ..
-                  git clone https://github.com/metacall/faas.git
-                  cd faas
-                  npm install
-                  npm run build
-                  node dist/index.js --version
-                  cd ../deploy
-                  export TEST_DEPLOY_LOCAL="true"
-                  node ../faas/dist/index.js &
-                  sleep 10
-                  mv .env.example .env
-                  npm run coverage
-
             - name: Run Tests (production)
               if: github.event_name != 'pull_request'
               run: |
                   echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' > .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run coverage
+
+            # # TODO: This depends on: https://github.com/metacall/faas/issues/78
+            # - name: Run Tests (local)
+            #   run: |
+            #       cd ..
+            #       git clone https://github.com/metacall/faas.git
+            #       cd faas
+            #       npm install
+            #       npm run build
+            #       node dist/index.js --version
+            #       cd ../deploy
+            #       export TEST_DEPLOY_LOCAL="true"
+            #       node ../faas/dist/index.js &
+            #       sleep 10
+            #       mv .env.example .env
+            #       npm run coverage
 
             - name: Publish
               uses: JS-DevTools/npm-publish@v1
