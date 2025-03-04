@@ -32,6 +32,8 @@ jobs:
                   cd ..
                   rm -rf faas
                   export PATH="$HOME/.metacall/faas/deps/node_modules/.bin:${PATH}"
+                  ls -la $HOME/.metacall/faas/deps/node_modules/.bin
+                  cat $HOME/.metacall/faas/deps/node_modules/.bin/metacall-faas
                   metacall-faas --version
 
             - name: Checkout
