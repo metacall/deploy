@@ -27,11 +27,11 @@ jobs:
                   cd faas
                   npm install
                   npm run build
-                  npm install -g $(pwd)
+                  npm install --prefix /gnu/lib $(pwd)
                   cd ..
                   rm -rf faas
                   find / -name "*metacall-faas*"
-                  metacall-faas --version
+                  metacall faas --version
 
             - name: Checkout
               uses: actions/checkout@v4
