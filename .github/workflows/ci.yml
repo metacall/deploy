@@ -21,16 +21,6 @@ jobs:
                   node-version: '20'
                   registry-url: https://registry.npmjs.org
 
-            - name: Setup MetaCall FaaS
-              run: |
-                  git clone https://github.com/metacall/faas.git
-                  cd faas
-                  npm install
-                  npm run build
-                  node dist/index.js --version
-                  pwd
-                  echo "$HOME"
-
             - name: Checkout
               uses: actions/checkout@v4
 
@@ -46,8 +36,13 @@ jobs:
             # TODO:
             - name: Run Tests (local)
               run: |
+                  git clone https://github.com/metacall/faas.git
+                  cd faas
+                  npm install
+                  npm run build
+                  node dist/index.js --version
+
                   export TEST_DEPLOY_LOCAL="true"
-                  pwd
                   node faas/dist/index.js &
                   sleep 10
                   mv .env.example .env
