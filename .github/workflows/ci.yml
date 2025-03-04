@@ -27,10 +27,9 @@ jobs:
                   cd faas
                   npm install
                   npm run build
-                  npm install --prefix $HOME $(pwd)
-                  cd ..
-                  rm -rf faas
-                  node $HOME/node_modules/@metacall/faas/dist/index.js --version
+                  node faas/dist/index.js --version
+                  pwd
+                  echo "$HOME"
 
             - name: Checkout
               uses: actions/checkout@v4
@@ -48,7 +47,8 @@ jobs:
             - name: Run Tests (local)
               run: |
                   export TEST_DEPLOY_LOCAL="true"
-                  node $HOME/node_modules/@metacall/faas/dist/index.js &
+                  pwd
+                  node faas/dist/index.js &
                   sleep 10
                   mv .env.example .env
                   npm run coverage
