@@ -43,21 +43,21 @@ jobs:
             - name: Build
               run: npm run build
 
+            # TODO:
+            - name: Run Tests (local)
+              run: |
+                  export TEST_DEPLOY_LOCAL="true"
+                  metacall-faas &
+                  sleep 10
+                  mv .env.example .env
+                  npm run coverage
+
             - name: Run Tests (production)
               if: github.event_name != 'pull_request'
               run: |
                   echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' > .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run coverage
-
-            # TODO:
-            # - name: Run Tests (local)
-            #   run: |
-            #       export TEST_DEPLOY_LOCAL="true"
-            #       metacall-faas &
-            #       sleep 10
-            #       mv .env.example .env
-            #       npm run coverage
 
             - name: Publish
               uses: JS-DevTools/npm-publish@v1
