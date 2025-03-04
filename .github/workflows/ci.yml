@@ -30,6 +30,7 @@ jobs:
                   npm install -g $(pwd)
                   cd ..
                   rm -rf faas
+                  metacall-faas --version
 
             - name: Checkout
               uses: actions/checkout@v4
