@@ -27,7 +27,7 @@ jobs:
                   cd faas
                   npm install
                   npm run build
-                  node faas/dist/index.js --version
+                  node dist/index.js --version
                   pwd
                   echo "$HOME"
 
