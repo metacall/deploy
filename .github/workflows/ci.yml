@@ -30,7 +30,6 @@ jobs:
                   sudo metacall npm install --prefix /gnu/lib $(pwd)
                   cd ..
                   rm -rf faas
-                  find / -name "*metacall-faas*"
                   metacall faas --version
 
             - name: Checkout
@@ -49,7 +48,7 @@ jobs:
             - name: Run Tests (local)
               run: |
                   export TEST_DEPLOY_LOCAL="true"
-                  metacall-faas &
+                  metacall faas &
                   sleep 10
                   mv .env.example .env
                   npm run coverage
