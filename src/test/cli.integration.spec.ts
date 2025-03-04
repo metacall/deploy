@@ -55,9 +55,9 @@ describe('Integration CLI (Deploy)', function () {
 		const file = await load();
 		const token = file.token || '';
 
-		await clearCache();
-
 		notStrictEqual(token, '');
+
+		await clearCache();
 
 		const workdir = await createTmpDirectory();
 
