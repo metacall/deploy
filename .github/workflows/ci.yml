@@ -27,7 +27,9 @@ jobs:
                   cd faas
                   npm install
                   npm run build
-                  sudo metacall npm install --prefix /gnu/lib $(pwd)
+                  mkdir -p $HOME/.metacall/faas/deps
+                  metacall npm install --prefix $HOME/.metacall/faas/deps $(pwd)
+                  ls -laR $HOME/.metacall/faas/deps
                   cd ..
                   rm -rf faas
                   metacall faas --version
