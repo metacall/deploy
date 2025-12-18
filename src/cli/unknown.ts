@@ -8,7 +8,7 @@ export const handleUnknownArgs = (): void => {
 	if (!(flags.length === 1 && (flags[0] === '--help' || flags[0] === '-h'))) {
 		const message = `${flags.join(
 			', '
-		)} does not exists as a valid command.`;
+		)} does not exist as a valid command.`;
 		warn(message);
 	}
 
