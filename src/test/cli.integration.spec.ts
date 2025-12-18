@@ -93,7 +93,7 @@ describe('Integration CLI (Deploy)', function () {
 			);
 		} catch (err) {
 			ok(
-				String(err) === '! --yeet does not exists as a valid command.\n'
+				String(err) === '! --yeet does not exist as a valid command.\n'
 			);
 		}
 	});
