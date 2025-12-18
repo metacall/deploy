@@ -11,5 +11,8 @@
 		"strings": "on",
 		"other": "on"
 	},
-	"editor.suggestOnTriggerCharacters": true
+  "editor.suggestOnTriggerCharacters": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }
