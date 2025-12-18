@@ -2,13 +2,13 @@ import { fail, notStrictEqual, ok, strictEqual } from 'assert';
 import { join } from 'path';
 import { load } from '../config';
 import {
-	checkEnvVars,
-	clearCache,
-	createTmpDirectory,
-	deleted,
-	deployed,
-	keys,
-	runCLI
+  checkEnvVars,
+  clearCache,
+  createTmpDirectory,
+  deleted,
+  deployed,
+  keys,
+  runCLI
 } from './cli';
 
 describe('Integration CLI (Deploy)', function () {
@@ -92,9 +92,7 @@ describe('Integration CLI (Deploy)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(
-				String(err) === '! --yeet does not exists as a valid command.\n'
-			);
+			ok(String(err) === '! --yeet does not exists as a valid command.\n');
 		}
 	});
 
