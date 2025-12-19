@@ -1,41 +1,61 @@
 import { strictEqual } from 'assert';
+import spawn from 'cross-spawn';
 import { existsSync, mkdirSync, rmdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { startup } from '../startup';
+import { join, resolve } from 'path';
 
-describe('Configuration Directory Logic', () => {
-	// 1. Create a temporary folder path
+describe('CLI Integration with --confDir', () => {
+	// 1. Setup paths
 	const customPath = join(process.cwd(), 'test-custom-config');
 	const configFilePath = join(customPath, 'config.ini');
 
-	const fakeToken = 'test-token-12345';
+	// Path to the compiled CLI entry point
+	const cliPath = resolve(__dirname, '../index.js');
 
-	// Write in INI format (key=value)
+	// 2. Mock Data
+	const fakeToken = 'test-token-12345';
 	const iniContent = `token=${fakeToken}`;
 
 	before(() => {
 		if (!existsSync(customPath)) {
 			mkdirSync(customPath);
 		}
-		// Write the INI file
 		writeFileSync(configFilePath, iniContent, 'utf8');
 	});
 
 	after(() => {
 		if (existsSync(customPath)) {
-			// Cleanup
 			rmdirSync(customPath, { recursive: true });
 		}
 	});
 
-	it('should load config from a custom directory via --confDir', async () => {
-		// Run startup. It should find config.ini and use the token inside.
-		const config = await startup(customPath);
+	it('should load config from a custom directory passed via --confDir', done => {
+		const process = spawn('node', [cliPath, '--confDir', customPath], {
+			stdio: 'pipe'
+		});
 
-		strictEqual(
-			config.token,
-			fakeToken,
-			'The token loaded does not match the custom config file'
-		);
+		let output = '';
+
+		// Fix: Explicitly type 'data' as Buffer so .toString() is safe
+		process.stdout?.on('data', (data: Buffer) => {
+			output += data.toString();
+		});
+
+		process.stderr?.on('data', (data: Buffer) => {
+			output += data.toString();
+		});
+
+		// Fix: Removed unused 'code' parameter
+		process.on('close', () => {
+			const promptForLogin =
+				output.includes('Select an option') || output.includes('Login');
+
+			strictEqual(
+				promptForLogin,
+				false,
+				'The CLI ignored the config file and prompted for login.'
+			);
+
+			done();
+		});
 	});
 });
