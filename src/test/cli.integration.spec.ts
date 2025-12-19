@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
 import { join } from 'path';
 import { load } from '../config';
