@@ -1,4 +1,5 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
+import { writeFileSync } from 'fs'; // <--- ADDED THIS
 import { join } from 'path';
 import { load } from '../config';
 import {
@@ -64,6 +65,34 @@ describe('Integration CLI (Deploy)', function () {
 		try {
 			await runCLI(
 				[`--token=${token}`, `--workdir=${workdir}`],
+				[keys.enter, keys.enter]
+			).promise;
+		} catch (err) {
+			strictEqual(
+				err,
+				`X The directory you specified (${workdir}) is empty.\n`
+			);
+		}
+	});
+
+	// --confDir
+	it('Should be able to login using --confDir flag', async function () {
+		const file = await load();
+		const token = file.token || '';
+
+		notStrictEqual(token, '');
+
+		await clearCache();
+
+		const confDir = await createTmpDirectory();
+		const configPath = join(confDir, 'config.ini');
+		writeFileSync(configPath, `token=${token}`, 'utf8');
+
+		const workdir = await createTmpDirectory();
+
+		try {
+			await runCLI(
+				[`--confDir=${confDir}`, `--workdir=${workdir}`],
 				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
@@ -254,44 +283,6 @@ describe('Integration CLI (Deploy)', function () {
 		return result;
 	});
 
-	// TODO:
-	// --force
-	// it('Should be able to deploy forcefully using --force flag', async () => {
-	// 	const resultDel = await runCLI(
-	// 		[
-	// 			`--workdir=${filePath}`,
-	// 			`--projectName=${workDirSuffix}`,
-	// 			'--plan=Essential',
-	// 			'--force'
-	// 		],
-	// 		[keys.enter, keys.kill]
-	// 	).promise;
-
-	// 	ok(String(resultDel).includes('Trying to deploy forcefully!'));
-
-	// 	strictEqual(await deleted(workDirSuffix), true);
-
-	// 	strictEqual(
-	// 		await runCLI(['--listPlans'], [keys.enter]).promise,
-	// 		'i Essential: 1\n'
-	// 	);
-
-	// 	const resultDeploy = await runCLI(
-	// 		[
-	// 			`--workdir=${filePath}`,
-	// 			`--projectName=${workDirSuffix}`,
-	// 			'--plan=Essential'
-	// 		],
-	// 		[keys.enter, keys.kill]
-	// 	).promise;
-
-	// 	ok(String(resultDeploy).includes(`i Deploying ${filePath}...\n`));
-
-	// 	strictEqual(await deployed(workDirSuffix), true);
-
-	// 	return resultDeploy;
-	// });
-
 	// --delete
 	it('Should be able to delete deployed repository using --delete flag', async () => {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
@@ -311,6 +302,3 @@ describe('Integration CLI (Deploy)', function () {
 			'i Essential: 2\n'
 		));
 });
-
-// TODO: Tests to add
-// if there is only one log file -> select it (TODO: This must be reviewed in case we use TUI)
