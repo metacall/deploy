@@ -28,6 +28,34 @@ describe('Integration CLI (Deploy)', function () {
 		'time-app-web'
 	);
 
+	// --confDir
+	it('Should be able to login using --confDir flag', async function () {
+		const file = await load();
+		const token = file.token || '';
+
+		notStrictEqual(token, '');
+
+		await clearCache();
+
+		const confDir = await createTmpDirectory();
+		const configPath = join(confDir, 'config.ini');
+		await writeFile(configPath, `token=${token}`, 'utf8');
+
+		const workdir = await createTmpDirectory();
+
+		try {
+			await runCLI(
+				[`--confDir=${confDir}`, `--workdir=${workdir}`],
+				[keys.enter, keys.enter]
+			).promise;
+		} catch (err) {
+			strictEqual(
+				err,
+				`X The directory you specified (${workdir}) is empty.\n`
+			);
+		}
+	});
+
 	// --email & --password
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
@@ -65,34 +93,6 @@ describe('Integration CLI (Deploy)', function () {
 		try {
 			await runCLI(
 				[`--token=${token}`, `--workdir=${workdir}`],
-				[keys.enter, keys.enter]
-			).promise;
-		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
-			);
-		}
-	});
-
-	// --confDir
-	it('Should be able to login using --confDir flag', async function () {
-		const file = await load();
-		const token = file.token || '';
-
-		notStrictEqual(token, '');
-
-		await clearCache();
-
-		const confDir = await createTmpDirectory();
-		const configPath = join(confDir, 'config.ini');
-		await writeFile(configPath, `token=${token}`, 'utf8');
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			await runCLI(
-				[`--confDir=${confDir}`, `--workdir=${workdir}`],
 				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
