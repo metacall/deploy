@@ -1,5 +1,5 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
-import { writeFileSync } from 'fs';
+import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { load } from '../config';
 import {
@@ -86,7 +86,7 @@ describe('Integration CLI (Deploy)', function () {
 
 		const confDir = await createTmpDirectory();
 		const configPath = join(confDir, 'config.ini');
-		writeFileSync(configPath, `token=${token}`, 'utf8');
+		await writeFile(configPath, `token=${token}`, 'utf8');
 
 		const workdir = await createTmpDirectory();
 
