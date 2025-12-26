@@ -1,5 +1,4 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
-import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { load } from '../config';
 import {
