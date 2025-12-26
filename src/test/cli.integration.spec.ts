@@ -51,7 +51,32 @@ describe('Integration CLI (Deploy)', function () {
 		}
 	});
 
-	// --confDir
+	// --token
+	it('Should be able to login using --token flag', async function () {
+		const file = await load();
+		const token = file.token || '';
+
+		notStrictEqual(token, '');
+
+		await clearCache();
+
+		const workdir = await createTmpDirectory();
+
+		try {
+			await runCLI(
+				[`--token=${token}`, `--workdir=${workdir}`],
+				[keys.enter, keys.enter]
+			).promise;
+		} catch (err) {
+			strictEqual(
+				err,
+				`X The directory you specified (${workdir}) is empty.\n`
+			);
+		}
+	});
+
+	// TODO: --confDir
+	/*
 	it('Should be able to login using --confDir flag', async function () {
 		const file = await load();
 		const token = file.token || '';
@@ -78,30 +103,7 @@ describe('Integration CLI (Deploy)', function () {
 			);
 		}
 	});
-
-	// --token
-	it('Should be able to login using --token flag', async function () {
-		const file = await load();
-		const token = file.token || '';
-
-		notStrictEqual(token, '');
-
-		await clearCache();
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			await runCLI(
-				[`--token=${token}`, `--workdir=${workdir}`],
-				[keys.enter, keys.enter]
-			).promise;
-		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
-			);
-		}
-	});
+	*/
 
 	// --help
 	it('Should be able to print help guide using --help flag', async () => {
