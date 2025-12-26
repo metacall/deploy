@@ -28,6 +28,29 @@ describe('Integration CLI (Deploy)', function () {
 		'time-app-web'
 	);
 
+	// --email & --password
+	it('Should be able to login using --email & --password flag', async function () {
+		await clearCache();
+		const { email, password } = checkEnvVars();
+		const workdir = await createTmpDirectory();
+
+		try {
+			await runCLI(
+				[
+					`--email=${email}`,
+					`--password=${password}`,
+					`--workdir=${workdir}`
+				],
+				[keys.enter]
+			).promise;
+		} catch (err) {
+			strictEqual(
+				err,
+				`X The directory you specified (${workdir}) is empty.\n`
+			);
+		}
+	});
+
 	// --confDir
 	it('Should be able to login using --confDir flag', async function () {
 		const file = await load();
@@ -47,29 +70,6 @@ describe('Integration CLI (Deploy)', function () {
 			await runCLI(
 				[`--confDir=${confDir}`, `--workdir=${workdir}`],
 				[keys.enter, keys.enter]
-			).promise;
-		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
-			);
-		}
-	});
-
-	// --email & --password
-	it('Should be able to login using --email & --password flag', async function () {
-		await clearCache();
-		const { email, password } = checkEnvVars();
-		const workdir = await createTmpDirectory();
-
-		try {
-			await runCLI(
-				[
-					`--email=${email}`,
-					`--password=${password}`,
-					`--workdir=${workdir}`
-				],
-				[keys.enter]
 			).promise;
 		} catch (err) {
 			strictEqual(
