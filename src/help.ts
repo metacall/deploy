@@ -23,7 +23,7 @@ Options
   -l      --logout             nothing      Accepts boolean value: use it in order to expire your current session.
   -r      --listPlans          nothing      Accepts boolean value: list all the plans that are offered in your account using it.
   -u      --serverUrl          string       Change the base URL for the FaaS.
-  -c      --confDir            string       (TODO) Overwrite the default configuration directory.`;
+  -c      --confDir            string       Overwrite the default configuration directory.`;
 
 export const printHelp = (): void => {
 	console.log(helpText);

@@ -1,4 +1,5 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
+import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { load } from '../config';
 import {
@@ -74,6 +75,34 @@ describe('Integration CLI (Deploy)', function () {
 		}
 	});
 
+	// --confDir
+	it('Should be able to login using --confDir flag', async function () {
+		const file = await load();
+		const token = file.token || '';
+
+		notStrictEqual(token, '');
+
+		await clearCache();
+
+		const confDir = await createTmpDirectory();
+		const configPath = join(confDir, 'config.ini');
+		await writeFile(configPath, `token=${token}`, 'utf8');
+
+		const workdir = await createTmpDirectory();
+
+		try {
+			await runCLI(
+				[`--confDir=${confDir}`, `--workdir=${workdir}`],
+				[keys.enter, keys.enter]
+			).promise;
+		} catch (err) {
+			strictEqual(
+				err,
+				`X The directory you specified (${workdir}) is empty.\n`
+			);
+		}
+	});
+
 	// --help
 	it('Should be able to print help guide using --help flag', async () => {
 		const result = await runCLI(['--help'], [keys.enter]).promise;
@@ -92,9 +121,7 @@ describe('Integration CLI (Deploy)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(
-				String(err) === '! --yeet does not exist as a valid command.\n'
-			);
+			ok(String(err) === '! --yeet does not exist as a valid command.\n');
 		}
 	});
 
