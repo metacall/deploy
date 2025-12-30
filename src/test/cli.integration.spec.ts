@@ -1,4 +1,5 @@
 import { fail, notStrictEqual, ok, strictEqual } from 'assert';
+import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { load } from '../config';
 import {
@@ -75,14 +76,13 @@ describe('Integration CLI (Deploy)', function () {
 	});
 
 	// TODO: --confDir
-	/*
 	it('Should be able to login using --confDir flag', async function () {
 		const file = await load();
 		const token = file.token || '';
 
 		notStrictEqual(token, '');
 
-		await clearCache();
+		// await clearCache();
 
 		const confDir = await createTmpDirectory();
 		const configPath = join(confDir, 'config.ini');
@@ -102,7 +102,6 @@ describe('Integration CLI (Deploy)', function () {
 			);
 		}
 	});
-	*/
 
 	// --help
 	it('Should be able to print help guide using --help flag', async () => {
