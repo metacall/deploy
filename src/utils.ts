@@ -10,7 +10,7 @@ import archiver, { Archiver } from 'archiver';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
-import { platform } from 'os';
+import { homedir, platform } from 'os';
 import { basename, join, relative } from 'path';
 import { error, info, printLanguage } from './cli/messages';
 import { consentSelection, fileSelection } from './cli/selection';
@@ -23,15 +23,24 @@ export const sleep = (ms: number) => {
 	return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-export const configDir = (name: string): string =>
-	platform() === 'win32'
-		? process.env.APPDATA
-			? join(process.env.APPDATA, name)
-			: error(missing('APPDATA'))
-		: process.env.HOME
-		? join(process.env.HOME, `.${name}`)
-		: error(missing('HOME'));
-
+export const configDir = (name: string): string => {
+	if (platform() === 'win32') {
+		const appData = process.env.APPDATA;
+		if (appData) {
+			return join(appData, name);
+		}
+		const userProfile = process.env.USERPROFILE;
+		if (userProfile) {
+			return join(userProfile, 'AppData', 'Roaming', name);
+		}
+		return join(homedir(), 'AppData', 'Roaming', name);
+	}
+	const home = process.env.HOME;
+	if (!home) {
+		throw new Error(missing('HOME'));
+	}
+	return join(home, `.${name}`);
+};
 export const exists = (path: string): Promise<boolean> =>
 	fs.stat(path).then(
 		() => true,
