@@ -1,3 +1,21 @@
-dist/
-.nyc_output/
-*.yml
+# Dependencies
+node_modules
+package-lock.json
+
+# Build outputs
+dist
+.nyc_output
+coverage
+
+# Generated files
+*.d.ts.map
+*.js.map
+
+# Deprecated
+deprecated
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
