@@ -93,10 +93,11 @@ describeTest('Integration CLI (Login)', function () {
 	});
 
 	// signup already taken email
-	it('Should fail with taken email', async () => {
+	it('Should fail with taken email and redirect to login', async () => {
 		await clearCache();
+		let stdout = '';
 		try {
-			const result = await runCLI(
+			const result = runCLI(
 				[],
 				[
 					keys.down,
@@ -108,17 +109,35 @@ describeTest('Integration CLI (Login)', function () {
 					keys.enter,
 					'diaa',
 					keys.enter,
-					'diaa',
+					'non-existing-alias',
 					keys.enter
 				]
-			).promise;
+			);
+
+			// Attach an event listener to capture stdout
+			result.child.stdout?.on('data', (data: Buffer) => {
+				stdout += data.toString();
+			});
+
+			await result.promise;
+
 			fail(
 				`The CLI passed without errors and it should fail. Result: ${String(
 					result
 				)}`
 			);
 		} catch (error) {
-			ok(String(error).includes('Account already exists'));
+			// Check the error message
+			ok(
+				String(error).includes(`Account already exists.`),
+				'Expected error message for existing account was not found.'
+			);
+
+			// Validate that the login method menu is printed after the error
+			ok(
+				String(stdout).includes('Select the login method'),
+				'The CLI did not print the login method menu after the error.'
+			);
 		}
 	});
 
