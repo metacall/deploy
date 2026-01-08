@@ -1,4 +1,14 @@
 node_modules
 dist
-.nyc_output
 .env
+.tsbuildinfo
+*.log
+.DS_Store
+.vscode/launch.json
+.idea
+
+# Test directories for mock mode testing
+test-node-app/
+test-python-app/
+test-app-*/
+my-project/

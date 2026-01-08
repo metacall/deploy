@@ -1,10 +1,13 @@
 {
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"editor.formatOnSave": true,
-	"editor.codeActionsOnSave": {
-		"source.organizeImports": "explicit",
-		"source.fixAll": "explicit"
+	"editor.formatOnSave": false,
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"prettier.requireConfig": true,
 	"editor.rulers": [80],
 	"editor.quickSuggestions": {
 		"comments": "on",

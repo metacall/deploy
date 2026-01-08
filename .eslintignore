@@ -1,2 +1,3 @@
-src/test/resources/**
+src/test/resources**
 githooks/**
+tests/**
