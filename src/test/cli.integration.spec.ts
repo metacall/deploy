@@ -12,11 +12,21 @@ import {
 	runCLI
 } from './cli';
 
+// Strip ANSI escape codes so assertions match plain text (CLI uses chalk)
+const ansiCsiRe = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+const stripAnsi = (s: string | unknown): string =>
+	String(s).replace(ansiCsiRe, '');
+
 describe('Integration CLI (Deploy)', function () {
 	this.timeout(2000000);
 
 	const url = 'https://github.com/metacall/examples';
-	const addRepoSuffix = 'metacall-examples';
+	// FaaS uses repositoryName(url) = last path segment, so "examples" not "metacall-examples"
+	const addRepoSuffix =
+		url
+			.split('/')
+			.pop()
+			?.replace(/\.git$/, '') ?? 'metacall-examples';
 
 	const workDirSuffix = 'time-app-web';
 	const filePath = join(
@@ -132,7 +142,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes('i Deploying...\n'));
+		ok(stripAnsi(result).includes('i Deploying...\n'));
 
 		strictEqual(await deployed(addRepoSuffix), true);
 		return result;
@@ -168,7 +178,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
+		ok(stripAnsi(result).includes('i Deploy Delete Succeed\n'));
 
 		strictEqual(await deleted(addRepoSuffix), true);
 
@@ -182,7 +192,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes(`i Deploying ${filePath}...\n`));
+		ok(stripAnsi(result).includes(`i Deploying ${filePath}...\n`));
 
 		strictEqual(await deployed(workDirSuffix), true);
 		return result;
@@ -193,7 +203,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
+		ok(stripAnsi(result).includes('i Deploy Delete Succeed\n'));
 
 		strictEqual(await deleted(workDirSuffix), true);
 
@@ -214,7 +224,7 @@ describe('Integration CLI (Deploy)', function () {
 			]
 		).promise;
 
-		ok(String(result).includes('i Deploying...\n'));
+		ok(stripAnsi(result).includes('i Deploying...\n'));
 
 		strictEqual(await deployed(addRepoSuffix), true);
 		return result;
@@ -225,7 +235,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
+		ok(stripAnsi(result).includes('i Deploy Delete Succeed\n'));
 
 		strictEqual(await deleted(workDirSuffix), true);
 
@@ -247,7 +257,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes(`i Deploying ${projectPath}...\n`));
+		ok(stripAnsi(result).includes(`i Deploying ${projectPath}...\n`));
 
 		strictEqual(await deployed('env'), true);
 		return result;
@@ -258,7 +268,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
+		ok(stripAnsi(result).includes('i Deploy Delete Succeed\n'));
 
 		strictEqual(await deleted('env'), true);
 
@@ -276,7 +286,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes(`i Deploying ${filePath}...\n`));
+		ok(stripAnsi(result).includes(`i Deploying ${filePath}...\n`));
 
 		strictEqual(await deployed(workDirSuffix), true);
 
@@ -326,7 +336,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
+		ok(stripAnsi(result).includes('i Deploy Delete Succeed\n'));
 
 		strictEqual(await deleted(workDirSuffix), true);
 

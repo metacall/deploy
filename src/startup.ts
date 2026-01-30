@@ -9,13 +9,17 @@
 
 import { auth } from './auth';
 import args from './cli/args';
-import { Config, defaultPath, load } from './config';
+import { Config, defaultPath, load, save } from './config';
 
 const devToken = 'local'; // Use some random token in order to proceed
 
 export const startup = async (confDir: string | undefined): Promise<Config> => {
 	const config = await load(confDir || defaultPath);
 	const token = args['dev'] ? devToken : await auth(config);
+
+	if (args['dev'] && token === devToken) {
+		await save({ token }, confDir || defaultPath);
+	}
 
 	return Object.assign(config, { token });
 };
