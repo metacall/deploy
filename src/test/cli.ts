@@ -88,31 +88,53 @@ export const runWithInput = (
 		}, 3000);
 	};
 
+	const stderrChunks: Buffer[] = [];
+	child.stderr?.on('data', (chunk: Buffer) => stderrChunks.push(chunk));
+
+	const isRealError = (stderrText: string): boolean => {
+		const trimmed = stderrText.trim();
+		if (!trimmed) return false;
+		// Ignore Node deprecation warnings (e.g. util.isArray, DEP0044)
+		if (/DeprecationWarning|DEP\d+|util\.isArray/i.test(trimmed))
+			return false;
+		if (/\(node:\d+\)\s*\[DEP/.test(trimmed)) return false;
+		// Real errors: CLI error prefix or HTTP/request errors
+		return (
+			trimmed.startsWith('X ') ||
+			trimmed.startsWith('! ') ||
+			trimmed.startsWith('Error:') ||
+			/Request failed|status code \d{3}/.test(trimmed)
+		);
+	};
+
 	return {
 		promise: new Promise((resolve, reject) => {
-			child.stderr?.once('data', err => {
-				child.stdin?.end();
-
-				if (childTimeout) {
-					clearTimeout(childTimeout);
-					inputs = [];
-				}
-				reject(String(err));
-			});
-
 			child.on('error', reject);
 
 			loop(inputs);
 
 			child.stdout?.pipe(
 				concat(result => {
-					if (killTimeout) {
-						clearTimeout(killTimeout);
+					if (killTimeout) clearTimeout(killTimeout);
+					if (childTimeout) clearTimeout(childTimeout);
+					const stderrText = Buffer.concat(stderrChunks).toString();
+					if (isRealError(stderrText)) {
+						child.stdin?.end();
+						reject(stderrText);
+					} else {
+						resolve(result.toString());
 					}
-
-					resolve(result.toString());
 				})
 			);
+
+			// If process exits before stdout ends, settle with buffered stderr
+			child.on('close', (code, signal) => {
+				if (childTimeout) clearTimeout(childTimeout);
+				if (code !== 0 && signal !== 'SIGTERM') {
+					const stderrText = Buffer.concat(stderrChunks).toString();
+					if (isRealError(stderrText)) reject(stderrText);
+				}
+			});
 		}),
 		child
 	};
@@ -130,7 +152,11 @@ export const keys = Object.freeze({
 
 export const deployed = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const baseURL =
+		process.env.TEST_DEPLOY_LOCAL === 'true'
+			? config.devURL
+			: config.baseURL;
+	const api = API(config.token as string, baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
 		new Promise(resolve => setTimeout(resolve, ms));
@@ -162,7 +188,11 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 
 export const deleted = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const baseURL =
+		process.env.TEST_DEPLOY_LOCAL === 'true'
+			? config.devURL
+			: config.baseURL;
+	const api = API(config.token as string, baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
 		new Promise(resolve => setTimeout(resolve, ms));
@@ -198,10 +228,14 @@ export const generateRandomString = (length: number): string => {
 };
 
 export const runCLI = (args: string[], inputs: string[]) => {
-	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+	const useLocal = process.env.TEST_DEPLOY_LOCAL === 'true';
+	if (useLocal) {
 		args.push('--dev');
 	}
-	return runWithInput('dist/index.js', args, inputs);
+	const env: Record<string, string> = useLocal
+		? { TEST_DEPLOY_LOCAL: 'true' }
+		: {};
+	return runWithInput('dist/index.js', args, inputs, env);
 };
 
 export const clearCache = async (): Promise<void> => {

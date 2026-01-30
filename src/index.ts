@@ -39,10 +39,11 @@ void (async () => {
 	if (args['logout']) return logout();
 
 	const config = await startup(args['confDir']);
-	const api: APIInterface = API(
-		config.token as string,
-		args['dev'] ? config.devURL : config.baseURL
-	);
+	const baseURL =
+		process.env.TEST_DEPLOY_LOCAL === 'true' || args['dev']
+			? config.devURL
+			: config.baseURL;
+	const api: APIInterface = API(config.token as string, baseURL);
 
 	await validateToken(api);
 

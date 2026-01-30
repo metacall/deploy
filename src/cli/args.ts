@@ -151,13 +151,8 @@ const args = ((): CLIArgs & { _unknown: Array<string> } => {
 		parsedArgs['dev'] = true;
 	}
 
-	// Initialize default working directory
-	if (parsedArgs['workdir'] === '') {
-		parsedArgs['workdir'] = process.cwd();
-	}
-
-	// Initialize default project name
-	if (parsedArgs['projectName'] === '') {
+	// Initialize default project name only when workdir was provided
+	if (parsedArgs['projectName'] === '' && parsedArgs['workdir'] !== '') {
 		parsedArgs['projectName'] = basename(parsedArgs['workdir']);
 	}
 
