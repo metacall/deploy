@@ -20,7 +20,8 @@ import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
 import { isInteractive } from './tty';
-import { getEnv, loadFilesToRun, zip } from './utils';
+import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
+import { debug } from './cli/messages';
 
 export enum ErrorCode {
 	Ok = 0,
@@ -42,15 +43,26 @@ export const deployPackage = async (
 		let descriptor = await generatePackage(rootPath);
 
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
-			// TODO: We should cache the plan and ask for it only once
-
 			const descriptor = await generatePackage(rootPath);
+
+			// Apply ignore patterns if specified
+			const filesToDeploy = filterFiles(descriptor.files, args['ignore']);
+
+			if (args['ignore']?.length) {
+				const ignoredCount =
+					descriptor.files.length - filesToDeploy.length;
+				if (ignoredCount > 0) {
+					debug(
+						`Ignored ${ignoredCount} file(s) based on ignore patterns`
+					);
+				}
+			}
 
 			const { progress, pulse, hide } = Progress();
 
 			const archive = await zip(
 				rootPath,
-				descriptor.files,
+				filesToDeploy,
 				progress,
 				pulse,
 				hide
@@ -65,8 +77,7 @@ export const deployPackage = async (
 				descriptor.runners
 			);
 
-			// TODO: We can ask for environment variables here too and cache them
-			const env = await getEnv(rootPath);
+			const env = await getEnv(rootPath, args['env'], args['envFile']);
 
 			info(`Deploying ${rootPath}...\n`);
 
@@ -243,7 +254,7 @@ export const deployFromRepository = async (
 
 		const name = (await api.add(url, selectedBranch, [])).id;
 
-		const env = await getEnv();
+		const env = await getEnv(undefined, args['env'], args['envFile']);
 
 		const deploy = await api.deploy(
 			name,
