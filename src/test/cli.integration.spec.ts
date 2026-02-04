@@ -128,7 +128,7 @@ describe('Integration CLI (Deploy)', function () {
 	// --addrepo
 	it('Should be able to deploy repository using --addrepo flag', async () => {
 		const result = await runCLI(
-			[`--addrepo=${url}`],
+			[`--addrepo=${url}`, '--plan=Essential'],
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
@@ -178,7 +178,11 @@ describe('Integration CLI (Deploy)', function () {
 	// --workdir & --projectName
 	it('Should be able to deploy repository using --workdir & --projectName flag', async () => {
 		const result = await runCLI(
-			[`--workdir=${filePath}`, `--projectName=${workDirSuffix}`],
+			[
+				`--workdir=${filePath}`,
+				`--projectName=${workDirSuffix}`,
+				'--plan=Essential'
+			],
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
@@ -203,7 +207,7 @@ describe('Integration CLI (Deploy)', function () {
 	// with env vars
 	it('Should be able to deploy repository using --addrepo flag with environment vars', async () => {
 		const result = await runCLI(
-			[`--addrepo=${url}`],
+			[`--addrepo=${url}`, '--plan=Essential'],
 			[
 				keys.enter,
 				'y',
@@ -243,7 +247,7 @@ describe('Integration CLI (Deploy)', function () {
 			'env'
 		);
 		const result = await runCLI(
-			[`--workdir=${projectPath}`],
+			[`--workdir=${projectPath}`, '--plan=Essential'],
 			[keys.enter, keys.kill]
 		).promise;
 
