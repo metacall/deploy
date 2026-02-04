@@ -40,16 +40,17 @@ export const planFetch = async (
 export const plan = async (api: APIInterface): Promise<Plans> => {
 	const availPlans = Object.keys(await planFetch(api));
 
-	let plan =
-		args['plan'] && availPlans.includes(args['plan']) && args['plan'];
+	// If user specified a plan via CLI and it's available, use it
+	if (args['plan'] && availPlans.includes(args['plan'])) {
+		return args['plan'];
+	}
 
-	plan =
-		plan || availPlans.length === 1
-			? (availPlans[0] as Plans)
-			: await planSelection(
-					'Please select plan from the list',
-					availPlans
-			  );
+	// If only one plan is available, auto-select it
+	if (availPlans.length === 1) {
+		info(`Auto-selecting the only available plan: ${availPlans[0]}`);
+		return availPlans[0] as Plans;
+	}
 
-	return plan;
+	// Otherwise, prompt user to select from available plans
+	return await planSelection('Please select plan from the list', availPlans);
 };

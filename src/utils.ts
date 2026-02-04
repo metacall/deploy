@@ -12,7 +12,7 @@ import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
 import { platform } from 'os';
 import { basename, join, relative } from 'path';
-import { error, info, printLanguage } from './cli/messages';
+import { error, info, printLanguage, warn } from './cli/messages';
 import { consentSelection, fileSelection } from './cli/selection';
 import { isInteractive } from './tty';
 
@@ -72,13 +72,46 @@ export const loadFilesToRun = async (
 	}
 };
 
+/**
+ * Filter files based on ignore patterns (glob-style)
+ * Supports patterns like: *.log, node_modules, *.test.js, etc.
+ */
+export const filterFiles = (
+	files: string[],
+	ignorePatterns?: string[]
+): string[] => {
+	if (!ignorePatterns || ignorePatterns.length === 0) {
+		return files;
+	}
+
+	// Convert glob patterns to regex
+	const patterns = ignorePatterns.map(pattern => {
+		// Escape regex special chars except * and ?
+		const regexStr = pattern
+			.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+			.replace(/\*/g, '.*')
+			.replace(/\?/g, '.');
+
+		// Match the pattern anywhere in the path
+		return new RegExp(`(^|/)${regexStr}($|/)`);
+	});
+
+	return files.filter(file => {
+		// Keep file if it doesn't match any ignore pattern
+		return !patterns.some(pattern => pattern.test(file));
+	});
+};
+
 export const zip = async (
 	source: string,
 	files: string[],
 	progress?: (text: string, bytes: number) => void,
 	pulse?: (name: string) => void,
-	hide?: () => void
+	hide?: () => void,
+	ignorePatterns?: string[]
 ): Promise<Archiver> => {
+	// Apply ignore patterns
+	files = filterFiles(files, ignorePatterns);
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
 	});
@@ -113,65 +146,149 @@ export const zip = async (
 	return archive;
 };
 
-export const getEnv = async (
-	rootPath?: string
-): Promise<{ name: string; value: string }[]> => {
-	if (rootPath !== undefined) {
-		const envFilePath = join(rootPath, '.env');
+/**
+ * Parse a single KEY=VALUE string into an object entry
+ */
+const parseEnvString = (
+	envStr: string
+): { name: string; value: string } | null => {
+	const eqIndex = envStr.indexOf('=');
+	if (eqIndex === -1) {
+		return null;
+	}
+	const name = envStr.substring(0, eqIndex).trim();
+	const value = envStr.substring(eqIndex + 1).trim();
+	if (!name) {
+		return null;
+	}
+	return { name, value };
+};
 
-		if (await exists(envFilePath)) {
-			try {
-				const source = await fs.readFile(envFilePath, 'utf8');
-				const parsedEnv = parse(source);
-				info(
-					'Detected and loaded environment variables from .env file.'
-				);
-				return Object.entries(parsedEnv).map(([name, value]) => ({
-					name,
-					value
-				}));
-			} catch (err) {
-				error(
-					`Error while reading the .env file: ${(
-						err as Error
-					).toString()}`
-				);
+/**
+ * Load environment variables from a .env file
+ */
+const loadEnvFile = async (
+	filePath: string,
+	silent = false
+): Promise<{ name: string; value: string }[]> => {
+	if (!(await exists(filePath))) {
+		if (!silent) {
+			warn(`Environment file not found: ${filePath}`);
+		}
+		return [];
+	}
+
+	try {
+		const source = await fs.readFile(filePath, 'utf8');
+		const parsedEnv = parse(source);
+		if (!silent) {
+			info(`Loaded environment variables from ${filePath}`);
+		}
+		return Object.entries(parsedEnv).map(([name, value]) => ({
+			name,
+			value
+		}));
+	} catch (err) {
+		if (!silent) {
+			warn(
+				`Error reading environment file ${filePath}: ${
+					(err as Error).message
+				}`
+			);
+		}
+		return [];
+	}
+};
+
+/**
+ * Get environment variables from multiple sources:
+ * 1. CLI --env flags (highest priority)
+ * 2. CLI --envFile flags
+ * 3. Project .env file (if rootPath provided)
+ * 4. Interactive prompt (if TTY available)
+ */
+export const getEnv = async (
+	rootPath?: string,
+	cliEnvVars?: string[],
+	cliEnvFiles?: string[]
+): Promise<{ name: string; value: string }[]> => {
+	const envMap = new Map<string, string>();
+
+	// 1. Load from project .env file (lowest priority, will be overwritten)
+	if (rootPath !== undefined) {
+		const defaultEnvPath = join(rootPath, '.env');
+		const defaultEnvVars = await loadEnvFile(defaultEnvPath, true);
+		for (const { name, value } of defaultEnvVars) {
+			envMap.set(name, value);
+		}
+		if (defaultEnvVars.length > 0) {
+			info(
+				`Detected ${defaultEnvVars.length} environment variable(s) from .env file`
+			);
+		}
+	}
+
+	// 2. Load from --envFile flags (medium priority)
+	if (cliEnvFiles && cliEnvFiles.length > 0) {
+		for (const filePath of cliEnvFiles) {
+			const fileEnvVars = await loadEnvFile(filePath);
+			for (const { name, value } of fileEnvVars) {
+				envMap.set(name, value);
 			}
 		}
 	}
 
-	// If the input is not interactive skip asking the end user
+	// 3. Load from --env flags (highest priority, overwrites others)
+	if (cliEnvVars && cliEnvVars.length > 0) {
+		for (const envStr of cliEnvVars) {
+			const parsed = parseEnvString(envStr);
+			if (parsed) {
+				envMap.set(parsed.name, parsed.value);
+			} else {
+				warn(
+					`Invalid environment variable format: "${envStr}". Expected KEY=VALUE`
+				);
+			}
+		}
+		info(`Applied ${cliEnvVars.length} environment variable(s) from CLI`);
+	}
+
+	// 4. If we already have env vars from files/CLI, return them
+	if (envMap.size > 0) {
+		return Array.from(envMap.entries()).map(([name, value]) => ({
+			name,
+			value
+		}));
+	}
+
+	// 5. If no env vars and not interactive, return empty
 	if (!isInteractive()) {
-		// TODO: We should implement support for all the inputs and prompts for non-interactive terminal
 		return [];
 	}
 
+	// 6. Interactive prompt for env vars
 	const enableEnv = await consentSelection(
 		'Do you want to add environment variables?'
 	);
 
-	const env = enableEnv
-		? await prompt<{ env: string }>([
-				{
-					type: 'input',
-					name: 'env',
-					message: 'Type env vars in the format: K1=V1, K2=V2'
-				}
-		  ]).then(({ env }) =>
-				env
-					.split(',')
-					.map(kv => {
-						const [k, v] = kv.trim().split('=');
-						return { [k]: v };
-					})
-					.reduce((obj, kv) => Object.assign(obj, kv), {})
-		  )
-		: {};
+	if (!enableEnv) {
+		return [];
+	}
 
-	const envArr = Object.entries(env).map(el => {
-		const [k, v] = el;
-		return { name: k, value: v };
-	});
+	const { env } = await prompt<{ env: string }>([
+		{
+			type: 'input',
+			name: 'env',
+			message: 'Type env vars in the format: K1=V1, K2=V2'
+		}
+	]);
 
-	return envArr;
+	const envEntries = env
+		.split(',')
+		.map(kv => parseEnvString(kv.trim()))
+		.filter(
+			(entry): entry is { name: string; value: string } => entry !== null
+		);
+
+	return envEntries;
 };

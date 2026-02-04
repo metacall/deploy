@@ -3,27 +3,63 @@ import { ErrorCode } from './deploy';
 const helpText = `
 Official CLI for metacall-deploy
 
-  Usage: metacall-deploy [--args]
+  Usage: metacall-deploy [options]
 
-Options
-  Alias   Flag                 Accepts      Description
-  -h      --help               string       Prints a user manual to assist you in using the CLI.
-  -v      --version            nothing      Prints current version of the CLI.
-  -a      --addrepo            string       Deploy from repository.
-  -w      --workdir            string       Accepts path to application directory.
-  -d      --dev                nothing      Run CLI in dev mode (deploy locally to metacall/faas).
-  -n      --projectName        string       Accepts name of the application.
-  -e      --email              string       Accepts email id for authentication.
-  -p      --password           string       Accepts password for authentication.
-  -t      --token              string       Accepts token for authentication, either pass email & password or token.
-  -f      --force              nothing      Accepts boolean value: it deletes the deployment present on an existing plan and deploys again.
-  -P      --plan               string       Accepts type of plan: "Essential", "Standard", "Premium".
-  -i      --inspect            string       Lists out all the deployments with specifications (it defaults to Table format, otherwise they are serialized into specified format: Table | Raw | OpenAPI).
-  -D      --delete             nothing      Accepts boolean value: it provides you all the available deployment options to delete.
-  -l      --logout             nothing      Accepts boolean value: use it in order to expire your current session.
-  -r      --listPlans          nothing      Accepts boolean value: list all the plans that are offered in your account using it.
-  -u      --serverUrl          string       Change the base URL for the FaaS.
-  -c      --confDir            string       Overwrite the default configuration directory.`;
+Authentication Options:
+  -e, --email <email>       Email for authentication
+  -p, --password <pass>     Password for authentication
+  -t, --token <token>       API token for authentication (alternative to email/password)
+  -l, --logout              Expire current session
+
+Deployment Options:
+  -w, --workdir <path>      Path to application directory (default: current directory)
+  -a, --addrepo <url>       Deploy from a Git repository URL
+  -n, --projectName <name>  Name for the deployment (default: directory name)
+  -P, --plan <plan>         Plan type: "Essential", "Standard", or "Premium"
+  -f, --force               Delete existing deployment and redeploy
+  --dryRun                  Show what would be deployed without deploying
+
+Environment Variables:
+  -E, --env <KEY=VALUE>     Set environment variable (can be repeated)
+  --envFile <path>          Load environment variables from file (can be repeated)
+
+File Filtering:
+  -I, --ignore <pattern>    Ignore files matching pattern (can be repeated)
+                            Examples: -I "*.log" -I "node_modules"
+
+Output Options:
+  -q, --quiet               Suppress non-essential output
+  -V, --verbose             Show detailed debug output
+  --json                    Output results in JSON format (for scripting)
+  -i, --inspect [format]    List deployments (Table | Raw | OpenAPIv3)
+
+Management:
+  -D, --delete              Interactively select and delete a deployment
+  -r, --listPlans           List available subscription plans
+
+Advanced:
+  -d, --dev                 Run in dev mode (deploy to local metacall/faas)
+  -u, --serverUrl <url>     Override the FaaS base URL
+  -c, --confDir <path>      Override the configuration directory
+
+General:
+  -v, --version             Show CLI version
+  -h, --help                Show this help message
+
+Examples:
+  $ metacall-deploy                            Deploy current directory
+  $ metacall-deploy -w ./my-app                Deploy specific directory
+  $ metacall-deploy -a https://github.com/...  Deploy from repository
+  $ metacall-deploy -E DB_HOST=localhost       Deploy with environment variable
+  $ metacall-deploy --envFile .env.prod        Deploy with env file
+  $ metacall-deploy -I "*.test.js" -I ".git"   Deploy ignoring test files
+  $ metacall-deploy --dryRun                   Preview deployment without deploying
+  $ metacall-deploy -i                         List all deployments
+  $ metacall-deploy -i Raw                     List deployments in raw format
+  $ metacall-deploy --json -i                  List deployments as JSON
+
+For more information, visit: https://github.com/metacall/deploy
+`;
 
 export const printHelp = (): void => {
 	console.log(helpText);

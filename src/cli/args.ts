@@ -26,6 +26,13 @@ interface CLIArgs {
 	serverUrl?: string;
 	logout?: boolean;
 	listPlans?: boolean;
+	env?: string[];
+	envFile?: string[];
+	ignore?: string[];
+	quiet?: boolean;
+	verbose?: boolean;
+	json?: boolean;
+	dryRun?: boolean;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -125,7 +132,56 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		alias: 'u',
 		optional: true
 	},
-	confDir: { type: String, alias: 'c', optional: true }
+	confDir: { type: String, alias: 'c', optional: true },
+	env: {
+		type: String,
+		alias: 'E',
+		optional: true,
+		multiple: true,
+		description:
+			'Set environment variable (can be used multiple times): -E KEY=VALUE'
+	},
+	envFile: {
+		type: String,
+		optional: true,
+		multiple: true,
+		description:
+			'Path to .env file (can be used multiple times): --envFile .env.production'
+	},
+	ignore: {
+		type: String,
+		alias: 'I',
+		optional: true,
+		multiple: true,
+		description:
+			'Ignore pattern for files (can be used multiple times): -I "*.log" -I "node_modules"'
+	},
+	quiet: {
+		type: Boolean,
+		alias: 'q',
+		defaultValue: false,
+		optional: true,
+		description: 'Suppress non-essential output'
+	},
+	verbose: {
+		type: Boolean,
+		alias: 'V',
+		defaultValue: false,
+		optional: true,
+		description: 'Show detailed output for debugging'
+	},
+	json: {
+		type: Boolean,
+		defaultValue: false,
+		optional: true,
+		description: 'Output results in JSON format (useful for scripting)'
+	},
+	dryRun: {
+		type: Boolean,
+		defaultValue: false,
+		optional: true,
+		description: 'Show what would be deployed without actually deploying'
+	}
 };
 
 const parseOptions: ParseOptions<CLIArgs> = {
