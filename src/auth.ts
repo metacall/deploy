@@ -159,8 +159,16 @@ const authSignup = async (config: Config): Promise<string> => {
 			break;
 		} catch (err) {
 			const errorMessage = String((err as ProtocolError).response?.data);
-			warn(errorMessage);
 
+			if (errorMessage.includes('Account already exists')) {
+				info(
+					'This email is already associated with an account. Please log in instead.'
+				);
+				return await authLogin(config);
+			}
+
+			warn(errorMessage);
+          
 			email = password = passwordConfirmation = userAlias = '';
 
 			await askData();
