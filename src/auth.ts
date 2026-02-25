@@ -168,7 +168,7 @@ const authSignup = async (config: Config): Promise<string> => {
 			}
 
 			warn(errorMessage);
-          
+
 			email = password = passwordConfirmation = userAlias = '';
 
 			await askData();
