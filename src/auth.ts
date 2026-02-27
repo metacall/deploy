@@ -163,7 +163,11 @@ const authSignup = async (config: Config): Promise<string> => {
 
 			email = password = passwordConfirmation = userAlias = '';
 
-			await askData();
+			if (!errorMessage.includes('alias is already taken')) {
+				await authSelection(config);
+			} else {
+				await askData();
+			}
 		}
 	}
 	return process.exit(ErrorCode.Ok);
