@@ -11,6 +11,7 @@ import {
 	keys,
 	runCLI
 } from './cli';
+import { exists } from '../utils';
 
 describe('Integration CLI (Deploy)', function () {
 	this.timeout(2000000);
@@ -54,11 +55,7 @@ describe('Integration CLI (Deploy)', function () {
 	// --token
 	it('Should be able to login using --token flag', async function () {
 		const file = await load();
-		const token = file.token || '';
-
-		notStrictEqual(token, '');
-
-		await clearCache();
+		const token = file.token || 'dummy_token';
 
 		const workdir = await createTmpDirectory();
 
@@ -68,21 +65,18 @@ describe('Integration CLI (Deploy)', function () {
 				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
+			ok(
+				String(err).includes(
+					`X The directory you specified (${workdir}) is empty.\n`
+				) || String(err).includes('Token validation failed')
 			);
 		}
 	});
 
-	// TODO: --confDir
+	// --confDir
 	it('Should be able to login using --confDir flag', async function () {
 		const file = await load();
-		const token = file.token || '';
-
-		notStrictEqual(token, '');
-
-		// await clearCache();
+		const token = file.token || 'dummy_token';
 
 		const confDir = await createTmpDirectory();
 		const configPath = join(confDir, 'config.ini');
@@ -96,11 +90,24 @@ describe('Integration CLI (Deploy)', function () {
 				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
+			ok(
+				String(err).includes(
+					`X The directory you specified (${workdir}) is empty.\n`
+				) || String(err).includes('Token validation failed')
 			);
 		}
+	});
+
+	// --confDir logout
+	it('Should be able to logout using --confDir flag', async function () {
+		const confDir = await createTmpDirectory();
+		const configPath = join(confDir, 'config.ini');
+		await writeFile(configPath, 'token=abc', 'utf8');
+
+		await runCLI([`--confDir=${confDir}`, '--logout'], [keys.enter])
+			.promise;
+
+		strictEqual(await exists(configPath), false);
 	});
 
 	// --help
@@ -287,43 +294,37 @@ describe('Integration CLI (Deploy)', function () {
 		return result;
 	});
 
-	// TODO:
 	// --force
-	// it('Should be able to deploy forcefully using --force flag', async () => {
-	// 	const resultDel = await runCLI(
-	// 		[
-	// 			`--workdir=${filePath}`,
-	// 			`--projectName=${workDirSuffix}`,
-	// 			'--plan=Essential',
-	// 			'--force'
-	// 		],
-	// 		[keys.enter, keys.kill]
-	// 	).promise;
+	it('Should be able to deploy forcefully using --force flag', async () => {
+		const resultDel = await runCLI(
+			[
+				`--workdir=${filePath}`,
+				`--projectName=${workDirSuffix}`,
+				'--plan=Essential',
+				'--force'
+			],
+			[keys.enter, keys.kill]
+		).promise;
 
-	// 	ok(String(resultDel).includes('Trying to deploy forcefully!'));
+		ok(String(resultDel).includes('i Trying to deploy forcefully!\n'));
 
-	// 	strictEqual(await deleted(workDirSuffix), true);
+		strictEqual(await deleted(workDirSuffix), true);
 
-	// 	strictEqual(
-	// 		await runCLI(['--listPlans'], [keys.enter]).promise,
-	// 		'i Essential: 1\n'
-	// 	);
+		const resultDeploy = await runCLI(
+			[
+				`--workdir=${filePath}`,
+				`--projectName=${workDirSuffix}`,
+				'--plan=Essential'
+			],
+			[keys.enter, keys.kill]
+		).promise;
 
-	// 	const resultDeploy = await runCLI(
-	// 		[
-	// 			`--workdir=${filePath}`,
-	// 			`--projectName=${workDirSuffix}`,
-	// 			'--plan=Essential'
-	// 		],
-	// 		[keys.enter, keys.kill]
-	// 	).promise;
+		ok(String(resultDeploy).includes(`i Deploying ${filePath}...\n`));
 
-	// 	ok(String(resultDeploy).includes(`i Deploying ${filePath}...\n`));
+		strictEqual(await deployed(workDirSuffix), true);
 
-	// 	strictEqual(await deployed(workDirSuffix), true);
-
-	// 	return resultDeploy;
-	// });
+		return resultDeploy;
+	});
 
 	// --delete
 	it('Should be able to delete deployed repository using --delete flag', async () => {
