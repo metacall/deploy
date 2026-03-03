@@ -8,8 +8,13 @@ export const force = async (api: APIInterface): Promise<string> => {
 	info('Trying to deploy forcefully!');
 
 	const suffix = args['addrepo']
-		? args['addrepo']?.split('com/')[1].split('/').join('-')
-		: args['projectName'].toLowerCase();
+		? args['addrepo']?.split('com/')[1]?.split('/').join('-')
+		: args['projectName']?.toLowerCase();
+
+	if (!suffix) {
+		info('No valid project identifier found. Proceeding normally.');
+		return '';
+	}
 
 	let res = '';
 
@@ -19,17 +24,26 @@ export const force = async (api: APIInterface): Promise<string> => {
 		).filter(dep => dep.deploy === suffix);
 
 		const repo: Deployment[] = (await api.inspect()).filter(
-			dep => dep.suffix == suffix
+			dep => dep.suffix === suffix
 		);
 
-		if (repo) {
+		if (repo.length > 0) {
 			res = await del(
 				repo[0].prefix,
 				repo[0].suffix,
 				repo[0].version,
 				api
 			);
-			args['plan'] = repoSubscriptionDetails[0].plan;
+
+			if (repoSubscriptionDetails.length > 0) {
+				args['plan'] = repoSubscriptionDetails[0].plan;
+			}
+
+			info('Existing deployment removed successfully.');
+		} else {
+			info(
+				'No existing deployment found. Proceeding with normal deployment.'
+			);
 		}
 	} catch (e) {
 		error(
@@ -39,5 +53,3 @@ export const force = async (api: APIInterface): Promise<string> => {
 
 	return res;
 };
-
-// One improvement can be done is, if with force flag, a person tries to deploy an app, and the app is not present actually there then it should behave as normal deployment procedure
