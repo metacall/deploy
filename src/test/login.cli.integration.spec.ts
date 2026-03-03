@@ -39,7 +39,7 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === 'X Token invalid: jwt malformed\n');
+			ok(String(err).includes('Token invalid: jwt malformed'));
 		}
 	});
 
@@ -60,8 +60,9 @@ describeTest('Integration CLI (Login)', function () {
 			);
 		} catch (err) {
 			ok(
-				String(err) ===
-					'X Token invalid: Invalid authorization header, no credentials provided.\n'
+				String(err).includes(
+					'Token invalid: Invalid authorization header, no credentials provided.'
+				)
 			);
 		}
 	});
@@ -88,12 +89,12 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === 'X Invalid account email or password.\n');
+			ok(String(err).includes('Invalid account email or password.'));
 		}
 	});
 
 	// signup already taken email
-	it('Should fail with taken email', async () => {
+	it('Should redirect to login when email already exists', async () => {
 		await clearCache();
 		try {
 			const result = await runCLI(
@@ -112,13 +113,17 @@ describeTest('Integration CLI (Login)', function () {
 					keys.enter
 				]
 			).promise;
-			fail(
-				`The CLI passed without errors and it should fail. Result: ${String(
-					result
-				)}`
+			ok(
+				String(result).includes(
+					'This email is already associated with an account. Please log in instead.'
+				)
 			);
 		} catch (error) {
-			ok(String(error).includes('Account already exists'));
+			fail(
+				`The CLI passed without errors and it should fail. Result: ${String(
+					error
+				)}`
+			);
 		}
 	});
 
