@@ -270,6 +270,7 @@ const inspectPrint: InspectPrint = {
 			});
 
 			p.printTable();
+			process.stdout.write('\n\x1b[2m  Press Ctrl+C to cancel.\x1b[0m\n');
 			await sleep(5000);
 		}
 	},
