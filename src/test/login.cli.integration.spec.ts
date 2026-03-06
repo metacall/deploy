@@ -39,7 +39,7 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err).includes('Token invalid: jwt malformed'));
+			ok(String(err) === 'X Token invalid: jwt malformed\n');
 		}
 	});
 
@@ -60,9 +60,8 @@ describeTest('Integration CLI (Login)', function () {
 			);
 		} catch (err) {
 			ok(
-				String(err).includes(
-					'Token invalid: Invalid authorization header, no credentials provided.'
-				)
+				String(err) ===
+					'X Token invalid: Invalid authorization header, no credentials provided.\n'
 			);
 		}
 	});
@@ -89,12 +88,12 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err).includes('Invalid account email or password.'));
+			ok(String(err) === 'X Invalid account email or password.\n');
 		}
 	});
 
 	// signup already taken email
-	it('Should redirect to login when email already exists', async () => {
+	it('Should fail with taken email', async () => {
 		await clearCache();
 		try {
 			const result = await runCLI(
