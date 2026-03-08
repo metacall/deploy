@@ -56,7 +56,17 @@ void (async () => {
 	}
 
 	if (args['logout']) return logout();
-
+	if (
+		args['inspect'] !== undefined &&
+		args['inspect'] !== null &&
+		args['inspect'] === InspectFormat.Invalid
+	) {
+		const values = Object.keys(InspectFormat)
+			.filter(k => k !== 'Invalid')
+			.join(', ');
+		error(`Invalid format passed to inspect, valid formats are: ${values}`);
+		return;
+	}
 	const config = await startup(args['confDir']);
 	const api: APIInterface = API(
 		config.token as string,
@@ -68,9 +78,7 @@ void (async () => {
 	);
 
 	await validateToken(api);
-
 	if (args['listPlans']) return await listPlans(api);
-
 	if (args['inspect'] === null) {
 		args['inspect'] = InspectFormat.Table;
 	}
