@@ -6,15 +6,27 @@ import {
 import { Plans } from '@metacall/protocol/plan';
 import { prompt } from 'inquirer';
 
+const EXIT_OPTION = 'Exit';
+
+const handleExit = (value: string): void => {
+	if (value === EXIT_OPTION) {
+		process.stdout.write('\nExiting...\n');
+		process.exit(0);
+	}
+};
+
 export const loginSelection = (methods: string[]): Promise<string> =>
 	prompt<{ method: string }>([
 		{
 			type: 'list',
 			name: 'method',
 			message: 'Select the login method',
-			choices: methods
+			choices: [...methods, EXIT_OPTION]
 		}
-	]).then((res: { method: string }) => res.method);
+	]).then((res: { method: string }) => {
+		handleExit(res.method);
+		return res.method;
+	});
 
 export const fileSelection = (
 	message: string,
@@ -52,22 +64,34 @@ export const planSelection = (
 			type: 'list',
 			name: 'plan',
 			message,
-			choices: availablePlans
+			choices: [...availablePlans, EXIT_OPTION]
 		}
-	]).then((res: { plan: Plans }) => res.plan);
+	]).then((res: { plan: Plans }) => {
+		handleExit(res.plan as string);
+		return res.plan;
+	});
 
 export const listSelection = (
 	list: string[] | { name: string; value: string }[],
 	message: string
-): Promise<string> =>
-	prompt<{ container: string }>([
+): Promise<string> => {
+	const choicesWithExit = [
+		...list,
+		{ name: EXIT_OPTION, value: EXIT_OPTION }
+	];
+
+	return prompt<{ container: string }>([
 		{
 			type: 'list',
 			name: 'container',
 			message,
-			choices: list
+			choices: choicesWithExit
 		}
-	]).then((res: { container: string }) => res.container);
+	]).then((res: { container: string }) => {
+		handleExit(res.container);
+		return res.container;
+	});
+};
 
 export const consentSelection = (message: string): Promise<boolean> =>
 	prompt<{ consent: boolean }>([
