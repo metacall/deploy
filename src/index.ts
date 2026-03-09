@@ -58,6 +58,10 @@ void (async () => {
 	if (args['logout']) return logout();
 
 	const config = await startup(args['confDir']);
+
+	if (args['serverUrl']) {
+		config.baseURL = args['serverUrl'];
+	}
 	const api: APIInterface = API(
 		config.token as string,
 		args['dev'] ? config.devURL : config.baseURL
@@ -172,9 +176,5 @@ void (async () => {
 		} catch (e) {
 			error(String(e));
 		}
-	}
-
-	if (args['serverUrl']) {
-		config.baseURL = args['serverUrl'];
 	}
 })();
