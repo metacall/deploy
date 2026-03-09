@@ -94,7 +94,7 @@
 		}
 	},
 	"dependencies": {
-		"@metacall/protocol": "^0.1.24",
+		"@metacall/protocol": "^0.1.27",
 		"archiver": "^5.0.2",
 		"chalk": "^4.1.1",
 		"console-table-printer": "^2.10.0",

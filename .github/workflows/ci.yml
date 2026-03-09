@@ -7,6 +7,10 @@ on:
         tags:
             - 'v*.*.*'
 
+permissions:
+    contents: read
+    id-token: write
+
 jobs:
     ci:
         runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
             - name: Setup NodeJS
               uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  node-version: 24
                   registry-url: https://registry.npmjs.org
 
             - name: Checkout
@@ -57,8 +61,7 @@ jobs:
             #       npm run coverage
 
             - name: Publish
-              uses: JS-DevTools/npm-publish@v1
               if: startsWith(github.ref, 'refs/tags/')
-              with:
-                  access: 'public'
-                  token: '${{ secrets.NPM_AUTH_TOKEN }}'
+              run: |
+                  unset NODE_AUTH_TOKEN
+                  npm publish --provenance
