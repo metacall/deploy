@@ -56,6 +56,7 @@ const authToken = async (config: Config): Promise<string> => {
 	if (expiresIn(token) < config.renewTime) {
 		// Token expires in < renewTime
 		token = await api.refresh();
+		await save({ token });
 	}
 
 	return token;
