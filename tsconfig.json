@@ -1,11 +1,13 @@
 {
 	"compilerOptions": {
 		"strict": true,
-		"lib": ["ES2020"],
-		"target": "ES2019",
+		"lib": ["es2020", "dom"],
+		"moduleResolution": "node",
+		"target": "es2020",
 		"module": "CommonJS",
 		"outDir": "dist",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"declaration": true
 	},
 	"include": ["types/*.ts", "src/*.ts", "src/**/*.ts"]
 }
