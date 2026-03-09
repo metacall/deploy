@@ -23,7 +23,7 @@
 
 ## About
 
-metacall-deploy provides the interface of options to deploy functions on Metacall FaaS platform. You can deploy your serverless functions within a few clicks without interacting with [Dashboard](https://dashboard.metacall.io/)
+metacall-deploy provides the interface of options to deploy functions on Metacall FaaS platform. You can deploy your serverless functions, services and static files within a few clicks without interacting with [Dashboard](https://dashboard.metacall.io/)
 
 ![giphyT](https://user-images.githubusercontent.com/65965202/209966480-5568a6da-5142-4259-a871-cc918e4855c1.gif)
 
