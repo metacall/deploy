@@ -9,6 +9,7 @@ import { promises as fs } from 'fs';
 import { parse, stringify } from 'ini';
 import { join } from 'path';
 import * as z from 'zod';
+import args from './cli/args';
 import { configDir, ensureFolderExists, filter, loadFile } from './utils';
 
 export const Config = z.object({
@@ -30,9 +31,12 @@ const defaultConfig: Config = {
 
 export const defaultPath = configDir(join('metacall', 'deploy'));
 
-export const configFilePath = (path = defaultPath) => join(path, 'config.ini');
+export const configFilePath = (path = args['confDir'] || defaultPath) =>
+	join(path, 'config.ini');
 
-export const load = async (path = defaultPath): Promise<Config> => {
+export const load = async (
+	path = args['confDir'] || defaultPath
+): Promise<Config> => {
 	const data = parse(
 		await loadFile(configFilePath(await ensureFolderExists(path)))
 	);
@@ -45,7 +49,7 @@ export const load = async (path = defaultPath): Promise<Config> => {
 
 export const save = async (
 	data: Partial<Config>,
-	path = defaultPath
+	path = args['confDir'] || defaultPath
 ): Promise<void> =>
 	fs.writeFile(
 		configFilePath(await ensureFolderExists(path)),
