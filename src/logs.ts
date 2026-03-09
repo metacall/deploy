@@ -24,7 +24,9 @@ const showLogs = async (
 	);
 
 	info(`Getting ${type} logs for ${suffix}...`);
-	process.stdout.write('\x1b[2m  Press Ctrl+C to cancel.\x1b[0m\n');
+	if (process.stdout.isTTY) {
+		process.stdout.write('\x1b[2m  Press Ctrl+C to cancel.\x1b[0m\n');
+	}
 
 	let logsTill: string[] = [''];
 

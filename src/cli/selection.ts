@@ -21,7 +21,8 @@ export const loginSelection = (methods: string[]): Promise<string> =>
 			type: 'list',
 			name: 'method',
 			message: 'Select the login method',
-			choices: [...methods, EXIT_OPTION]
+			choices: [...methods, EXIT_OPTION],
+			loop: false
 		}
 	]).then((res: { method: string }) => {
 		handleExit(res.method);
@@ -64,7 +65,8 @@ export const planSelection = (
 			type: 'list',
 			name: 'plan',
 			message,
-			choices: [...availablePlans, EXIT_OPTION]
+			choices: [...availablePlans, EXIT_OPTION],
+			loop: false
 		}
 	]).then((res: { plan: Plans }) => {
 		handleExit(res.plan as string);
@@ -85,7 +87,8 @@ export const listSelection = (
 			type: 'list',
 			name: 'container',
 			message,
-			choices: choicesWithExit
+			choices: choicesWithExit,
+			loop: false
 		}
 	]).then((res: { container: string }) => {
 		handleExit(res.container);

@@ -26,7 +26,11 @@ const validateToken = async (api: APIInterface): Promise<void> => {
 
 		// Removing cache so user will have to login again
 		const configFile = configFilePath();
-		(await exists(configFile)) && (await unlink(configFile));
+		try {
+			(await exists(configFile)) && (await unlink(configFile));
+		} catch {
+			// proceed even if cache deletion fails
+		}
 
 		warn(
 			'Your session has expired or the token is invalid. Please login again.'
