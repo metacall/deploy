@@ -30,7 +30,8 @@ export enum ErrorCode {
 	NotFoundRootPath = 3,
 	AccountDisabled = 4,
 	DeployPackageFailed = 5,
-	DeployRepositoryFailed = 6
+	DeployRepositoryFailed = 6,
+	InvalidArguments = 7
 }
 
 export const deployPackage = async (
