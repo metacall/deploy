@@ -22,22 +22,31 @@ export const force = async (api: APIInterface): Promise<string> => {
 			dep => dep.suffix == suffix
 		);
 
-		if (repo) {
+		if (repo.length > 0) {
+			// An existing deployment was found — delete it before re-deploying.
 			res = await del(
 				repo[0].prefix,
 				repo[0].suffix,
 				repo[0].version,
 				api
 			);
-			args['plan'] = repoSubscriptionDetails[0].plan;
+
+			// Restore the plan from the subscription that owned this deployment
+			// so the re-deploy is charged to the same subscription slot.
+			if (repoSubscriptionDetails.length > 0) {
+				args['plan'] = repoSubscriptionDetails[0].plan;
+			}
+		} else {
+			// No prior deployment found skip deletion and proceed normally.
+			info(
+				'No existing deployment found for this project. Continuing as a fresh deploy.'
+			);
 		}
 	} catch (e) {
 		error(
-			'Deployment Aborted because this directory is not being used by any applications.'
+			'Deployment Aborted due to an unexpected error while checking existing deployments.'
 		);
 	}
 
 	return res;
 };
-
-// One improvement can be done is, if with force flag, a person tries to deploy an app, and the app is not present actually there then it should behave as normal deployment procedure
