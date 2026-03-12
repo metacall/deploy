@@ -27,12 +27,19 @@ const showLogs = async (
 
 	let logsTill: string[] = [''];
 
-	let app: Deployment;
+	let app: Deployment | undefined;
 	let status: DeployStatus = 'create';
 
 	while (status !== 'ready') {
-		app = (await api.inspect()).filter(dep => dep.suffix === suffix)[0];
+		const deployments = (await api.inspect()).filter(
+			dep => dep.suffix === suffix
+		);
 
+		if (deployments.length === 0) {
+			error(`Deployment with suffix "${suffix}" not found`);
+		}
+
+		app = deployments[0];
 		status = app.status;
 		const prefix = app.prefix;
 
