@@ -13,9 +13,8 @@ jobs:
         steps:
             # Required for local tests
             - name: Setup MetaCall CLI and Python Bindings
-              run: |
-                  wget -O - https://raw.githubusercontent.com/metacall/install/master/install.sh | sh
-                  pip3 install metacall
+              run: wget -O - https://raw.githubusercontent.com/metacall/install/master/install.sh | sh
+              
             - name: Setup NodeJS
               uses: actions/setup-node@v4
               with:
