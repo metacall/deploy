@@ -46,11 +46,12 @@ export const deleteBySelection = async (api: APIInterface): Promise<void> => {
 
 		// Find the matching deployment
 		const app = deployments.find(
-			dep => dep.suffix === selectedSuffix && dep.version === selectedVersion
+			dep =>
+				dep.suffix === selectedSuffix && dep.version === selectedVersion
 		);
 
 		if (!app) {
-			error(
+			return error(
 				'Selected deployment not found. It may have been deleted already.'
 			);
 		}
