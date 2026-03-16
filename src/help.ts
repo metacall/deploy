@@ -24,14 +24,14 @@ Environment Variables:
   --envFile <path>          Load environment variables from file (can be repeated)
 
 File Filtering:
-  -I, --ignore <pattern>    Ignore files matching pattern (can be repeated)
-                            Examples: -I "*.log" -I "node_modules"
+  -i, --ignore-pattern <pattern>    Ignore files matching pattern (can be repeated)
+                                    Examples: -i "*.log" -i "node_modules"
 
 Output Options:
   -q, --quiet               Suppress non-essential output
   -V, --verbose             Show detailed debug output
   --json                    Output results in JSON format (for scripting)
-  -i, --inspect [format]    List deployments (Table | Raw | OpenAPIv3)
+  --inspect [format]        List deployments (Table | Raw | OpenAPIv3)
 
 Management:
   -D, --delete              Interactively select and delete a deployment
@@ -52,11 +52,11 @@ Examples:
   $ metacall-deploy -a https://github.com/...  Deploy from repository
   $ metacall-deploy -E DB_HOST=localhost       Deploy with environment variable
   $ metacall-deploy --envFile .env.prod        Deploy with env file
-  $ metacall-deploy -I "*.test.js" -I ".git"   Deploy ignoring test files
+  $ metacall-deploy -i "*.test.js" -i ".git"   Deploy ignoring test files
   $ metacall-deploy --dryRun                   Preview deployment without deploying
-  $ metacall-deploy -i                         List all deployments
-  $ metacall-deploy -i Raw                     List deployments in raw format
-  $ metacall-deploy --json -i                  List deployments as JSON
+  $ metacall-deploy --inspect                  List all deployments
+  $ metacall-deploy --inspect Raw              List deployments in raw format
+  $ metacall-deploy --json --inspect           List deployments as JSON
 
 For more information, visit: https://github.com/metacall/deploy
 `;
