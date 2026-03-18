@@ -11,6 +11,13 @@ import { listSelection } from './cli/selection';
 import { startup } from './startup';
 import { sleep } from './utils';
 
+// Terminal states where polling should stop
+// Using string[] because runtime status values may not align with TypeScript types
+const TERMINAL_STATES: string[] = ['ready', 'error', 'fail'];
+
+// Maximum polling attempts to prevent infinite loops (360 * 10s = 1 hour)
+const MAX_POLL_ATTEMPTS = 360;
+
 const showLogs = async (
 	container: string,
 	suffix: string,
@@ -29,8 +36,12 @@ const showLogs = async (
 
 	let app: Deployment;
 	let status: DeployStatus = 'create';
+	let pollAttempts = 0;
 
-	while (status !== 'ready') {
+	while (
+		!TERMINAL_STATES.includes(status) &&
+		pollAttempts < MAX_POLL_ATTEMPTS
+	) {
 		app = (await api.inspect()).filter(dep => dep.suffix === suffix)[0];
 
 		status = app.status;
@@ -45,10 +56,31 @@ const showLogs = async (
 
 			logsTill = allLogs.split('\n');
 		} catch (err) {
-			if (isProtocolError(err)) continue;
+			if (isProtocolError(err)) {
+				pollAttempts++;
+				await sleep(10000);
+				continue;
+			}
 		}
 
+		pollAttempts++;
 		await sleep(10000);
+	}
+
+	// Handle terminal states
+	if (status === ('error' as DeployStatus)) {
+		error('Deployment failed with error status. Check logs above.');
+		process.exit(1);
+	}
+
+	if (status === ('fail' as DeployStatus)) {
+		error('Deployment failed. Check logs above.');
+		process.exit(1);
+	}
+
+	if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+		error('Polling timeout: maximum polling attempts exceeded.');
+		process.exit(1);
 	}
 };
 
