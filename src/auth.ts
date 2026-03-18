@@ -12,7 +12,7 @@ import signup from '@metacall/protocol/signup';
 import { expiresIn } from '@metacall/protocol/token';
 import args from './cli/args';
 import { input, maskedInput } from './cli/inputs';
-import { error, info, warn } from './cli/messages';
+import { error, info, success, warn } from './cli/messages';
 import { loginSelection } from './cli/selection';
 import { Config, save } from './config';
 import { ErrorCode } from './deploy';
@@ -20,7 +20,7 @@ import { forever } from './utils';
 
 const authToken = async (config: Config): Promise<string> => {
 	const askToken = (): Promise<string> =>
-		maskedInput('Please enter your metacall token');
+		maskedInput('Enter your MetaCall token:');
 
 	const shouldKeepAsking = args['token'] === undefined;
 	let token: string = args['token'] || (await askToken());
@@ -62,11 +62,10 @@ const authToken = async (config: Config): Promise<string> => {
 };
 
 const authLogin = async (config: Config): Promise<string> => {
-	const askEmail = (): Promise<string> =>
-		input('Please enter your email id:');
+	const askEmail = (): Promise<string> => input('Enter your email address:');
 
 	const askPassword = (): Promise<string> =>
-		maskedInput('Please enter your password:');
+		maskedInput('Enter your password:');
 
 	let email = '';
 	let password = '';
@@ -107,16 +106,15 @@ const authLogin = async (config: Config): Promise<string> => {
 };
 
 const authSignup = async (config: Config): Promise<string> => {
-	const askEmail = (): Promise<string> =>
-		input('Please enter your email id:');
+	const askEmail = (): Promise<string> => input('Enter your email address:');
 
-	const askAlias = (): Promise<string> => input('Please enter your Alias:');
+	const askAlias = (): Promise<string> => input('Enter your alias:');
 
 	const askPassword = (): Promise<string> =>
-		maskedInput('Please enter your password:');
+		maskedInput('Enter your password:');
 
 	const askPasswordConfirmation = (): Promise<string> =>
-		maskedInput('Confirm password:');
+		maskedInput('Confirm your password:');
 
 	let email = '';
 	let password = '';
@@ -136,7 +134,7 @@ const authSignup = async (config: Config): Promise<string> => {
 			await askCredentials();
 
 			if (password !== passwordConfirmation) {
-				warn('Passwords did not match.');
+				warn('Passwords do not match.');
 				password = '';
 				passwordConfirmation = '';
 			} else {
@@ -199,7 +197,7 @@ const authSelection = async (config: Config): Promise<string> => {
 
 	await save({ token });
 
-	info('Login Successfull!');
+	success('Login successful.');
 
 	return token;
 };

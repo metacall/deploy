@@ -32,7 +32,7 @@ const validateToken = async (api: APIInterface): Promise<void> => {
 
 		(await exists(configFile)) && (await unlink(configFile));
 
-		info('Try to login again!');
+		info('Please login again.');
 
 		return error(
 			`Token validation failed, potential causes include:\n\t1) The JWT may be mistranslated (Invalid Signature).\n\t2) JWT might have expired.`

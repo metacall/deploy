@@ -11,7 +11,7 @@ export const loginSelection = (methods: string[]): Promise<string> =>
 		{
 			type: 'list',
 			name: 'method',
-			message: 'Select the login method',
+			message: 'Select a login method:',
 			choices: methods
 		}
 	]).then((res: { method: string }) => res.method);
@@ -36,7 +36,7 @@ export const languageSelection = (
 		{
 			type: 'checkbox',
 			name: 'langs',
-			message: 'Select languages to run on MetaCall',
+			message: 'Select languages to run on MetaCall:',
 			choices: languages.map(lang => Languages[lang].displayName)
 		}
 	]).then((res: { langs: string[] }) =>

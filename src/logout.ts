@@ -1,5 +1,5 @@
 import { unlink } from 'fs/promises';
-import { error, info } from './cli/messages';
+import { error, success } from './cli/messages';
 import { configFilePath } from './config';
 import { exists } from './utils';
 
@@ -7,9 +7,9 @@ export const logout = async (): Promise<void> => {
 	const configFile = configFilePath();
 
 	!(await exists(configFile)) &&
-		error("You haven't logged in yet! Kindly log in.");
+		error('You are not logged in. Please log in first.');
 
 	await unlink(configFile);
 
-	info('You have logout! See you later.');
+	success('Logged out successfully.');
 };
