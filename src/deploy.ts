@@ -100,7 +100,18 @@ export const deployPackage = async (
 					);
 				}
 			} catch (err) {
-				apiError(err as ProtocolError);
+				const protocolErr = err as ProtocolError;
+				if (protocolErr.response?.status === 400) {
+					debug(
+						`Deploy API returned 400: ${String(
+							protocolErr.response?.data
+						)}`
+					);
+					error(
+						`Deployment "${name}" already exists. Use --force to redeploy or --delete to remove it.`
+					);
+				}
+				apiError(protocolErr);
 			}
 		};
 
@@ -223,6 +234,17 @@ export const deployPackage = async (
 			}
 		}
 	} catch (e) {
+		const protocolErr = e as ProtocolError;
+		if (protocolErr.response?.status === 400) {
+			debug(
+				`Deploy API returned 400: ${String(protocolErr.response?.data)}`
+			);
+			error(
+				`Deployment "${args[
+					'projectName'
+				].toLowerCase()}" already exists. Use --force to redeploy or --delete to remove it.`
+			);
+		}
 		error(String(e), ErrorCode.DeployPackageFailed);
 	}
 };
@@ -272,6 +294,16 @@ export const deployFromRepository = async (
 				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
 			);
 	} catch (e) {
+		const protocolErr = e as ProtocolError;
+		if (protocolErr.response?.status === 400) {
+			const repoName = url.split('/').pop() || url;
+			debug(
+				`Deploy API returned 400: ${String(protocolErr.response?.data)}`
+			);
+			error(
+				`Deployment "${repoName}" already exists. Use --force to redeploy or --delete to remove it.`
+			);
+		}
 		error(String(e), ErrorCode.DeployRepositoryFailed);
 	}
 };
