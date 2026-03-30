@@ -11,6 +11,52 @@ import { listSelection } from './cli/selection';
 import { startup } from './startup';
 import { sleep } from './utils';
 
+export const getAppendedLogLines = (
+	previousLogs: string[],
+	allLogs: string
+): { appendedLogs: string[]; nextLogs: string[] } => {
+	const normalizeLogLines = (lines: string[]): string[] => {
+		if (lines[lines.length - 1] === '') {
+			return lines.slice(0, -1);
+		}
+
+		return lines;
+	};
+
+	const normalizedPreviousLogs = normalizeLogLines(previousLogs);
+	const nextLogs = normalizeLogLines(allLogs.split('\n'));
+
+	// The API returns the full log snapshot on each poll. We track progress by
+	// position so repeated messages are preserved as distinct log events.
+	const hasSamePrefix = normalizedPreviousLogs.every(
+		(line, index) => nextLogs[index] === line
+	);
+
+	if (
+		nextLogs.length >= normalizedPreviousLogs.length &&
+		normalizedPreviousLogs.length > 0 &&
+		hasSamePrefix
+	) {
+		return {
+			appendedLogs: nextLogs.slice(normalizedPreviousLogs.length),
+			nextLogs
+		};
+	}
+
+	if (normalizedPreviousLogs.length === 0) {
+		return {
+			appendedLogs: nextLogs,
+			nextLogs
+		};
+	}
+
+	// If the snapshot shrank or history was rewritten, replay the fresh snapshot.
+	return {
+		appendedLogs: nextLogs,
+		nextLogs
+	};
+};
+
 const showLogs = async (
 	container: string,
 	suffix: string,
@@ -38,12 +84,16 @@ const showLogs = async (
 
 		try {
 			const allLogs = await api.logs(container, type, suffix, prefix);
+			const { appendedLogs, nextLogs } = getAppendedLogLines(
+				logsTill,
+				allLogs
+			);
 
-			allLogs.split('\n').forEach(el => {
-				if (!logsTill.includes(el)) console.log(el);
+			appendedLogs.forEach(line => {
+				console.log(line);
 			});
 
-			logsTill = allLogs.split('\n');
+			logsTill = nextLogs;
 		} catch (err) {
 			if (isProtocolError(err)) continue;
 		}
