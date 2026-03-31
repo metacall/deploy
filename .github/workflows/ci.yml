@@ -6,6 +6,11 @@ on:
             - master
         tags:
             - 'v*.*.*'
+    workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
     contents: read
@@ -30,6 +35,26 @@ jobs:
 
             - name: Installing Dependencies
               run: npm i
+
+            - name: Checkout Protocol Repository
+              if: github.event_name == 'workflow_dispatch'
+              uses: actions/checkout@v4
+              with:
+                  repository: metacall/protocol
+                  path: protocol
+                  # TODO: client_payload for match the exact commit
+
+            - name: Install Latest Protocol
+              if: github.event_name == 'workflow_dispatch'
+              working-directory: protocol
+              run: |
+                  npm i
+                  npm run build
+                  npm pack
+                  cd ..
+                  npm uninstall @metacall/protocol
+                  npm i ./protocol/metacall-protocol-*.tgz
+                  rm -rf protocol
 
             - name: Lint
               run: npm run lint
