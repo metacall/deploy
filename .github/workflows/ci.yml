@@ -50,14 +50,14 @@ jobs:
               uses: actions/checkout@v4
               with:
                   repository: ${{ github.event.inputs.repo }}
-                  path: /tmp/metacall-protocol
+                  path: ${{ runner.temp }}
                   ref: ${{ github.event.inputs.ref }}
                   fetch-depth: 0
                   fetch-tags: true
 
             - name: Pack Latest Protocol
               if: github.event_name == 'workflow_dispatch'
-              working-directory: /tmp/metacall-protocol
+              working-directory: ${{ runner.temp }}
               run: |
                   npm i
                   npm run build
@@ -67,7 +67,7 @@ jobs:
               if: github.event_name == 'workflow_dispatch'
               run: |
                   npm uninstall @metacall/protocol
-                  npm i /tmp/metacall-protocol/metacall-protocol-*.tgz
+                  npm i ${{ runner.temp }}/metacall-protocol-*.tgz
 
             - name: Lint
               run: npm run lint
