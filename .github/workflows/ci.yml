@@ -7,6 +7,15 @@ on:
         tags:
             - 'v*.*.*'
     workflow_dispatch:
+        inputs:
+            ref:
+              description: "Commit hash for testing metacall/protocol"
+              required: false
+              default: "master"
+        repo:
+            description: "Repository from which we should clone metacall/protocol"
+            required: false
+            default: "metacall/faas"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,9 +49,11 @@ jobs:
               if: github.event_name == 'workflow_dispatch'
               uses: actions/checkout@v4
               with:
-                  repository: metacall/protocol
+                  repository: ${{ github.event.inputs.repository }}
                   path: protocol
-                  # TODO: client_payload for match the exact commit
+                  ref: ${{ github.event.inputs.ref }}
+                  fetch-depth: 0
+                  fetch-tags: true
 
             - name: Install Latest Protocol
               if: github.event_name == 'workflow_dispatch'
