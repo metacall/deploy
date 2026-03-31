@@ -50,7 +50,8 @@ jobs:
             - uses: actions/upload-artifact@v4
               with:
                   name: metacall-protocol
-                  path: metacall-protocol-*.tgz
+                  path: ./metacall-protocol-*.tgz
+                  if-no-files-found: error
 
     ci:
         needs: protocol
