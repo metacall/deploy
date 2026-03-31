@@ -55,6 +55,7 @@ jobs:
     ci:
         needs: protocol
         runs-on: ubuntu-latest
+        if: always()
         steps:
             # Required for local tests
             - name: Setup MetaCall CLI
