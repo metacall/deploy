@@ -81,7 +81,8 @@ jobs:
               if: github.event_name == 'workflow_dispatch'
               run: |
                   npm uninstall --save @metacall/protocol
-                  npm i ./metacall-protocol-*.tgz
+                  npm install --save ./metacall-protocol-*.tgz
+                  npm list @metacall/protocol
 
             - name: Lint
               run: npm run lint
