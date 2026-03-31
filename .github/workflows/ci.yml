@@ -9,13 +9,13 @@ on:
     workflow_dispatch:
         inputs:
             ref:
-              description: "Commit hash for testing metacall/protocol"
-              required: false
-              default: "master"
-        repo:
-            description: "Repository from which we should clone metacall/protocol"
-            required: false
-            default: "metacall/faas"
+                description: "Commit hash for testing metacall/protocol"
+                required: false
+                default: "master"
+            repo:
+                description: "Repository from which we should clone metacall/protocol"
+                required: false
+                default: "metacall/protocol"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
