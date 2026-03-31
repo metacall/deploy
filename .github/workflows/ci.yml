@@ -34,14 +34,12 @@ jobs:
               uses: actions/checkout@v4
               with:
                   repository: ${{ github.event.inputs.repo }}
-                  path: protocol
                   ref: ${{ github.event.inputs.ref }}
                   fetch-depth: 0
                   fetch-tags: true
 
             - name: Pack Latest Protocol
               if: github.event_name == 'workflow_dispatch'
-              working-directory: protocol
               run: |
                   npm i
                   npm run build
