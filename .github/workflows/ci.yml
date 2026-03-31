@@ -45,17 +45,11 @@ jobs:
             - name: Installing Dependencies
               run: npm i
 
-            - name: Debug Protocol
-              if: github.event_name == 'workflow_dispatch'
-              run: |
-                  echo "${{ github.event.inputs.repository }}"
-                  echo "${{ github.event.inputs.ref }}"
-
             - name: Checkout Protocol Repository
               if: github.event_name == 'workflow_dispatch'
               uses: actions/checkout@v4
               with:
-                  repository: ${{ github.event.inputs.repository }}
+                  repository: ${{ github.event.inputs.repo }}
                   path: protocol
                   ref: ${{ github.event.inputs.ref }}
                   fetch-depth: 0
