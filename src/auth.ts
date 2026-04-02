@@ -33,11 +33,7 @@ const authToken = async (config: Config): Promise<string> => {
 				await api.validate();
 				break;
 			} catch (err) {
-				warn(
-					`Token invalid: ${String(
-						(err as ProtocolError).data
-					)}`
-				);
+				warn(`Token invalid: ${String((err as ProtocolError).data)}`);
 				token = await askToken();
 			}
 		}
@@ -45,11 +41,7 @@ const authToken = async (config: Config): Promise<string> => {
 		try {
 			await api.validate();
 		} catch (err) {
-			error(
-				`Token invalid: ${String(
-					(err as ProtocolError).data
-				)}`
-			);
+			error(`Token invalid: ${String((err as ProtocolError).data)}`);
 		}
 	}
 
