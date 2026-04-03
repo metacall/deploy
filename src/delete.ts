@@ -28,7 +28,7 @@ export const deleteBySelection = async (api: APIInterface): Promise<void> => {
 		const deployments: Deployment[] = (await api.inspect()).filter(
 			dep => dep.status === 'ready'
 		);
-		if (!deployments.length) error('No deployment found');
+		if (!deployments.length) error('No deployments found.');
 
 		const project: string = await listSelection(
 			[...deployments.map(el => `${el.suffix} ${el.version}`)],

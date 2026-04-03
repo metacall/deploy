@@ -52,5 +52,5 @@ export const plan = async (api: APIInterface): Promise<Plans> => {
 	}
 
 	// Otherwise, prompt user to select from available plans
-	return await planSelection('Please select plan from the list', availPlans);
+	return await planSelection('Select a plan:', availPlans);
 };

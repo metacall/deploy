@@ -279,7 +279,7 @@ export const getEnv = async (
 		{
 			type: 'input',
 			name: 'env',
-			message: 'Type env vars in the format: K1=V1, K2=V2'
+			message: 'Enter environment variables in the format K1=V1, K2=V2:'
 		}
 	]);
 
