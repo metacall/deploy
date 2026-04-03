@@ -68,20 +68,19 @@ export const deployPackage = async (
 				hide
 			);
 
-			// TODO: We should do something with the return value, for example
-			// check for error or show the output to the user
-			await api.upload(
-				name,
-				archive,
-				additionalJsons,
-				descriptor.runners
-			);
-
-			const env = await getEnv(rootPath, args['env'], args['envFile']);
-
-			info(`Deploying ${rootPath}...\n`);
-
 			try {
+				// TODO: We should do something with the return value, for example
+				// check for error or show the output to the user
+				await api.upload(
+					name,
+					archive,
+					additionalJsons,
+					descriptor.runners
+				);
+
+				const env = await getEnv(rootPath, args['env'], args['envFile']);
+
+				info(`Deploying ${rootPath}...\n`);
 				const deploy = await api.deploy(
 					name,
 					env,
@@ -100,9 +99,21 @@ export const deployPackage = async (
 					);
 				}
 			} catch (err) {
-				apiError(err as ProtocolError);
-			}
-		};
+				const protocolErr = err as ProtocolError;
+                if (
+                    protocolErr.response?.status === 400 &&
+                    String(protocolErr.response?.data).includes(
+                        'already'
+                    )
+                ) {
+                    return error(
+                        `Deployment "${name}" already exists.\nUse --force to redeploy or --delete to remove it.`
+                    );
+                }
+                apiError(protocolErr);
+            }
+        };
+
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
 			let languages: LanguageId[] = [];
@@ -232,6 +243,7 @@ export const deployFromRepository = async (
 	plan: Plans,
 	url: string
 ) => {
+	let name = '';
 	try {
 		const { branches } = await api.branchList(url);
 
@@ -252,7 +264,7 @@ export const deployFromRepository = async (
 			findRunners(await api.fileList(url, selectedBranch))
 		);
 
-		const name = (await api.add(url, selectedBranch, [])).id;
+		name = (await api.add(url, selectedBranch, [])).id;
 
 		const env = await getEnv(undefined, args['env'], args['envFile']);
 
@@ -272,6 +284,16 @@ export const deployFromRepository = async (
 				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
 			);
 	} catch (e) {
-		error(String(e), ErrorCode.DeployRepositoryFailed);
-	}
+		const protocolErr = e as ProtocolError;
+
+        if (
+            protocolErr.response?.status === 400 &&
+            String(protocolErr.response?.data).includes('already')
+        ) {
+            return error(
+                `Deployment "${name}" already exists.\nUse --force to redeploy or --delete to remove it.`
+            );
+        }
+        apiError(protocolErr);
+    }
 };
