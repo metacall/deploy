@@ -35,16 +35,29 @@ export const deleteBySelection = async (api: APIInterface): Promise<void> => {
 			'Select the deployment to delete:'
 		);
 
-		const app = deployments.filter(
+		// Parse the selected project string
+		const parts = project.split(' ');
+		const selectedSuffix = parts[0];
+		const selectedVersion = parts[1];
+
+		if (!selectedSuffix || !selectedVersion) {
+			error('Invalid deployment selection format');
+		}
+
+		// Find the matching deployment
+		const app = deployments.find(
 			dep =>
-				dep.suffix === project.split(' ')[0] &&
-				dep.version === project.split(' ')[1]
-		)[0];
+				dep.suffix === selectedSuffix && dep.version === selectedVersion
+		);
+
+		if (!app) {
+			return error(
+				'Selected deployment not found. It may have been deleted already.'
+			);
+		}
 
 		info(await del(app.prefix, app.suffix, app.version, api));
 	} catch (err) {
 		error(String(err));
 	}
 };
-
-// This can be better
