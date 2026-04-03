@@ -20,7 +20,13 @@ import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
 import { isInteractive } from './tty';
-import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
+import {
+	filterFiles,
+	getEnv,
+	loadFilesToRun,
+	streamToBuffer,
+	zip
+} from './utils';
 import { debug } from './cli/messages';
 
 export enum ErrorCode {
@@ -68,14 +74,8 @@ export const deployPackage = async (
 				hide
 			);
 
-			// TODO: We should do something with the return value, for example
-			// check for error or show the output to the user
-			await api.upload(
-				name,
-				archive,
-				additionalJsons,
-				descriptor.runners
-			);
+			const blob = await streamToBuffer(archive);
+			await api.upload(name, blob, additionalJsons, descriptor.runners);
 
 			const env = await getEnv(rootPath, args['env'], args['envFile']);
 

@@ -7,11 +7,13 @@
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
 import archiver, { Archiver } from 'archiver';
+import concat from 'concat-stream';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
 import { platform } from 'os';
 import { basename, join, relative } from 'path';
+import { Readable } from 'stream';
 import { error, info, printLanguage, warn } from './cli/messages';
 import { consentSelection, fileSelection } from './cli/selection';
 import { isInteractive } from './tty';
@@ -145,6 +147,18 @@ export const zip = async (
 
 	return archive;
 };
+
+/**
+ * Collect a readable stream into a Buffer.
+ * Required for multipart uploads with axios 1.x - streams cause wrong Content-Length.
+ */
+export const streamToBuffer = (stream: Readable): Promise<Buffer> =>
+	new Promise((resolve, reject) => {
+		const collector = concat((buf: Buffer) => resolve(buf));
+		stream.on('error', reject);
+		collector.on('error', reject);
+		stream.pipe(collector);
+	});
 
 /**
  * Parse a single KEY=VALUE string into an object entry
