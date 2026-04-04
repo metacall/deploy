@@ -14,6 +14,30 @@ const handleValidateToken = async (api: APIInterface): Promise<void> => {
 	}
 };
 
+const isAuthFailure = (err: unknown): boolean => {
+	const response = (err as { response?: { status?: number; data?: unknown } })
+		?.response;
+	const status = response?.status;
+	const message = String(response?.data || (err as Error)?.message || '')
+		.toLowerCase()
+		.trim();
+
+	if (status === 401 || status === 403) {
+		return true;
+	}
+
+	return [
+		'jwt',
+		'token',
+		'unauthorized',
+		'forbidden',
+		'authorization',
+		'credentials',
+		'invalid signature',
+		'expired'
+	].some(pattern => message.includes(pattern));
+};
+
 const validateToken = async (api: APIInterface): Promise<void> => {
 	try {
 		await handleValidateToken(api);
@@ -24,6 +48,12 @@ const validateToken = async (api: APIInterface): Promise<void> => {
 			);
 
 			return error('FaaS is not serving locally.');
+		}
+
+		if (!isAuthFailure(err)) {
+			return error(
+				'Token validation could not be completed because the server is unavailable or returned an unexpected error. Cached credentials were preserved, please try again.'
+			);
 		}
 
 		// Removing cache such that user will have to login again.
