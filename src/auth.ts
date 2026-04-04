@@ -33,11 +33,7 @@ const authToken = async (config: Config): Promise<string> => {
 				await api.validate();
 				break;
 			} catch (err) {
-				warn(
-					`Token invalid: ${String(
-						(err as ProtocolError).response?.data
-					)}`
-				);
+				warn(`Token invalid: ${String((err as ProtocolError).data)}`);
 				token = await askToken();
 			}
 		}
@@ -45,11 +41,7 @@ const authToken = async (config: Config): Promise<string> => {
 		try {
 			await api.validate();
 		} catch (err) {
-			error(
-				`Token invalid: ${String(
-					(err as ProtocolError).response?.data
-				)}`
-			);
+			error(`Token invalid: ${String((err as ProtocolError).data)}`);
 		}
 	}
 
@@ -90,7 +82,7 @@ const authLogin = async (config: Config): Promise<string> => {
 				token = await login(email, password, config.baseURL);
 				break;
 			} catch (err) {
-				warn(String((err as ProtocolError).response?.data));
+				warn(String((err as ProtocolError).data));
 				args['email'] = args['password'] = undefined;
 				await askCredentials();
 			}
@@ -99,7 +91,7 @@ const authLogin = async (config: Config): Promise<string> => {
 		try {
 			token = await login(email, password, config.baseURL);
 		} catch (err) {
-			error(String((err as ProtocolError).response?.data));
+			error(String((err as ProtocolError).data));
 		}
 	}
 
@@ -158,7 +150,7 @@ const authSignup = async (config: Config): Promise<string> => {
 			);
 			break;
 		} catch (err) {
-			const errorMessage = String((err as ProtocolError).response?.data);
+			const errorMessage = String((err as ProtocolError).data);
 
 			if (errorMessage.includes('Account already exists')) {
 				info(
