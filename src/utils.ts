@@ -6,7 +6,7 @@
 */
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
-import archiver, { Archiver } from 'archiver';
+import archiver from 'archiver';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
@@ -109,7 +109,7 @@ export const zip = async (
 	pulse?: (name: string) => void,
 	hide?: () => void,
 	ignorePatterns?: string[]
-): Promise<Archiver> => {
+): Promise<Blob> => {
 	// Apply ignore patterns
 	files = filterFiles(files, ignorePatterns);
 	const archive = archiver('zip', {
@@ -137,13 +137,24 @@ export const zip = async (
 			: archive.file(file, { name: relative(source, file) });
 	}
 
-	if (hide) {
-		archive.on('finish', () => hide());
-	}
+	// Collect all compressed chunks into a Buffer, then wrap as a Blob.
+	// @metacall/protocol now uses native fetch + FormData which requires a
+	// Blob — Node.js Transform streams are not accepted by FormData.append().
+	const chunks: Buffer[] = [];
+	archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 
-	await archive.finalize();
+	await new Promise<void>((resolve, reject) => {
+		archive.on('end', () => {
+			if (hide) hide();
+			resolve();
+		});
+		archive.on('error', reject);
+		void archive.finalize();
+	});
 
-	return archive;
+	return new Blob([Buffer.concat(chunks)], {
+		type: 'application/zip'
+	});
 };
 
 /**
