@@ -1,4 +1,3 @@
-
 import { LanguageId } from '@metacall/protocol/deployment';
 import { Languages } from '@metacall/protocol/language';
 import { ProtocolError } from '@metacall/protocol/protocol';
@@ -93,9 +92,11 @@ export const apiError = (err: ProtocolError): never => {
 		// eslint-disable-next-line no-console
 		console.error(
 			chalk.redBright.bold('X') +
-			chalk.redBright(
-				` Server responded with error code: ${String(status)} ${data}`
-			)
+				chalk.redBright(
+					` Server responded with error code: ${String(
+						status
+					)} ${data}`
+				)
 		);
 	}
 	return process.exit(1);
@@ -135,4 +136,3 @@ export const step = (stepNum: number, total: number, message: string): void => {
 	// eslint-disable-next-line no-console
 	console.log(chalk.dim(`[${stepNum}/${total}]`) + ' ' + message);
 };
-

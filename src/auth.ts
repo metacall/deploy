@@ -1,4 +1,3 @@
-
 /*
  About File:
   1) CLI login
@@ -178,11 +177,11 @@ const authSelection = async (config: Config): Promise<string> => {
 			return await authToken(config);
 		} else {
 			const methods: Record<string, (config: Config) => Promise<string>> =
-			{
-				'Login by token': authToken,
-				'Login by email and password': authLogin,
-				'New user, sign up': authSignup
-			};
+				{
+					'Login by token': authToken,
+					'Login by email and password': authLogin,
+					'New user, sign up': authSignup
+				};
 
 			return await methods[await loginSelection(Object.keys(methods))](
 				config
