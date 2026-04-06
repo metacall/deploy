@@ -6,14 +6,55 @@ on:
             - master
         tags:
             - 'v*.*.*'
+    workflow_dispatch:
+        inputs:
+            ref:
+                description: "Commit hash for testing metacall/protocol"
+                required: false
+                default: "master"
+            repo:
+                description: "Repository from which we should clone metacall/protocol"
+                required: false
+                default: "metacall/protocol"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
     contents: read
     id-token: write
 
 jobs:
-    ci:
+    protocol:
+        if: github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Protocol Repository
+              uses: actions/checkout@v4
+              with:
+                  repository: ${{ github.event.inputs.repo }}
+                  ref: ${{ github.event.inputs.ref }}
+                  fetch-depth: 0
+                  fetch-tags: true
+
+            - name: Pack Latest Protocol
+              if: github.event_name == 'workflow_dispatch'
+              run: |
+                  npm i
+                  npm run build
+                  npm pack
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: metacall-protocol
+                  path: ./metacall-protocol-*.tgz
+                  if-no-files-found: error
+
+    ci:
+        needs: protocol
+        runs-on: ubuntu-latest
+        if: always()
         steps:
             # Required for local tests
             - name: Setup MetaCall CLI
@@ -30,6 +71,18 @@ jobs:
 
             - name: Installing Dependencies
               run: npm i
+
+            - uses: actions/download-artifact@v8.0.1
+              if: github.event_name == 'workflow_dispatch'
+              with:
+                  name: metacall-protocol
+
+            - name: Install Latest Protocol
+              if: github.event_name == 'workflow_dispatch'
+              run: |
+                  npm uninstall --save @metacall/protocol
+                  npm install --save ./metacall-protocol-*.tgz
+                  npm list @metacall/protocol
 
             - name: Lint
               run: npm run lint
