@@ -1,3 +1,4 @@
+
 import { LanguageId } from '@metacall/protocol/deployment';
 import { Languages } from '@metacall/protocol/language';
 import { ProtocolError } from '@metacall/protocol/protocol';
@@ -75,8 +76,8 @@ export const error = (message: string, exitCode = 1): never => {
  * Log API error and exit (always shown)
  */
 export const apiError = (err: ProtocolError): never => {
-	const status = err.response?.status || 'unknown';
-	const data = err.response?.data as string;
+	const status = err.status ?? 'unknown';
+	const data = String(err.data ?? '');
 
 	if (isJson()) {
 		// eslint-disable-next-line no-console
@@ -92,9 +93,9 @@ export const apiError = (err: ProtocolError): never => {
 		// eslint-disable-next-line no-console
 		console.error(
 			chalk.redBright.bold('X') +
-				chalk.redBright(
-					` Server responded with error code: ${status} ${data}`
-				)
+			chalk.redBright(
+				` Server responded with error code: ${String(status)} ${data}`
+			)
 		);
 	}
 	return process.exit(1);
@@ -134,3 +135,4 @@ export const step = (stepNum: number, total: number, message: string): void => {
 	// eslint-disable-next-line no-console
 	console.log(chalk.dim(`[${stepNum}/${total}]`) + ' ' + message);
 };
+
