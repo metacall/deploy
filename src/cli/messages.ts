@@ -75,8 +75,8 @@ export const error = (message: string, exitCode = 1): never => {
  * Log API error and exit (always shown)
  */
 export const apiError = (err: ProtocolError): never => {
-	const status = err.response?.status || 'unknown';
-	const data = err.response?.data as string;
+	const status = err.status ?? 'unknown';
+	const data = String(err.data ?? '');
 
 	if (isJson()) {
 		// eslint-disable-next-line no-console
@@ -93,7 +93,9 @@ export const apiError = (err: ProtocolError): never => {
 		console.error(
 			chalk.redBright.bold('X') +
 				chalk.redBright(
-					` Server responded with error code: ${status} ${data}`
+					` Server responded with error code: ${String(
+						status
+					)} ${data}`
 				)
 		);
 	}
