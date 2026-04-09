@@ -8,7 +8,6 @@ import fs from 'fs/promises';
 import inspector from 'inspector';
 import os from 'os';
 import { join } from 'path';
-import args from '../cli/args';
 import { configFilePath } from '../config';
 import { startup } from '../startup';
 import { exists } from '../utils';
@@ -129,7 +128,7 @@ export const keys = Object.freeze({
 });
 
 export const deployed = async (suffix: string): Promise<boolean> => {
-	const config = await startup(args['confDir']);
+	const config = await startup();
 	const api = API(config.token as string, config.baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
@@ -161,7 +160,7 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 };
 
 export const deleted = async (suffix: string): Promise<boolean> => {
-	const config = await startup(args['confDir']);
+	const config = await startup();
 	const api = API(config.token as string, config.baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
