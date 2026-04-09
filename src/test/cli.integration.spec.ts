@@ -55,7 +55,11 @@ describe('Integration CLI (Deploy)', function () {
 	// --token
 	it('Should be able to login using --token flag', async function () {
 		const file = await load();
-		const token = file.token || 'dummy_token';
+		const token = file.token || '';
+
+		notStrictEqual(token, '');
+
+		await clearCache();
 
 		const workdir = await createTmpDirectory();
 
@@ -65,10 +69,9 @@ describe('Integration CLI (Deploy)', function () {
 				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
-			ok(
-				String(err).includes(
-					`X The directory you specified (${workdir}) is empty.\n`
-				) || String(err).includes('Token validation failed')
+			strictEqual(
+				err,
+				`X The directory you specified (${workdir}) is empty.\n`
 			);
 		}
 	});
@@ -109,7 +112,6 @@ describe('Integration CLI (Deploy)', function () {
 
 		strictEqual(await exists(configPath), false);
 	});
-
 	// --help
 	it('Should be able to print help guide using --help flag', async () => {
 		const result = await runCLI(['--help'], [keys.enter]).promise;
@@ -294,6 +296,7 @@ describe('Integration CLI (Deploy)', function () {
 		return result;
 	});
 
+	// TODO:
 	// --force
 	// it('Should be able to deploy forcefully using --force flag', async () => {
 	// 	const resultDel = await runCLI(
@@ -306,9 +309,14 @@ describe('Integration CLI (Deploy)', function () {
 	// 		[keys.enter, keys.kill]
 	// 	).promise;
 
-	// 	ok(String(resultDel).includes('i Trying to deploy forcefully!\n'));
+	// 	ok(String(resultDel).includes('Trying to deploy forcefully!'));
 
 	// 	strictEqual(await deleted(workDirSuffix), true);
+
+	// 	strictEqual(
+	// 		await runCLI(['--listPlans'], [keys.enter]).promise,
+	// 		'i Essential: 1\n'
+	// 	);
 
 	// 	const resultDeploy = await runCLI(
 	// 		[
