@@ -4,12 +4,24 @@ import args from './cli/args';
 import { error, info } from './cli/messages';
 import { del } from './delete';
 
+export const getSuffixFromUrl = (urlStr: string): string => {
+	const url = new URL(urlStr);
+	return url.pathname.replace(/^\//, '').split('/').join('-');
+};
+
 export const force = async (api: APIInterface): Promise<string> => {
 	info('Trying to deploy forcefully!');
 
-	const suffix = args['addrepo']
-		? args['addrepo']?.split('com/')[1].split('/').join('-')
-		: args['projectName'].toLowerCase();
+	let suffix: string;
+	if (args['addrepo']) {
+		try {
+			suffix = getSuffixFromUrl(args['addrepo']);
+		} catch (e) {
+			return error('Invalid repository URL');
+		}
+	} else {
+		suffix = args['projectName'].toLowerCase();
+	}
 
 	let res = '';
 
