@@ -6,7 +6,7 @@
 */
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
-import archiver, { Archiver } from 'archiver';
+import archiver from 'archiver';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
@@ -109,7 +109,7 @@ export const zip = async (
 	pulse?: (name: string) => void,
 	hide?: () => void,
 	ignorePatterns?: string[]
-): Promise<Archiver> => {
+): Promise<Blob> => {
 	// Apply ignore patterns
 	files = filterFiles(files, ignorePatterns);
 	const archive = archiver('zip', {
@@ -137,13 +137,19 @@ export const zip = async (
 			: archive.file(file, { name: relative(source, file) });
 	}
 
-	if (hide) {
-		archive.on('finish', () => hide());
-	}
+	// Collect chunks into a Blob. The archiver package extends readable-stream's
+	// Transform (not Node.js native stream.Readable), so passing the Archiver
+	// directly to protocol upload() would fail its instanceof Readable check.
+	const chunks: Buffer[] = [];
+	archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 
 	await archive.finalize();
 
-	return archive;
+	if (hide) hide();
+
+	return new Blob([Buffer.concat(chunks)], {
+		type: 'application/x-zip-compressed'
+	});
 };
 
 /**
