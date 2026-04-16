@@ -28,11 +28,16 @@ const defaultConfig: Config = {
 	renewTime: 1000 * 60 * 60 * 24 * 15
 };
 
-export const defaultPath = configDir(join('metacall', 'deploy'));
+export const getDefaultPath = (): string =>
+	configDir(join('metacall', 'deploy'));
 
-export const configFilePath = (path = defaultPath) => join(path, 'config.ini');
+// Keep exported defaultPath for backward compatibility.
+export const defaultPath = getDefaultPath();
 
-export const load = async (path = defaultPath): Promise<Config> => {
+export const configFilePath = (path = getDefaultPath()) =>
+	join(path, 'config.ini');
+
+export const load = async (path = getDefaultPath()): Promise<Config> => {
 	const data = parse(
 		await loadFile(configFilePath(await ensureFolderExists(path)))
 	);
@@ -45,7 +50,7 @@ export const load = async (path = defaultPath): Promise<Config> => {
 
 export const save = async (
 	data: Partial<Config>,
-	path = defaultPath
+	path = getDefaultPath()
 ): Promise<void> =>
 	fs.writeFile(
 		configFilePath(await ensureFolderExists(path)),
