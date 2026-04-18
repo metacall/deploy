@@ -6,7 +6,7 @@
 */
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
-import archiver, { Archiver } from 'archiver';
+import archiver from 'archiver';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
@@ -109,41 +109,60 @@ export const zip = async (
 	pulse?: (name: string) => void,
 	hide?: () => void,
 	ignorePatterns?: string[]
-): Promise<Archiver> => {
-	// Apply ignore patterns
+): Promise<Blob> => {
 	files = filterFiles(files, ignorePatterns);
+
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
 	});
 
+	const chunks: Buffer[] = [];
+
 	if (progress) {
-		archive.on('progress', data =>
+		archive.on('progress', data => {
 			progress(
 				'Compressing and deploying...',
 				data.fs.processedBytes / data.fs.totalBytes
-			)
-		);
+			);
+		});
 	}
 
 	if (pulse) {
-		archive.on('entry', (entry: archiver.EntryData) => pulse(entry.name));
+		archive.on('entry', (entry: archiver.EntryData) => {
+			pulse(entry.name);
+		});
 	}
 
-	files = files.map(file => join(source, file));
+	const dataPromise = new Promise<Blob>((resolve, reject) => {
+		archive.on('data', (chunk: Buffer) => chunks.push(chunk));
+		archive.on('end', () => {
+			if (hide) {
+				archive.on('finish', () => hide());
+			}
+			resolve(
+				new Blob([Buffer.concat(chunks)], {
+					type: 'application/x-zip-compressed'
+				})
+			);
+		});
+		archive.on('error', reject);
+	});
 
-	for (const file of files) {
-		(await fs.stat(file)).isDirectory()
-			? archive.directory(file, basename(file))
-			: archive.file(file, { name: relative(source, file) });
-	}
+	const fullPaths = files.map(file => join(source, file));
 
-	if (hide) {
-		archive.on('finish', () => hide());
+	for (const file of fullPaths) {
+		const stat = await fs.stat(file);
+
+		if (stat.isDirectory()) {
+			archive.directory(file, basename(file));
+		} else {
+			archive.file(file, { name: relative(source, file) });
+		}
 	}
 
 	await archive.finalize();
 
-	return archive;
+	return dataPromise;
 };
 
 /**
