@@ -6,7 +6,7 @@
 */
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
-import archiver, { Archiver } from 'archiver';
+import archiver from 'archiver';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
@@ -109,12 +109,18 @@ export const zip = async (
 	pulse?: (name: string) => void,
 	hide?: () => void,
 	ignorePatterns?: string[]
-): Promise<Archiver> => {
+): Promise<Blob> => {
 	// Apply ignore patterns
 	files = filterFiles(files, ignorePatterns);
+
+	// Create archive with maximum compression
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
 	});
+
+	const chunks: Buffer[] = [];
+
+	archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 
 	if (progress) {
 		archive.on('progress', data =>
@@ -137,13 +143,19 @@ export const zip = async (
 			: archive.file(file, { name: relative(source, file) });
 	}
 
-	if (hide) {
-		archive.on('finish', () => hide());
-	}
+	const blobPromise = new Promise<Blob>((resolve, reject) => {
+		archive.on('end', () => {
+			if (hide) {
+				hide();
+			}
+			resolve(new Blob([Buffer.concat(chunks)]));
+		});
+		archive.on('error', reject);
+	});
 
 	await archive.finalize();
 
-	return archive;
+	return await blobPromise;
 };
 
 /**
