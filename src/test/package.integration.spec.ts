@@ -34,4 +34,29 @@ describe('Integration Package', function () {
 
 		deepStrictEqual(files, archiveFiles);
 	});
+
+	it('Should ignore files when ignorePatterns are provided', async () => {
+		const rootPath = join(
+			process.cwd(),
+			'src',
+			'test',
+			'resources',
+			'integration',
+			'folder-hierarchy'
+		);
+
+		const descriptor = await generatePackage(rootPath);
+		const archiveFiles: string[] = [];
+
+		await zip(
+			rootPath,
+			descriptor.files,
+			undefined,
+			name => archiveFiles.push(name),
+			undefined,
+			['*.md', 'src']
+		);
+
+		deepStrictEqual(['metacall-py.json'], archiveFiles);
+	});
 });
