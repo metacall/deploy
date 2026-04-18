@@ -118,62 +118,51 @@ export const zip = async (
 
 	const chunks: Buffer[] = [];
 
-	return new Promise<Blob>((resolve, reject) => {
-		if (progress) {
-			archive.on('progress', data => {
-				progress(
-					'Compressing and deploying...',
-					data.fs.processedBytes / data.fs.totalBytes
-				);
-			});
-		}
-
-		if (pulse) {
-			archive.on('entry', (entry: archiver.EntryData) => {
-				pulse(entry.name);
-			});
-		}
-
-		archive.on('data', (chunk: Buffer) => {
-			chunks.push(chunk);
+	if (progress) {
+		archive.on('progress', data => {
+			progress(
+				'Compressing and deploying...',
+				data.fs.processedBytes / data.fs.totalBytes
+			);
 		});
+	}
 
+	if (pulse) {
+		archive.on('entry', (entry: archiver.EntryData) => {
+			pulse(entry.name);
+		});
+	}
+
+	const dataPromise = new Promise<Blob>((resolve, reject) => {
+		archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 		archive.on('end', () => {
 			if (hide) {
 				archive.on('finish', () => hide());
 			}
-
 			resolve(
 				new Blob([Buffer.concat(chunks)], {
 					type: 'application/x-zip-compressed'
 				})
 			);
 		});
-
 		archive.on('error', reject);
-
-		void (async () => {
-			try {
-				const fullPaths = files.map(file => join(source, file));
-
-				for (const file of fullPaths) {
-					const stat = await fs.stat(file);
-
-					if (stat.isDirectory()) {
-						archive.directory(file, basename(file));
-					} else {
-						archive.file(file, {
-							name: relative(source, file)
-						});
-					}
-				}
-
-				await archive.finalize();
-			} catch (err) {
-				reject(err);
-			}
-		})();
 	});
+
+	const fullPaths = files.map(file => join(source, file));
+
+	for (const file of fullPaths) {
+		const stat = await fs.stat(file);
+
+		if (stat.isDirectory()) {
+			archive.directory(file, basename(file));
+		} else {
+			archive.file(file, { name: relative(source, file) });
+		}
+	}
+
+	await archive.finalize();
+
+	return dataPromise;
 };
 
 /**
