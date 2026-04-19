@@ -146,7 +146,11 @@ export const zip = async (
 			if (hide) {
 				hide();
 			}
-			resolve(new Blob([Buffer.concat(chunks)]));
+			resolve(
+				new Blob([Buffer.concat(chunks)], {
+					type: 'application/x-zip-compressed'
+				})
+			);
 		});
 		archive.on('error', reject);
 		archive.finalize().catch(reject);
