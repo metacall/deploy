@@ -118,10 +118,6 @@ export const zip = async (
 		zlib: { level: 9 }
 	});
 
-	const chunks: Buffer[] = [];
-
-	archive.on('data', (chunk: Buffer) => chunks.push(chunk));
-
 	if (progress) {
 		archive.on('progress', data =>
 			progress(
@@ -143,7 +139,9 @@ export const zip = async (
 			: archive.file(file, { name: relative(source, file) });
 	}
 
-	const blobPromise = new Promise<Blob>((resolve, reject) => {
+	return new Promise<Blob>((resolve, reject) => {
+		const chunks: Buffer[] = [];
+		archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 		archive.on('end', () => {
 			if (hide) {
 				hide();
@@ -151,11 +149,8 @@ export const zip = async (
 			resolve(new Blob([Buffer.concat(chunks)]));
 		});
 		archive.on('error', reject);
+		archive.finalize().catch(reject);
 	});
-
-	await archive.finalize();
-
-	return await blobPromise;
 };
 
 /**
