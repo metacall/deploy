@@ -1,13 +1,13 @@
 import API from '@metacall/protocol/protocol';
 import { fail } from 'assert';
-import concat from 'concat-stream';
-import spawn from 'cross-spawn';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import fs from 'fs/promises';
 import inspector from 'inspector';
+import * as pty from 'node-pty';
 import os from 'os';
 import { join } from 'path';
+import { stripVTControlCharacters } from 'util';
 import args from '../cli/args';
 import { configFilePath } from '../config';
 import { startup } from '../startup';
@@ -18,9 +18,6 @@ dotenv.config();
 // Define tty as interactive in order to test properly the CLI
 process.env.NODE_ENV = 'testing';
 process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
-
-const PATH = process.env.PATH;
-const HOME = process.env.HOME;
 
 export const isInDebugMode = () => inspector.url() !== undefined;
 
@@ -36,19 +33,17 @@ export const run = (
 	// TODO: Implement this properly for better debugging
 	/* const debugArgs = isInDebugMode() ? ['--inspect-brk=0'] : []; */
 
-	const child = spawn('node', [/*...debugArgs,*/ path, ...args], {
-		env: Object.assign(
-			{
-				NODE_ENV: 'test',
-				PATH,
-				HOME
-			},
-			env
-		),
-		stdio: [null, null, null, 'ipc']
+	const child = pty.spawn('node', [/*...debugArgs,*/ path, ...args], {
+		name: 'xterm-color',
+		cols: 80,
+		rows: 30,
+		cwd: process.cwd(),
+		env: {
+			...process.env,
+			NODE_ENV: 'test',
+			...env
+		}
 	});
-
-	child.stdin?.setDefaultEncoding('utf-8');
 
 	return child;
 };
@@ -60,59 +55,29 @@ export const runWithInput = (
 	env: Record<string, string> = {}
 ) => {
 	const child = run(path, args, env);
-	let childTimeout: NodeJS.Timeout, killTimeout: NodeJS.Timeout;
-
-	const loop = (inputs: string[]) => {
-		if (killTimeout) {
-			clearTimeout(killTimeout);
-		}
-
-		if (
-			inputs.length === 0 ||
-			(inputs.length > 0 && inputs[0] === keys.kill)
-		) {
-			child.stdin?.end();
-
-			killTimeout = setTimeout(() => {
-				child.kill(os.constants.signals.SIGTERM);
-			}, 3000);
-
-			return;
-		}
-
-		childTimeout = setTimeout(() => {
-			child.stdin?.cork();
-			child.stdin?.write(inputs.shift());
-			child.stdin?.uncork();
-			loop(inputs);
-		}, 3000);
-	};
 
 	return {
 		promise: new Promise((resolve, reject) => {
-			child.stderr?.once('data', err => {
-				child.stdin?.end();
+			let output = '';
 
-				if (childTimeout) {
-					clearTimeout(childTimeout);
-					inputs = [];
-				}
-				reject(String(err));
+			child.onData(data => {
+				output += stripVTControlCharacters(data);
 			});
 
-			child.on('error', reject);
+			child.onExit(({ exitCode }) => {
+				if (exitCode === 0) {
+					resolve(output);
+				} else {
+					reject({
+						output,
+						exitCode
+					});
+				}
+			});
 
-			loop(inputs);
-
-			child.stdout?.pipe(
-				concat(result => {
-					if (killTimeout) {
-						clearTimeout(killTimeout);
-					}
-
-					resolve(result.toString());
-				})
-			);
+			for (const input of inputs) {
+				child.write(input);
+			}
 		}),
 		child
 	};
