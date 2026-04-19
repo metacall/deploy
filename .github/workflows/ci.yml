@@ -91,7 +91,7 @@ jobs:
               run: npm run build
 
             - name: Run Tests (production)
-              if: github.event_name != 'pull_request'
+              # if: github.event_name != 'pull_request'
               run: |
                   echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' > .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
