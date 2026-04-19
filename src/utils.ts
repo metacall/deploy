@@ -110,47 +110,59 @@ export const zip = async (
 	hide?: () => void,
 	ignorePatterns?: string[]
 ): Promise<Blob> => {
-	// Apply ignore patterns
 	files = filterFiles(files, ignorePatterns);
 
-	// Create archive with maximum compression
 	const archive = archiver('zip', {
 		zlib: { level: 9 }
 	});
 
+	const chunks: Buffer[] = [];
+
 	if (progress) {
-		archive.on('progress', data =>
+		archive.on('progress', data => {
 			progress(
 				'Compressing and deploying...',
 				data.fs.processedBytes / data.fs.totalBytes
-			)
-		);
+			);
+		});
 	}
 
 	if (pulse) {
-		archive.on('entry', (entry: archiver.EntryData) => pulse(entry.name));
+		archive.on('entry', (entry: archiver.EntryData) => {
+			pulse(entry.name);
+		});
 	}
 
-	files = files.map(file => join(source, file));
-
-	for (const file of files) {
-		(await fs.stat(file)).isDirectory()
-			? archive.directory(file, basename(file))
-			: archive.file(file, { name: relative(source, file) });
-	}
-
-	return new Promise<Blob>((resolve, reject) => {
-		const chunks: Buffer[] = [];
+	const dataPromise = new Promise<Blob>((resolve, reject) => {
 		archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 		archive.on('end', () => {
 			if (hide) {
-				hide();
+				archive.on('finish', () => hide());
 			}
-			resolve(new Blob([Buffer.concat(chunks)]));
+			resolve(
+				new Blob([Buffer.concat(chunks)], {
+					type: 'application/x-zip-compressed'
+				})
+			);
 		});
 		archive.on('error', reject);
-		archive.finalize().catch(reject);
 	});
+
+	const fullPaths = files.map(file => join(source, file));
+
+	for (const file of fullPaths) {
+		const stat = await fs.stat(file);
+
+		if (stat.isDirectory()) {
+			archive.directory(file, basename(file));
+		} else {
+			archive.file(file, { name: relative(source, file) });
+		}
+	}
+
+	await archive.finalize();
+
+	return dataPromise;
 };
 
 /**
