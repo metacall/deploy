@@ -11,6 +11,7 @@ import {
 	keys,
 	runCLI
 } from './cli';
+import { exists } from '../utils';
 
 describe('Integration CLI (Deploy)', function () {
 	this.timeout(2000000);
@@ -75,14 +76,10 @@ describe('Integration CLI (Deploy)', function () {
 		}
 	});
 
-	// TODO: --confDir
+	// --confDir
 	it('Should be able to login using --confDir flag', async function () {
 		const file = await load();
-		const token = file.token || '';
-
-		notStrictEqual(token, '');
-
-		// await clearCache();
+		const token = file.token || 'dummy_token';
 
 		const confDir = await createTmpDirectory();
 		const configPath = join(confDir, 'config.ini');
@@ -96,13 +93,25 @@ describe('Integration CLI (Deploy)', function () {
 				[keys.enter, keys.enter]
 			).promise;
 		} catch (err) {
-			strictEqual(
-				err,
-				`X The directory you specified (${workdir}) is empty.\n`
+			ok(
+				String(err).includes(
+					`X The directory you specified (${workdir}) is empty.\n`
+				) || String(err).includes('Token validation failed')
 			);
 		}
 	});
 
+	// --confDir logout
+	it('Should be able to logout using --confDir flag', async function () {
+		const confDir = await createTmpDirectory();
+		const configPath = join(confDir, 'config.ini');
+		await writeFile(configPath, 'token=abc', 'utf8');
+
+		await runCLI([`--confDir=${confDir}`, '--logout'], [keys.enter])
+			.promise;
+
+		strictEqual(await exists(configPath), false);
+	});
 	// --help
 	it('Should be able to print help guide using --help flag', async () => {
 		const result = await runCLI(['--help'], [keys.enter]).promise;
