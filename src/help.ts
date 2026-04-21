@@ -61,7 +61,7 @@ Examples:
 For more information, visit: https://github.com/metacall/deploy
 `;
 
-export const printHelp = (): void => {
+export const printHelp = (exitCode: ErrorCode = ErrorCode.Ok): void => {
 	console.log(helpText);
-	return process.exit(ErrorCode.Ok);
+	return process.exit(exitCode);
 };
