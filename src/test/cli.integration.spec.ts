@@ -120,10 +120,10 @@ describe('Integration CLI (Deploy)', function () {
 	// 			)}`
 	// 		);
 	// 	} catch (err) {
-	// 		console.log('🔴 RAW ERROR:', err);
-	// 		console.log('🟡 STRING ERROR:', String(err));
-	// 		console.log('🟢 TRIMMED ERROR:', String(err).trim());
-	// 		console.log('🔵 JSON ERROR:', JSON.stringify(err, null, 2));
+	// 		console.log(' RAW ERROR:', err);
+	// 		console.log(' STRING ERROR:', String(err));
+	// 		console.log(' TRIMMED ERROR:', String(err).trim());
+	// 		console.log(' JSON ERROR:', JSON.stringify(err, null, 2));
 
 	// 		ok(String(err) === '--yeet does not exist as a valid command.');
 	// 	}
