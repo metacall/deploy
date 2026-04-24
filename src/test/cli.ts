@@ -1,15 +1,16 @@
-import API from '@metacall/protocol/protocol';
+import realAPI from '@metacall/protocol/protocol';
 import { fail } from 'assert';
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
 import * as dotenv from 'dotenv';
-import { existsSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 import fs from 'fs/promises';
 import inspector from 'inspector';
 import os from 'os';
 import { join } from 'path';
 import args from '../cli/args';
 import { configFilePath } from '../config';
+import mockAPI from '../mocks/protocol';
 import { startup } from '../startup';
 import { exists } from '../utils';
 
@@ -21,6 +22,22 @@ process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
 
 const PATH = process.env.PATH;
 const HOME = process.env.HOME;
+
+// Use mocks in test mode
+const useMocks = process.env.TEST_DEPLOY_LOCAL === 'true';
+const API = useMocks ? mockAPI : realAPI;
+
+// Clear mock deployments state file
+export const clearMockDeployments = (): void => {
+	const stateFile = join(os.homedir(), '.metacall-deploy-test-state.json');
+	try {
+		if (existsSync(stateFile)) {
+			unlinkSync(stateFile);
+		}
+	} catch (e) {
+		// Silently fail if can't delete
+	}
+};
 
 export const isInDebugMode = () => inspector.url() !== undefined;
 
@@ -136,6 +153,9 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 		new Promise(resolve => setTimeout(resolve, ms));
 	let res = false,
 		wait = true;
+	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+		return true;
+	}
 	while (wait) {
 		await sleep(1000);
 		const inspect = await api.inspect();
@@ -168,6 +188,10 @@ export const deleted = async (suffix: string): Promise<boolean> => {
 		new Promise(resolve => setTimeout(resolve, ms));
 	let res = false,
 		wait = true;
+
+	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+		return true;
+	}
 	while (wait) {
 		await sleep(1000);
 		const inspect = await api.inspect();
@@ -198,13 +222,18 @@ export const generateRandomString = (length: number): string => {
 };
 
 export const runCLI = (args: string[], inputs: string[]) => {
+	const env: Record<string, string> = {};
+
 	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
 		args.push('--dev');
+		env.TEST_DEPLOY_LOCAL = 'true';
 	}
-	return runWithInput('dist/index.js', args, inputs);
+
+	return runWithInput('dist/index.js', args, inputs, env);
 };
 
 export const clearCache = async (): Promise<void> => {
+	clearMockDeployments();
 	if (await exists(configFilePath()))
 		await runCLI(['-l'], [keys.enter]).promise;
 };

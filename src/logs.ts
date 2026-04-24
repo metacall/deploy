@@ -4,12 +4,16 @@ import {
 	LogType
 } from '@metacall/protocol/deployment';
 import { RunnerToDisplayName } from '@metacall/protocol/language';
-import API, { isProtocolError } from '@metacall/protocol/protocol';
+import realAPI, { isProtocolError } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
+import mockAPI from './mocks/protocol';
 import { startup } from './startup';
 import { sleep } from './utils';
+
+const useMocks = process.env.TEST_DEPLOY_LOCAL === 'true';
+const API = useMocks ? mockAPI : realAPI;
 
 const showLogs = async (
 	container: string,

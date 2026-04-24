@@ -6,9 +6,9 @@
 */
 
 // remember to uninstall it
-import login from '@metacall/protocol/login';
-import API, { ProtocolError } from '@metacall/protocol/protocol';
-import signup from '@metacall/protocol/signup';
+import realLogin from '@metacall/protocol/login';
+import realAPI, { ProtocolError } from '@metacall/protocol/protocol';
+import realSignup from '@metacall/protocol/signup';
 import { expiresIn } from '@metacall/protocol/token';
 import args from './cli/args';
 import { input, maskedInput } from './cli/inputs';
@@ -17,6 +17,17 @@ import { loginSelection } from './cli/selection';
 import { Config, save } from './config';
 import { ErrorCode } from './deploy';
 import { forever } from './utils';
+
+// Import mock implementations
+import mockLogin from './mocks/login';
+import mockAPI from './mocks/protocol';
+import mockSignup from './mocks/signup';
+
+// Use mocks in test mode
+const useMocks = process.env.TEST_DEPLOY_LOCAL === 'true';
+const login = useMocks ? mockLogin : realLogin;
+const signup = useMocks ? mockSignup : realSignup;
+const API = useMocks ? mockAPI : realAPI;
 
 const authToken = async (config: Config): Promise<string> => {
 	const askToken = (): Promise<string> =>
@@ -33,7 +44,9 @@ const authToken = async (config: Config): Promise<string> => {
 				await api.validate();
 				break;
 			} catch (err) {
-				warn(`Token invalid: ${String((err as ProtocolError).data)}`);
+				const protocolErr = err as ProtocolError;
+				const msg = String(protocolErr.data || (err as Error).message);
+				warn(`Token invalid: ${msg}`);
 				token = await askToken();
 			}
 		}
@@ -41,7 +54,9 @@ const authToken = async (config: Config): Promise<string> => {
 		try {
 			await api.validate();
 		} catch (err) {
-			error(`Token invalid: ${String((err as ProtocolError).data)}`);
+			const protocolErr = err as ProtocolError;
+			const msg = String(protocolErr.data || (err as Error).message);
+			error(`Token invalid: ${msg}`);
 		}
 	}
 
@@ -82,7 +97,9 @@ const authLogin = async (config: Config): Promise<string> => {
 				token = await login(email, password, config.baseURL);
 				break;
 			} catch (err) {
-				warn(String((err as ProtocolError).data));
+				const protocolErr = err as ProtocolError;
+				const msg = String(protocolErr.data || (err as Error).message);
+				warn(msg);
 				args['email'] = args['password'] = undefined;
 				await askCredentials();
 			}
@@ -91,7 +108,9 @@ const authLogin = async (config: Config): Promise<string> => {
 		try {
 			token = await login(email, password, config.baseURL);
 		} catch (err) {
-			error(String((err as ProtocolError).data));
+			const protocolErr = err as ProtocolError;
+			const msg = String(protocolErr.data || (err as Error).message);
+			error(msg);
 		}
 	}
 
@@ -150,7 +169,10 @@ const authSignup = async (config: Config): Promise<string> => {
 			);
 			break;
 		} catch (err) {
-			const errorMessage = String((err as ProtocolError).data);
+			const protocolErr = err as ProtocolError;
+			const errorMessage = String(
+				protocolErr.data || (err as Error).message
+			);
 
 			if (errorMessage.includes('Account already exists')) {
 				info(

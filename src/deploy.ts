@@ -15,13 +15,19 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
-import { apiError, error, info, printLanguage, warn } from './cli/messages';
+import {
+	apiError,
+	debug,
+	error,
+	info,
+	printLanguage,
+	warn
+} from './cli/messages';
 import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
 import { isInteractive } from './tty';
 import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
-import { debug } from './cli/messages';
 
 export enum ErrorCode {
 	Ok = 0,
@@ -266,6 +272,11 @@ export const deployFromRepository = async (
 		info('Deploying...');
 
 		await logs(runners, deploy.suffix, args['dev']);
+		if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+			info(
+				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
+			);
+		}
 
 		if (deploy)
 			info(
