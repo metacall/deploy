@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Plans } from '@metacall/protocol/plan';
-import API, { API as APIInterface } from '@metacall/protocol/protocol';
+import realAPI, { API as APIInterface } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 import args, { InspectFormat } from './cli/args';
@@ -20,8 +20,13 @@ import { deployFromRepository, deployPackage, ErrorCode } from './deploy';
 import { force } from './force';
 import { listPlans } from './listPlans';
 import { logout } from './logout';
+import mockAPI from './mocks/protocol';
 import { plan } from './plan';
 import { startup } from './startup';
+
+// Use mocks in test mode
+const useMocks = process.env.TEST_DEPLOY_LOCAL === 'true';
+const API = useMocks ? mockAPI : realAPI;
 
 void (async () => {
 	// Initialize output mode based on CLI flags

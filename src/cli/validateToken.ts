@@ -15,6 +15,11 @@ const handleValidateToken = async (api: APIInterface): Promise<void> => {
 };
 
 const validateToken = async (api: APIInterface): Promise<void> => {
+	// Skip validation in test mode
+	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
+		return;
+	}
+
 	try {
 		await handleValidateToken(api);
 	} catch (err) {
