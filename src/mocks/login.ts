@@ -7,7 +7,7 @@ export default async function login(
 	// simulate async
 	await new Promise(resolve => setTimeout(resolve, 10));
 
-	// ❌ missing credentials
+	//  missing credentials
 	if (!email || !password) {
 		const err = new Error(
 			'Invalid authorization header, no credentials provided.'
@@ -16,14 +16,14 @@ export default async function login(
 		throw err;
 	}
 
-	// ❌ invalid email
+	//  invalid email
 	if (!email.includes('@')) {
 		const err = new Error('Invalid email') as ProtocolError;
 		err.data = 'Invalid email';
 		throw err;
 	}
 
-	// ❌ invalid credentials (yeet@yeet.com / yeetyeet test case)
+	//  invalid credentials (yeet@yeet.com / yeetyeet test case)
 	if (email === 'yeet@yeet.com' && password === 'yeetyeet') {
 		const err = new Error(
 			'Invalid account email or password.'
@@ -32,6 +32,6 @@ export default async function login(
 		throw err;
 	}
 
-	// ✅ success case → return token
+	//  success case → return token
 	return `mock_token_${email}`;
 }
