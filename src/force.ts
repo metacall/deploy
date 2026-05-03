@@ -5,7 +5,7 @@ import { error, info } from './cli/messages';
 import { del } from './delete';
 
 export const force = async (api: APIInterface): Promise<string> => {
-	info('Trying to deploy forcefully!');
+	info('Attempting forceful deployment.');
 
 	const suffix = args['addrepo']
 		? args['addrepo']?.split('com/')[1].split('/').join('-')
@@ -33,7 +33,7 @@ export const force = async (api: APIInterface): Promise<string> => {
 		}
 	} catch (e) {
 		error(
-			'Deployment Aborted because this directory is not being used by any applications.'
+			'Deployment aborted. This directory is not associated with any applications.'
 		);
 	}
 

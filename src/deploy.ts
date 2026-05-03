@@ -15,7 +15,14 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
-import { apiError, error, info, printLanguage, warn } from './cli/messages';
+import {
+	apiError,
+	error,
+	info,
+	printLanguage,
+	success,
+	warn
+} from './cli/messages';
 import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
@@ -95,8 +102,8 @@ export const deployPackage = async (
 				}
 
 				if (deploy) {
-					info(
-						'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
+					success(
+						'Package deployed successfully. Use $ metacall-deploy --inspect to view deployment details.'
 					);
 				}
 			} catch (err) {
@@ -163,7 +170,7 @@ export const deployPackage = async (
 							.map(el => printLanguage(el))
 							.join(
 								', '
-							)} but you didn't select any file, do you want to continue? (Y/N):`
+							)} but didn't select any files. Do you want to continue? (Y/N):`
 					)
 				).toUpperCase();
 
@@ -210,11 +217,11 @@ export const deployPackage = async (
 			}
 			case PackageError.JsonNotFound: {
 				warn(
-					`No metacall.json was found in ${rootPath}, launching the wizard...`
+					`No metacall.json was found in ${rootPath}. Launching the wizard...`
 				);
 
 				const askToCachePackagesFile = (): Promise<string> =>
-					input('Do you want to save metacall.json file? (Y/N):');
+					input('Do you want to save the metacall.json file? (Y/N):');
 
 				await createJsonAndDeploy(
 					(await askToCachePackagesFile()).toUpperCase()
@@ -235,7 +242,7 @@ export const deployFromRepository = async (
 	try {
 		const { branches } = await api.branchList(url);
 
-		if (!branches.length) return error('Invalid Repository URL');
+		if (!branches.length) return error('Invalid repository URL.');
 
 		// TODO: API response type should be created in protocol, it is string as of now
 		const selectedBranch =
@@ -245,7 +252,7 @@ export const deployFromRepository = async (
 
 		if (branches.length === 1)
 			info(
-				`Only one branch found : ${selectedBranch}, Selecting it automatically.`
+				`Only one branch found: ${selectedBranch}. Selecting it automatically.`
 			);
 
 		const runners = Array.from(
@@ -268,8 +275,8 @@ export const deployFromRepository = async (
 		await logs(runners, deploy.suffix, args['dev']);
 
 		if (deploy)
-			info(
-				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
+			success(
+				'Repository deployed successfully. Use $ metacall-deploy --inspect to view deployment details.'
 			);
 	} catch (e) {
 		error(String(e), ErrorCode.DeployRepositoryFailed);
