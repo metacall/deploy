@@ -1,5 +1,4 @@
 import API from '@metacall/protocol/protocol';
-import { fail } from 'assert';
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
 import * as dotenv from 'dotenv';
@@ -20,7 +19,6 @@ process.env.NODE_ENV = 'testing';
 process.env.METACALL_DEPLOY_INTERACTIVE = 'true';
 
 const PATH = process.env.PATH;
-const HOME = process.env.HOME;
 
 export const isInDebugMode = () => inspector.url() !== undefined;
 
@@ -41,7 +39,7 @@ export const run = (
 			{
 				NODE_ENV: 'test',
 				PATH,
-				HOME
+				HOME: process.env.HOME || os.homedir()
 			},
 			env
 		),
@@ -209,14 +207,12 @@ export const clearCache = async (): Promise<void> => {
 		await runCLI(['-l'], [keys.enter]).promise;
 };
 
-export const checkEnvVars = (): { email: string; password: string } | never => {
+export const checkEnvVars = (): { email: string; password: string } | null => {
 	const email = process.env.METACALL_AUTH_EMAIL;
 	const password = process.env.METACALL_AUTH_PASSWORD;
 
 	if (typeof email === 'undefined' || typeof password === 'undefined') {
-		fail(
-			'No environment files present to test the below flags, please set up METACALL_AUTH_EMAIL and METACALL_AUTH_PASSWORD'
-		);
+		return null;
 	}
 
 	return { email, password };

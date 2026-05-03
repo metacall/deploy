@@ -18,7 +18,10 @@ describeTest('Integration CLI (Login)', function () {
 	// Test for env variables before running tests
 	before(async function () {
 		await clearCache();
-		checkEnvVars();
+		process.env.HOME = await createTmpDirectory();
+		if (!checkEnvVars()) {
+			this.skip();
+		}
 	});
 
 	// Invalid token login

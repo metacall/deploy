@@ -14,6 +14,9 @@ import {
 
 describe('Integration CLI (Deploy)', function () {
 	this.timeout(2000000);
+	before(async function () {
+		process.env.HOME = await createTmpDirectory();
+	});
 
 	const url = 'https://github.com/metacall/examples';
 	const addRepoSuffix = 'metacall-examples';
@@ -31,7 +34,11 @@ describe('Integration CLI (Deploy)', function () {
 	// --email & --password
 	it('Should be able to login using --email & --password flag', async function () {
 		await clearCache();
-		const { email, password } = checkEnvVars();
+		const creds = checkEnvVars();
+		if (!creds) {
+			this.skip();
+		}
+		const { email, password } = creds;
 		const workdir = await createTmpDirectory();
 
 		try {
