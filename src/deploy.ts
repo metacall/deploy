@@ -20,7 +20,7 @@ import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
 import { logs } from './logs';
 import { isInteractive } from './tty';
-import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
+import { filterFiles, getEnv, loadFile, loadFilesToRun, zip } from './utils';
 import { debug } from './cli/messages';
 
 export enum ErrorCode {
@@ -43,19 +43,35 @@ export const deployPackage = async (
 		let descriptor = await generatePackage(rootPath);
 
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
-			const descriptor = await generatePackage(rootPath);
+			descriptor = await generatePackage(rootPath);
 
-			// Apply ignore patterns if specified
-			const filesToDeploy = filterFiles(descriptor.files, args['ignore']);
+			const gitIgnore = await loadFile(join(rootPath, '.gitignore'));
+			const metaIgnore = await loadFile(
+				join(rootPath, '.metacallignore')
+			);
 
-			if (args['ignore']?.length) {
-				const ignoredCount =
-					descriptor.files.length - filesToDeploy.length;
-				if (ignoredCount > 0) {
-					debug(
-						`Ignored ${ignoredCount} file(s) based on ignore patterns`
-					);
-				}
+			const parseIgnore = (file?: string) =>
+				(file || '')
+					.split('\n')
+					.map(l => l.trim())
+					.filter(l => l.length > 0 && !l.startsWith('#'));
+
+			const ignores = Array.from(
+				new Set([
+					...(args['ignore'] || []),
+					...parseIgnore(gitIgnore),
+					...parseIgnore(metaIgnore)
+				])
+			);
+
+			// apply ignore patterns
+			const filesToDeploy = filterFiles(descriptor.files, ignores);
+
+			const ignoredCount = descriptor.files.length - filesToDeploy.length;
+			if (ignoredCount > 0) {
+				debug(
+					`Ignored ${ignoredCount} file(s) based on ignore patterns`
+				);
 			}
 
 			const { progress, pulse, hide } = Progress();
