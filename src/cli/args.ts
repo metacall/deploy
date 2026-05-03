@@ -28,7 +28,7 @@ interface CLIArgs {
 	listPlans?: boolean;
 	env?: string[];
 	envFile?: string[];
-	ignore?: string[];
+	'ignore-pattern'?: string[];
 	quiet?: boolean;
 	verbose?: boolean;
 	json?: boolean;
@@ -106,7 +106,6 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 	},
 	inspect: {
 		type: parseInspectFormat,
-		alias: 'i',
 		optional: true
 	},
 	delete: {
@@ -148,13 +147,13 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		description:
 			'Path to .env file (can be used multiple times): --envFile .env.production'
 	},
-	ignore: {
+	'ignore-pattern': {
 		type: String,
-		alias: 'I',
+		alias: 'i',
 		optional: true,
 		multiple: true,
 		description:
-			'Ignore pattern for files (can be used multiple times): -I "*.log" -I "node_modules"'
+			'Ignore pattern for files (can be used multiple times): -i "*.log" -i "node_modules"'
 	},
 	quiet: {
 		type: Boolean,

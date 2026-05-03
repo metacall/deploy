@@ -153,8 +153,8 @@ void (async () => {
 			if (args['envFile']?.length) {
 				info(`Environment files: ${args['envFile'].join(', ')}`);
 			}
-			if (args['ignore']?.length) {
-				info(`Ignore patterns: ${args['ignore'].join(', ')}`);
+			if (args['ignore-pattern']?.length) {
+				info(`Ignore patterns: ${args['ignore-pattern'].join(', ')}`);
 			}
 			jsonOutput({
 				dryRun: true,
@@ -165,7 +165,7 @@ void (async () => {
 				fileCount: files.length,
 				envCount: args['env']?.length || 0,
 				envFiles: args['envFile'] || [],
-				ignorePatterns: args['ignore'] || []
+				ignorePatterns: args['ignore-pattern'] || []
 			});
 			return;
 		}

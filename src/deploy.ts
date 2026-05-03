@@ -45,10 +45,34 @@ export const deployPackage = async (
 		const deploy = async (additionalJsons: MetaCallJSON[]) => {
 			const descriptor = await generatePackage(rootPath);
 
-			// Apply ignore patterns if specified
-			const filesToDeploy = filterFiles(descriptor.files, args['ignore']);
+			const defaultIgnores: Record<string, string[]> = {
+				node: ['node_modules'],
+				python: ['__pycache__', '*.pyc'],
+				ruby: ['vendor'],
+				php: ['vendor'],
+				csharp: ['bin', 'obj'],
+				fsharp: ['bin', 'obj'],
+				cobol: ['bin', 'obj'],
+				file: [],
+				rust: ['target']
+			};
 
-			if (args['ignore']?.length) {
+			const languageIgnores = descriptor.runners.flatMap(
+				runner => defaultIgnores[runner] || []
+			);
+
+			const combinedIgnores = [
+				...(args['ignore-pattern'] || []),
+				...languageIgnores
+			];
+
+			// Apply ignore patterns if specified
+			const filesToDeploy = filterFiles(
+				descriptor.files,
+				combinedIgnores
+			);
+
+			if (combinedIgnores.length > 0) {
 				const ignoredCount =
 					descriptor.files.length - filesToDeploy.length;
 				if (ignoredCount > 0) {
