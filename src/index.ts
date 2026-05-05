@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Plans } from '@metacall/protocol/plan';
-import API, { API as APIInterface } from '@metacall/protocol/protocol';
+import type { API as APIInterface } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 import args, { InspectFormat } from './cli/args';
@@ -20,6 +20,7 @@ import { deployFromRepository, deployPackage, ErrorCode } from './deploy';
 import { force } from './force';
 import { listPlans } from './listPlans';
 import { logout } from './logout';
+import { getAPI } from './mocks';
 import { plan } from './plan';
 import { startup } from './startup';
 
@@ -62,7 +63,7 @@ void (async () => {
 	if (args['serverUrl']) {
 		config.baseURL = args['serverUrl'];
 	}
-	const api: APIInterface = API(
+	const api: APIInterface = getAPI(
 		config.token as string,
 		args['dev'] ? config.devURL : config.baseURL
 	);

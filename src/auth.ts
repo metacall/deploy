@@ -16,6 +16,7 @@ import { error, info, warn } from './cli/messages';
 import { loginSelection } from './cli/selection';
 import { Config, save } from './config';
 import { ErrorCode } from './deploy';
+import { mockAPI, mockLogin, mockSignup, shouldUseMocks } from './mocks';
 import { forever } from './utils';
 
 const authToken = async (config: Config): Promise<string> => {
@@ -25,7 +26,9 @@ const authToken = async (config: Config): Promise<string> => {
 	const shouldKeepAsking = args['token'] === undefined;
 	let token: string = args['token'] || (await askToken());
 
-	const api = API(token, config.baseURL);
+	const api = shouldUseMocks()
+		? mockAPI(token, config.baseURL)
+		: API(token, config.baseURL);
 
 	if (process.stdout.isTTY && shouldKeepAsking) {
 		while (forever) {
@@ -76,10 +79,15 @@ const authLogin = async (config: Config): Promise<string> => {
 	// Now we got email and password let's call login api endpoint and get the token and store it int somewhere else
 	let token = '';
 
+	const loginFn = shouldUseMocks()
+		? (email: string, password: string) => mockLogin(email, password)
+		: (email: string, password: string) =>
+				login(email, password, config.baseURL);
+
 	if (process.stdout.isTTY && shouldKeepAsking) {
 		while (forever) {
 			try {
-				token = await login(email, password, config.baseURL);
+				token = await loginFn(email, password);
 				break;
 			} catch (err) {
 				warn(String((err as ProtocolError).data));
@@ -89,7 +97,7 @@ const authLogin = async (config: Config): Promise<string> => {
 		}
 	} else {
 		try {
-			token = await login(email, password, config.baseURL);
+			token = await loginFn(email, password);
 		} catch (err) {
 			error(String((err as ProtocolError).data));
 		}
@@ -141,9 +149,15 @@ const authSignup = async (config: Config): Promise<string> => {
 
 	let res: string;
 
+	const signupFn = shouldUseMocks()
+		? (email: string, password: string, alias: string) =>
+				mockSignup(email, password, alias)
+		: (email: string, password: string, alias: string) =>
+				signup(email, password, alias, config.baseURL);
+
 	while (forever) {
 		try {
-			res = await signup(email, password, userAlias, config.baseURL);
+			res = await signupFn(email, password, userAlias);
 			info(res);
 			info(
 				'Visit Metacall Hub directly to learn more about deployments and to purchase plans: https://metacall.io/pricing/'

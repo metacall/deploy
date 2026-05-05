@@ -1,4 +1,3 @@
-import API from '@metacall/protocol/protocol';
 import { fail } from 'assert';
 import concat from 'concat-stream';
 import spawn from 'cross-spawn';
@@ -10,6 +9,7 @@ import os from 'os';
 import { join } from 'path';
 import args from '../cli/args';
 import { configFilePath } from '../config';
+import { getAPI } from '../mocks';
 import { startup } from '../startup';
 import { exists } from '../utils';
 
@@ -130,7 +130,7 @@ export const keys = Object.freeze({
 
 export const deployed = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const api = getAPI(config.token as string, config.baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
 		new Promise(resolve => setTimeout(resolve, ms));
@@ -162,7 +162,7 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 
 export const deleted = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const api = getAPI(config.token as string, config.baseURL);
 
 	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
 		new Promise(resolve => setTimeout(resolve, ms));
@@ -201,7 +201,15 @@ export const runCLI = (args: string[], inputs: string[]) => {
 	if (process.env.TEST_DEPLOY_LOCAL === 'true') {
 		args.push('--dev');
 	}
-	return runWithInput('dist/index.js', args, inputs);
+	const env: Record<string, string> =
+		process.env.TEST_DEPLOY_LOCAL === 'true'
+			? {
+					TEST_DEPLOY_LOCAL: 'true',
+					PATH: process.env.PATH || '',
+					HOME: process.env.HOME || ''
+			  }
+			: {};
+	return runWithInput('dist/index.js', args, inputs, env);
 };
 
 export const clearCache = async (): Promise<void> => {

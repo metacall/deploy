@@ -4,10 +4,11 @@ import {
 	LogType
 } from '@metacall/protocol/deployment';
 import { RunnerToDisplayName } from '@metacall/protocol/language';
-import API, { isProtocolError } from '@metacall/protocol/protocol';
+import { isProtocolError } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
+import { getAPI } from './mocks';
 import { startup } from './startup';
 import { sleep } from './utils';
 
@@ -18,7 +19,7 @@ const showLogs = async (
 	dev: boolean
 ): Promise<void> => {
 	const config = await startup(args['confDir']);
-	const api = API(
+	const api = getAPI(
 		config.token as string,
 		dev ? config.devURL : config.baseURL
 	);
