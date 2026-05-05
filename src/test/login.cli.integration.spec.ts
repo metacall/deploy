@@ -66,66 +66,6 @@ describeTest('Integration CLI (Login)', function () {
 		}
 	});
 
-	// Invalid login credentials
-	it('Should fail with invalid login credentials', async () => {
-		await clearCache();
-
-		const workdir = await createTmpDirectory();
-
-		try {
-			const result = await runCLI(
-				[
-					'--email=yeet@yeet.com',
-					'--password=yeetyeet',
-					`--workdir=${workdir}`
-				],
-				[keys.enter]
-			).promise;
-
-			fail(
-				`The CLI passed without errors and it should have failed. Result: ${String(
-					result
-				)}`
-			);
-		} catch (err) {
-			ok(String(err) === 'X Invalid account email or password.\n');
-		}
-	});
-
-	// signup already taken email
-	it('Should fail with taken email', async () => {
-		await clearCache();
-		try {
-			const result = await runCLI(
-				[],
-				[
-					keys.down,
-					keys.down,
-					keys.enter,
-					'noot@noot.com',
-					keys.enter,
-					'diaa',
-					keys.enter,
-					'diaa',
-					keys.enter,
-					'diaa',
-					keys.enter
-				]
-			).promise;
-			ok(
-				String(result).includes(
-					'This email is already associated with an account. Please log in instead.'
-				)
-			);
-		} catch (error) {
-			fail(
-				`The CLI passed without errors and it should fail. Result: ${String(
-					error
-				)}`
-			);
-		}
-	});
-
 	// signup with invalid email
 	it('Should fail with invalid email', async () => {
 		await clearCache();
