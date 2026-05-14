@@ -1,7 +1,7 @@
 /*
  About File:
   1) CLI login
-	2) If there is no token present, then it asks for your loging credentials and saves the token into config.
+  2) If there is no token present, then it asks for your loging credentials and saves the token into config.
 
 */
 

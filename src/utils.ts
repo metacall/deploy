@@ -20,6 +20,7 @@ const missing = (name: string): string =>
 	`Missing ${name} environment variable! Unable to load config`;
 
 export const sleep = (ms: number) => {
+	// TODO: Delete this, use waitFor
 	return new Promise(resolve => setTimeout(resolve, ms));
 };
 

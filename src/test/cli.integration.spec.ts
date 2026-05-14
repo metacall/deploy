@@ -135,6 +135,7 @@ describe('Integration CLI (Deploy)', function () {
 		ok(String(result).includes('i Deploying...\n'));
 
 		strictEqual(await deployed(addRepoSuffix), true);
+
 		return result;
 	});
 
@@ -156,12 +157,16 @@ describe('Integration CLI (Deploy)', function () {
 		}
 	});
 
-	// --inspect without parameter
-	it('Should fail --inspect command with proper output', async () =>
-		notStrictEqual(
-			await runCLI(['--inspect'], [keys.enter]).promise,
-			'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
-		));
+	// --inspect OpenAPIv3
+	it('Should be able to inspect with OpenAPIv3 format', async () => {
+		const openAPIv3 = JSON.parse(
+			String(
+				await runCLI(['--inspect', 'OpenAPIv3'], [keys.enter]).promise
+			)
+		) as { openapi: string }[];
+
+		strictEqual(openAPIv3[0].openapi, '3.0.0');
+	});
 
 	// --delete
 	it('Should be able to delete deployed repository using --delete flag', async () => {
@@ -179,19 +184,24 @@ describe('Integration CLI (Deploy)', function () {
 
 	// --workdir & --projectName
 	it('Should be able to deploy repository using --workdir & --projectName flag', async () => {
-		const result = await runCLI(
-			[
-				`--workdir=${filePath}`,
-				`--projectName=${workDirSuffix}`,
-				'--plan=Essential'
-			],
-			[keys.enter, 'n', keys.enter, keys.kill]
-		).promise;
+		try {
+			const result = await runCLI(
+				[
+					`--workdir=${filePath}`,
+					`--projectName=${workDirSuffix}`,
+					'--plan=Essential'
+				],
+				[keys.enter, 'n', keys.enter, keys.kill]
+			).promise;
 
-		ok(String(result).includes(`i Deploying ${filePath}...\n`));
+			ok(String(result).includes(`i Deploying ${filePath}...\n`));
 
-		strictEqual(await deployed(workDirSuffix), true);
-		return result;
+			strictEqual(await deployed(workDirSuffix), true);
+
+			return result;
+		} catch (err) {
+			fail(err as Error);
+		}
 	});
 
 	// --delete
@@ -260,6 +270,7 @@ describe('Integration CLI (Deploy)', function () {
 		ok(String(result).includes(`i Deploying ${projectPath}...\n`));
 
 		strictEqual(await deployed('env'), true);
+
 		return result;
 	});
 

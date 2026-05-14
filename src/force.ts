@@ -2,7 +2,7 @@ import { Deployment } from '@metacall/protocol/deployment';
 import { API as APIInterface } from '@metacall/protocol/protocol';
 import args from './cli/args';
 import { error, info } from './cli/messages';
-import { del } from './delete';
+import { deleteDeploy } from './delete';
 
 export const force = async (api: APIInterface): Promise<string> => {
 	info('Trying to deploy forcefully!');
@@ -23,7 +23,7 @@ export const force = async (api: APIInterface): Promise<string> => {
 		);
 
 		if (repo) {
-			res = await del(
+			res = await deleteDeploy(
 				repo[0].prefix,
 				repo[0].suffix,
 				repo[0].version,

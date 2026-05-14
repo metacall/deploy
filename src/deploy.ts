@@ -15,13 +15,18 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
-import { apiError, error, info, printLanguage, warn } from './cli/messages';
+import {
+	apiError,
+	debug,
+	error,
+	info,
+	printLanguage,
+	warn
+} from './cli/messages';
 import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
-import { logs } from './logs';
-import { isInteractive } from './tty';
+import { logJobs } from './logs';
 import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
-import { debug } from './cli/messages';
 
 export enum ErrorCode {
 	Ok = 0,
@@ -89,10 +94,7 @@ export const deployPackage = async (
 					ResourceType.Package
 				);
 
-				if (isInteractive()) {
-					// TODO: Need a TUI for logs
-					await logs(descriptor.runners, name, args['dev']);
-				}
+				await logJobs(descriptor.runners, name);
 
 				if (deploy) {
 					info(
@@ -243,10 +245,11 @@ export const deployFromRepository = async (
 				? branches[0]
 				: await listSelection(branches, 'Select branch:');
 
-		if (branches.length === 1)
+		if (branches.length === 1) {
 			info(
 				`Only one branch found : ${selectedBranch}, Selecting it automatically.`
 			);
+		}
 
 		const runners = Array.from(
 			findRunners(await api.fileList(url, selectedBranch))
@@ -265,12 +268,13 @@ export const deployFromRepository = async (
 
 		info('Deploying...');
 
-		await logs(runners, deploy.suffix, args['dev']);
+		await logJobs(runners, deploy.suffix);
 
-		if (deploy)
+		if (deploy) {
 			info(
 				'Repository deployed, Use command $ metacall-deploy --inspect, to know more about deployment'
 			);
+		}
 	} catch (e) {
 		error(String(e), ErrorCode.DeployRepositoryFailed);
 	}

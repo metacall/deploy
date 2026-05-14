@@ -3,7 +3,7 @@ import { Plans } from '@metacall/protocol/plan';
 import API, { API as APIInterface } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
-import args, { InspectFormat } from './cli/args';
+import args from './cli/args';
 import { inspect } from './cli/inspect';
 import {
 	debug,
@@ -15,7 +15,7 @@ import {
 } from './cli/messages';
 import { handleUnknownArgs } from './cli/unknown';
 import validateToken from './cli/validateToken';
-import { deleteBySelection } from './delete';
+import { deleteDeployBySelection } from './delete';
 import { deployFromRepository, deployPackage, ErrorCode } from './deploy';
 import { force } from './force';
 import { listPlans } from './listPlans';
@@ -73,14 +73,14 @@ void (async () => {
 
 	await validateToken(api);
 
+	// TODO: Not working yet
+	// if (args['logs']) return await logs();
+
 	if (args['listPlans']) return await listPlans(api);
 
-	if (args['inspect'] === null) {
-		args['inspect'] = InspectFormat.Table;
-	}
 	if (args['inspect']) return await inspect(args['inspect'], config, api);
 
-	if (args['delete']) return await deleteBySelection(api);
+	if (args['delete']) return await deleteDeployBySelection(api);
 
 	if (args['force']) await force(api);
 

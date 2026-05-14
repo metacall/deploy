@@ -7,8 +7,8 @@
 
 [![NPM](https://img.shields.io/npm/v/@metacall/deploy?color=blue)](https://www.npmjs.com/package/@metacall/deploy)
 [![Workflow](https://github.com/metacall/deploy/actions/workflows/ci.yml/badge.svg)](https://github.com/metacall/deploy/actions)
-[![install size](https://packagephobia.com/badge?p=@metacall/deploy)](https://packagephobia.com/result?p=@metacall/deploy)
-[![discord](https://img.shields.io/discord/781987805974757426?color=purple&style=plastic)](https://discord.com/channels/781987805974757426/)
+[![Install Size](https://packagephobia.com/badge?p=@metacall/deploy)](https://packagephobia.com/result?p=@metacall/deploy)
+[![Discord](https://img.shields.io/discord/781987805974757426?color=purple&style=plastic)](https://discord.com/channels/781987805974757426/)
 
 ## Table of Contents
 
@@ -23,9 +23,9 @@
 
 ## About
 
-metacall-deploy provides the interface of options to deploy functions on Metacall FaaS platform. You can deploy your serverless functions, services and static files within a few clicks without interacting with [Dashboard](https://dashboard.metacall.io/)
+MetaCall Deploy provides the CLI to deploy projects on MetaCall FaaS platform. You can deploy your serverless functions, services and static files within your terminal without interacting with [Dashboard](https://dashboard.metacall.io/).
 
-![giphyT](https://user-images.githubusercontent.com/65965202/209966480-5568a6da-5142-4259-a871-cc918e4855c1.gif)
+![Preview](https://user-images.githubusercontent.com/65965202/209966480-5568a6da-5142-4259-a871-cc918e4855c1.gif)
 
 ## How to install
 
@@ -33,7 +33,15 @@ metacall-deploy provides the interface of options to deploy functions on Metacal
 npm i -g @metacall/deploy
 ```
 
-## Check installation
+If you [install MetaCall](https://github.com/metacall/install), it comes with the same CLI together and it can be run with:
+
+```sh
+metacall deploy
+```
+
+Instead of `metacall-deploy` as provided by NPM.
+
+## Check Installation
 
 ```bash
 metacall-deploy --help
@@ -72,6 +80,7 @@ metacall-deploy --[args=value]
 | `--confDir`     | Accepts relative path for changing default config directory                                                   |
 | `--logout`      | Accepts boolean value: use it in order to expire your current session.                                        |
 | `--listPlans`   | Accepts boolean value: list all the plans that are offered in your account using it.                          |
+| `--logs`        | Print the logs of a deployment.                                                                               |
 
 ## Ignore Files
 

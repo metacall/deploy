@@ -1,6 +1,5 @@
-import API from '@metacall/protocol/protocol';
+import API, { waitFor } from '@metacall/protocol/protocol';
 import { fail } from 'assert';
-import concat from 'concat-stream';
 import spawn from 'cross-spawn';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
@@ -8,8 +7,10 @@ import fs from 'fs/promises';
 import inspector from 'inspector';
 import os from 'os';
 import { join } from 'path';
+import { stripVTControlCharacters } from 'util';
 import args from '../cli/args';
 import { configFilePath } from '../config';
+import { deletedDeploy } from '../delete';
 import { startup } from '../startup';
 import { exists } from '../utils';
 
@@ -36,17 +37,21 @@ export const run = (
 	// TODO: Implement this properly for better debugging
 	/* const debugArgs = isInDebugMode() ? ['--inspect-brk=0'] : []; */
 
-	const child = spawn('node', [/*...debugArgs,*/ path, ...args], {
-		env: Object.assign(
-			{
-				NODE_ENV: 'test',
-				PATH,
-				HOME
-			},
-			env
-		),
-		stdio: [null, null, null, 'ipc']
-	});
+	const child = spawn(
+		'node',
+		[/*...debugArgs,*/ '--no-warnings', path, ...args],
+		{
+			env: Object.assign(
+				{
+					NODE_ENV: 'test',
+					PATH,
+					HOME
+				},
+				env
+			),
+			stdio: [null, null, null, 'ipc']
+		}
+	);
 
 	child.stdin?.setDefaultEncoding('utf-8');
 
@@ -57,7 +62,8 @@ export const runWithInput = (
 	path: string,
 	args: string[] = [],
 	inputs: string[] = [],
-	env: Record<string, string> = {}
+	env: Record<string, string> = {},
+	discardExitCode = true
 ) => {
 	const child = run(path, args, env);
 	let childTimeout: NodeJS.Timeout, killTimeout: NodeJS.Timeout;
@@ -75,7 +81,7 @@ export const runWithInput = (
 
 			killTimeout = setTimeout(() => {
 				child.kill(os.constants.signals.SIGTERM);
-			}, 3000);
+			}, 10000);
 
 			return;
 		}
@@ -85,11 +91,20 @@ export const runWithInput = (
 			child.stdin?.write(inputs.shift());
 			child.stdin?.uncork();
 			loop(inputs);
-		}, 3000);
+		}, 5000);
 	};
+
+	const removeTrailingNewline = (str: string) =>
+		str.endsWith('\r\n')
+			? str.slice(0, -2)
+			: str.endsWith('\n')
+			? str.slice(0, -1)
+			: str;
 
 	return {
 		promise: new Promise((resolve, reject) => {
+			const chunks: string[] = [];
+
 			child.stderr?.once('data', err => {
 				child.stdin?.end();
 
@@ -97,22 +112,39 @@ export const runWithInput = (
 					clearTimeout(childTimeout);
 					inputs = [];
 				}
-				reject(String(err));
+
+				const message = String(err);
+				console.error(removeTrailingNewline(message));
+				reject(message);
 			});
 
 			child.on('error', reject);
 
 			loop(inputs);
 
-			child.stdout?.pipe(
-				concat(result => {
-					if (killTimeout) {
-						clearTimeout(killTimeout);
-					}
+			child.on('exit', exitCode => {
+				const output = chunks.map(stripVTControlCharacters).join('');
 
-					resolve(result.toString());
-				})
-			);
+				if (discardExitCode === false && exitCode !== 0) {
+					reject({
+						exitCode,
+						output
+					});
+				} else {
+					resolve(output);
+				}
+			});
+
+			child.stdout?.on('data', chunk => {
+				if (killTimeout) {
+					clearTimeout(killTimeout);
+				}
+
+				const message = String(chunk);
+
+				console.log(removeTrailingNewline(message));
+				chunks.push(message);
+			});
 		}),
 		child
 	};
@@ -132,54 +164,29 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
 	const api = API(config.token as string, config.baseURL);
 
-	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
-		new Promise(resolve => setTimeout(resolve, ms));
-	let res = false,
-		wait = true;
-	while (wait) {
-		await sleep(1000);
+	return await waitFor(async () => {
 		const inspect = await api.inspect();
-
 		const deployIdx = inspect.findIndex(deploy => deploy.suffix === suffix);
 		if (deployIdx !== -1) {
 			switch (inspect[deployIdx].status) {
-				case 'create':
-					break;
 				case 'ready':
-					wait = false;
-					res = true;
-					break;
-				default:
-					wait = false;
-					res = false;
-					break;
+					return true;
+				case 'create':
+					throw new Error('Deploy not ready yet');
+				case 'fail':
+					return false;
 			}
 		}
-	}
 
-	return res;
+		throw new Error('Not deployed yet');
+	});
 };
 
 export const deleted = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
 	const api = API(config.token as string, config.baseURL);
 
-	const sleep = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
-		new Promise(resolve => setTimeout(resolve, ms));
-	let res = false,
-		wait = true;
-	while (wait) {
-		await sleep(1000);
-		const inspect = await api.inspect();
-
-		const deployIdx = inspect.findIndex(deploy => deploy.suffix === suffix);
-		if (deployIdx === -1) {
-			wait = false;
-			res = true;
-		}
-	}
-
-	return res;
+	return await deletedDeploy(suffix, api);
 };
 
 export const generateRandomString = (length: number): string => {

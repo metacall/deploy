@@ -1,12 +1,30 @@
 import { Deployment } from '@metacall/protocol/deployment';
 import {
 	API as APIInterface,
-	ProtocolError
+	ProtocolError,
+	waitFor
 } from '@metacall/protocol/protocol';
 import { apiError, error, info } from './cli/messages';
 import { listSelection } from './cli/selection';
 
-export const del = async (
+export const deletedDeploy = async (
+	suffix: string,
+	api: APIInterface
+): Promise<boolean> => {
+	return await waitFor(async () => {
+		const inspect = await api.inspect();
+
+		const deployIdx = inspect.findIndex(deploy => deploy.suffix === suffix);
+
+		if (deployIdx !== -1) {
+			throw new Error('Not deleted yet');
+		}
+
+		return true;
+	});
+};
+
+export const deleteDeploy = async (
 	prefix: string,
 	suffix: string,
 	version: string,
@@ -20,10 +38,14 @@ export const del = async (
 		apiError(err as ProtocolError);
 	}
 
+	await deletedDeploy(suffix, api);
+
 	return res;
 };
 
-export const deleteBySelection = async (api: APIInterface): Promise<void> => {
+export const deleteDeployBySelection = async (
+	api: APIInterface
+): Promise<void> => {
 	try {
 		const deployments: Deployment[] = (await api.inspect()).filter(
 			dep => dep.status === 'ready'
@@ -41,7 +63,7 @@ export const deleteBySelection = async (api: APIInterface): Promise<void> => {
 				dep.version === project.split(' ')[1]
 		)[0];
 
-		info(await del(app.prefix, app.suffix, app.version, api));
+		info(await deleteDeploy(app.prefix, app.suffix, app.version, api));
 	} catch (err) {
 		error(String(err));
 	}

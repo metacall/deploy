@@ -33,6 +33,7 @@ interface CLIArgs {
 	verbose?: boolean;
 	json?: boolean;
 	dryRun?: boolean;
+	logs?: string;
 }
 
 const parsePlan = (planType: string): Plans | undefined => {
@@ -181,6 +182,12 @@ const optionsDefinition: ArgumentConfig<CLIArgs> = {
 		defaultValue: false,
 		optional: true,
 		description: 'Show what would be deployed without actually deploying'
+	},
+	logs: {
+		type: String,
+		defaultValue: 'deploy',
+		optional: true,
+		description: 'Show the logs of a deployment'
 	}
 };
 

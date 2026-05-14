@@ -32,6 +32,7 @@ Output Options:
   -V, --verbose             Show detailed debug output
   --json                    Output results in JSON format (for scripting)
   -i, --inspect [format]    List deployments (Table | Raw | OpenAPIv3)
+  -L, --logs                Show logs of a deployment
 
 Management:
   -D, --delete              Interactively select and delete a deployment
