@@ -251,6 +251,7 @@ export const deployFromRepository = async (
 			);
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const runners = Array.from(
 			findRunners(await api.fileList(url, selectedBranch))
 		);
