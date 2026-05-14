@@ -25,7 +25,6 @@ import {
 } from './cli/messages';
 import Progress from './cli/progress';
 import { languageSelection, listSelection } from './cli/selection';
-import { logJobs } from './logs';
 import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
 
 export enum ErrorCode {
@@ -94,7 +93,8 @@ export const deployPackage = async (
 					ResourceType.Package
 				);
 
-				await logJobs(descriptor.runners, name);
+				// TODO: Not working yet
+				// await logJobs(descriptor.runners, name);
 
 				if (deploy) {
 					info(
@@ -268,7 +268,8 @@ export const deployFromRepository = async (
 
 		info('Deploying...');
 
-		await logJobs(runners, deploy.suffix);
+		// TODO: Not working yet
+		// await logJobs(runners, deploy.suffix);
 
 		if (deploy) {
 			info(
