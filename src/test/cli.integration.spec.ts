@@ -1,4 +1,4 @@
-import { fail, notStrictEqual, ok, strictEqual } from 'assert';
+import { fail, match, notStrictEqual, ok, strictEqual } from 'assert';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { load } from '../config';
@@ -107,7 +107,7 @@ describe('Integration CLI (Deploy)', function () {
 	it('Should be able to print help guide using --help flag', async () => {
 		const result = await runCLI(['--help'], [keys.enter]).promise;
 
-		ok(String(result).includes('Official CLI for metacall-deploy\n'));
+		match(result, /Official CLI for metacall-deploy\n/);
 	});
 
 	// --unknown-flags
@@ -116,12 +116,10 @@ describe('Integration CLI (Deploy)', function () {
 			const result = await runCLI(['--yeet'], [keys.enter]).promise;
 
 			fail(
-				`The CLI passed without errors and it should have failed. Result: ${String(
-					result
-				)}`
+				`The CLI passed without errors and it should have failed. Result: ${result}`
 			);
 		} catch (err) {
-			ok(String(err) === '! --yeet does not exist as a valid command.\n');
+			strictEqual(err, '! --yeet does not exist as a valid command.\n');
 		}
 	});
 
@@ -132,7 +130,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes('i Deploying...\n'));
+		match(result, /i Deploying...\n/);
 
 		strictEqual(await deployed(addRepoSuffix), true);
 
@@ -145,13 +143,11 @@ describe('Integration CLI (Deploy)', function () {
 			const result = await runCLI(['--inspect', 'yeet'], [keys.enter])
 				.promise;
 			fail(
-				`The CLI passed without errors and it should fail. Result: ${String(
-					result
-				)}`
+				`The CLI passed without errors and it should fail. Result: ${result}`
 			);
 		} catch (error) {
 			strictEqual(
-				String(error),
+				error,
 				'X Invalid format passed to inspect, valid formats are: Table, Raw, OpenAPIv3\n'
 			);
 		}
@@ -160,9 +156,7 @@ describe('Integration CLI (Deploy)', function () {
 	// --inspect OpenAPIv3
 	it('Should be able to inspect with OpenAPIv3 format', async () => {
 		const openAPIv3 = JSON.parse(
-			String(
-				await runCLI(['--inspect', 'OpenAPIv3'], [keys.enter]).promise
-			)
+			await runCLI(['--inspect', 'OpenAPIv3'], [keys.enter]).promise
 		) as { openapi: string }[];
 
 		strictEqual(openAPIv3[0].openapi, '3.0.0');
@@ -173,9 +167,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		const output = String(result);
-
-		ok(output.includes('i Deploy Delete Succeed\n'), output);
+		match(result, /i Deploy Delete Succeed\n/);
 
 		strictEqual(await deleted(addRepoSuffix), true);
 
@@ -194,7 +186,7 @@ describe('Integration CLI (Deploy)', function () {
 				[keys.enter, 'n', keys.enter, keys.kill]
 			).promise;
 
-			ok(String(result).includes(`i Deploying ${filePath}...\n`));
+			ok(result.includes(`i Deploying ${filePath}...\n`), result);
 
 			strictEqual(await deployed(workDirSuffix), true);
 
@@ -209,9 +201,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		const output = String(result);
-
-		ok(output.includes('i Deploy Delete Succeed\n'), output);
+		match(result, /i Deploy Delete Succeed\n/);
 
 		strictEqual(await deleted(workDirSuffix), true);
 
@@ -232,9 +222,10 @@ describe('Integration CLI (Deploy)', function () {
 			]
 		).promise;
 
-		ok(String(result).includes('i Deploying...\n'));
+		match(result, /i Deploying...\n/);
 
 		strictEqual(await deployed(addRepoSuffix), true);
+
 		return result;
 	});
 
@@ -243,9 +234,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		const output = String(result);
-
-		ok(output.includes('i Deploy Delete Succeed\n'), output);
+		match(result, /i Deploy Delete Succeed\n/);
 
 		strictEqual(await deleted(workDirSuffix), true);
 
@@ -267,7 +256,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes(`i Deploying ${projectPath}...\n`));
+		ok(result.includes(`i Deploying ${projectPath}...\n`), result);
 
 		strictEqual(await deployed('env'), true);
 
@@ -279,9 +268,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		const output = String(result);
-
-		ok(output.includes('i Deploy Delete Succeed\n'), output);
+		match(result, /i Deploy Delete Succeed\n/);
 
 		strictEqual(await deleted('env'), true);
 
@@ -299,7 +286,7 @@ describe('Integration CLI (Deploy)', function () {
 			[keys.enter, 'n', keys.enter, keys.kill]
 		).promise;
 
-		ok(String(result).includes(`i Deploying ${filePath}...\n`));
+		ok(result.includes(`i Deploying ${filePath}...\n`), result);
 
 		strictEqual(await deployed(workDirSuffix), true);
 
@@ -319,7 +306,7 @@ describe('Integration CLI (Deploy)', function () {
 	// 		[keys.enter, keys.kill]
 	// 	).promise;
 
-	// 	ok(String(resultDel).includes('Trying to deploy forcefully!'));
+	// 	ok(resultDel.includes('Trying to deploy forcefully!'), resultDel);
 
 	// 	strictEqual(await deleted(workDirSuffix), true);
 
@@ -337,7 +324,7 @@ describe('Integration CLI (Deploy)', function () {
 	// 		[keys.enter, keys.kill]
 	// 	).promise;
 
-	// 	ok(String(resultDeploy).includes(`i Deploying ${filePath}...\n`));
+	// 	ok(resultDeploy.includes(`i Deploying ${filePath}...\n`), resultDeploy);
 
 	// 	strictEqual(await deployed(workDirSuffix), true);
 
@@ -349,9 +336,7 @@ describe('Integration CLI (Deploy)', function () {
 		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
 			.promise;
 
-		const output = String(result);
-
-		ok(output.includes('i Deploy Delete Succeed\n'), output);
+		match(result, /i Deploy Delete Succeed\n/);
 
 		strictEqual(await deleted(workDirSuffix), true);
 
@@ -362,8 +347,8 @@ describe('Integration CLI (Deploy)', function () {
 	it("Should be able to list all the plans in user's account", async () => {
 		const result = await runCLI(['--listPlans'], [keys.enter]).promise;
 		ok(
-			String(result).length > 0,
-			`Expected plan list to be non-empty, got: ${String(result)}`
+			result.length > 0,
+			`Expected plan list to be non-empty, got: ${result}`
 		);
 	});
 });

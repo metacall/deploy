@@ -1,4 +1,4 @@
-import { fail, ok } from 'assert';
+import { fail, match, strictEqual } from 'assert';
 import {
 	checkEnvVars,
 	clearCache,
@@ -39,7 +39,7 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === 'X Token invalid: jwt malformed\n');
+			strictEqual(String(err), 'X Token invalid: jwt malformed\n');
 		}
 	});
 
@@ -59,9 +59,9 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(
-				String(err) ===
-					'X Token invalid: Invalid authorization header, no credentials provided.\n'
+			strictEqual(
+				String(err),
+				'X Token invalid: Invalid authorization header, no credentials provided.\n'
 			);
 		}
 	});
@@ -88,7 +88,7 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (err) {
-			ok(String(err) === 'X Invalid account email or password.\n');
+			strictEqual(String(err), 'X Invalid account email or password.\n');
 		}
 	});
 
@@ -112,10 +112,9 @@ describeTest('Integration CLI (Login)', function () {
 					keys.enter
 				]
 			).promise;
-			ok(
-				String(result).includes(
-					'This email is already associated with an account. Please log in instead.'
-				)
+			match(
+				String(result),
+				/This email is already associated with an account. Please log in instead./
 			);
 		} catch (error) {
 			fail(
@@ -152,7 +151,7 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (error) {
-			ok(String(error).includes('Invalid email'));
+			match(String(error), /Invalid email/);
 		}
 	});
 
@@ -183,7 +182,7 @@ describeTest('Integration CLI (Login)', function () {
 				)}`
 			);
 		} catch (error) {
-			ok(String(error).includes('alias is already taken'));
+			match(String(error), /alias is already taken/);
 		}
 	});
 
@@ -210,7 +209,7 @@ describeTest('Integration CLI (Login)', function () {
 					keys.enter
 				]
 			).promise;
-			ok(String(result).includes('A verification email has been sent'));
+			match(String(result), /A verification email has been sent/);
 		} catch (error) {
 			fail(
 				`The CLI failed with error: ${String(

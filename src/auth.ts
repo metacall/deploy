@@ -5,7 +5,6 @@
 
 */
 
-// remember to uninstall it
 import login from '@metacall/protocol/login';
 import API, { ProtocolError } from '@metacall/protocol/protocol';
 import signup from '@metacall/protocol/signup';

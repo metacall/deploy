@@ -102,7 +102,7 @@ export const runWithInput = (
 			: str;
 
 	return {
-		promise: new Promise((resolve, reject) => {
+		promise: new Promise<string>((resolve, reject) => {
 			const chunks: string[] = [];
 
 			child.stderr?.once('data', err => {
