@@ -97,21 +97,20 @@ jobs:
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
                   npm run coverage
 
-            # # TODO: This depends on: https://github.com/metacall/faas/issues/78
-            # - name: Run Tests (local)
-            #   run: |
-            #       cd ..
-            #       git clone https://github.com/metacall/faas.git
-            #       cd faas
-            #       npm install
-            #       npm run build
-            #       node dist/index.js --version
-            #       cd ../deploy
-            #       export TEST_DEPLOY_LOCAL="true"
-            #       node ../faas/dist/index.js &
-            #       sleep 10
-            #       mv .env.example .env
-            #       npm run coverage
+            - name: Run Tests (local)
+              run: |
+                  cd ..
+                  git clone https://github.com/metacall/faas.git
+                  cd faas
+                  npm install
+                  npm run build
+                  node dist/index.js --version
+                  cd ../deploy
+                  export TEST_DEPLOY_LOCAL="true"
+                  node ../faas/dist/index.js &
+                  sleep 10
+                  mv .env.example .env
+                  npm run coverage
 
             - name: Publish
               if: startsWith(github.ref, 'refs/tags/')
