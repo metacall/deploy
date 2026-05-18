@@ -95,7 +95,10 @@ jobs:
               run: |
                   echo 'METACALL_AUTH_EMAIL="${{ secrets.METACALL_AUTH_EMAIL }}"' > .env
                   echo 'METACALL_AUTH_PASSWORD="${{ secrets.METACALL_AUTH_PASSWORD }}"' >> .env
-                  npm run coverage
+                  npm run test
+
+            # TODO:
+            #      npm run coverage
 
             # # TODO: This depends on: https://github.com/metacall/faas/issues/78
             # - name: Run Tests (local)
