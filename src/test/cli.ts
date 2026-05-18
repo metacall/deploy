@@ -37,18 +37,22 @@ export const run = (
 	// TODO: Implement this properly for better debugging
 	/* const debugArgs = isInDebugMode() ? ['--inspect-brk=0'] : []; */
 
+	const coverageNycArgs =
+		process.env.NYC_PROCESS_ID !== undefined
+			? ['--enable-source-maps']
+			: [];
+
 	const child = spawn(
 		'node',
-		[/*...debugArgs,*/ '--no-warnings', path, ...args],
+		[/*...debugArgs,*/ ...coverageNycArgs, '--no-warnings', path, ...args],
 		{
-			env: Object.assign(
-				{
-					NODE_ENV: 'test',
-					PATH,
-					HOME
-				},
-				env
-			),
+			env: {
+				...process.env,
+				NODE_ENV: 'test',
+				PATH,
+				HOME,
+				...env
+			},
 			stdio: [null, null, null, 'ipc']
 		}
 	);

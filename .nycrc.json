@@ -1,0 +1,15 @@
+{
+    "all": true,
+    "sourceMap": true,
+    "instrument": true,
+    "extension": [
+        ".js"
+    ],
+    "include": [
+        "dist/**/*"
+    ],
+    "exclude": [
+        "node_modules/**",
+        "dist/test/**"
+    ]
+}
