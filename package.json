@@ -2,6 +2,9 @@
 	"name": "@metacall/deploy",
 	"version": "0.1.34",
 	"description": "Tool for deploying into MetaCall FaaS platform.",
+	"publishConfig": {
+		"access": "public"
+	},
 	"main": "dist/index.js",
 	"bin": {
 		"metacall-deploy": "dist/index.js"
