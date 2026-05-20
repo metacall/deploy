@@ -38,8 +38,13 @@ jobs:
                   fetch-depth: 0
                   fetch-tags: true
 
+            - name: Setup NodeJS
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  registry-url: https://registry.npmjs.org
+
             - name: Pack Latest Protocol
-              if: github.event_name == 'workflow_dispatch'
               run: |
                   npm i
                   npm run build
@@ -63,7 +68,7 @@ jobs:
             - name: Setup NodeJS
               uses: actions/setup-node@v4
               with:
-                  node-version: 22
+                  node-version: 24
                   registry-url: https://registry.npmjs.org
 
             - name: Checkout
