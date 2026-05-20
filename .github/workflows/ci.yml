@@ -125,4 +125,4 @@ jobs:
               if: startsWith(github.ref, 'refs/tags/')
               run: |
                   unset NODE_AUTH_TOKEN
-                  npm publish --provenance --access public
+                  npm publish --provenance
