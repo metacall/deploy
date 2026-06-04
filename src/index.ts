@@ -20,6 +20,7 @@ import { deployFromRepository, deployPackage, ErrorCode } from './deploy';
 import { force } from './force';
 import { listPlans } from './listPlans';
 import { logout } from './logout';
+import { logs } from './logs';
 import { plan } from './plan';
 import { startup } from './startup';
 
@@ -81,8 +82,7 @@ void (async () => {
 
 	await validateToken(api);
 
-	// TODO: Not working yet
-	// if (args['logs']) return await logs();
+	if (args['logs']) return await logs();
 
 	if (args['listPlans']) return await listPlans(api);
 
