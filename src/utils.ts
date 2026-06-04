@@ -9,7 +9,7 @@ import { MetaCallJSON } from '@metacall/protocol/deployment';
 import archiver from 'archiver';
 import { parse } from 'dotenv';
 import { promises as fs } from 'fs';
-import { prompt } from 'inquirer';
+import inquirer from 'inquirer';
 import { platform } from 'os';
 import { basename, join, relative } from 'path';
 import { error, info, printLanguage, warn } from './cli/messages';
@@ -287,7 +287,7 @@ export const getEnv = async (
 		return [];
 	}
 
-	const { env } = await prompt<{ env: string }>([
+	const { env } = await inquirer.prompt<{ env: string }>([
 		{
 			type: 'input',
 			name: 'env',

@@ -33,6 +33,14 @@ void (async () => {
 		setOutputMode('verbose');
 	}
 
+	// Inquirer.js throws ExitPromptError in case of force close (^C, ^D).
+	process.on('uncaughtException', error => {
+		if (error.name === 'ExitPromptError') {
+			console.log('\nGood Bye.');
+			process.exit(0);
+		}
+	});
+
 	if (args['_unknown'].length) handleUnknownArgs();
 
 	if (args['version']) {
