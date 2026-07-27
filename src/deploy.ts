@@ -29,12 +29,13 @@ import { filterFiles, getEnv, loadFilesToRun, zip } from './utils';
 
 export enum ErrorCode {
 	Ok = 0,
-	NotDirectoryRootPath = 1,
-	EmptyRootPath = 2,
-	NotFoundRootPath = 3,
-	AccountDisabled = 4,
-	DeployPackageFailed = 5,
-	DeployRepositoryFailed = 6
+	UnknownFlag = 1,
+	NotDirectoryRootPath = 2,
+	EmptyRootPath = 3,
+	NotFoundRootPath = 4,
+	AccountDisabled = 5,
+	DeployPackageFailed = 6,
+	DeployRepositoryFailed = 7
 }
 
 export const deployPackage = async (
