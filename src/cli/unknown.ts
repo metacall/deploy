@@ -1,3 +1,4 @@
+import { ErrorCode } from '../deploy';
 import { printHelp } from '../help';
 import args from './args';
 import { warn } from './messages';
@@ -10,6 +11,8 @@ export const handleUnknownArgs = (): void => {
 			', '
 		)} does not exist as a valid command.`;
 		warn(message);
+		printHelp(ErrorCode.UnknownFlag);
+		return;
 	}
 
 	printHelp();
