@@ -69,6 +69,7 @@ metacall-deploy --[args=value]
 | `--version`     | Prints current version of the cli.                                                                            |
 | `--workdir`     | Accepts relative path to application directory, Defaults to `cwd`                                             |
 | `--addrepo`     | Accepts url of repository to deploy                                                                           |
+| `--dev`         | Accepts boolean value: run in dev mode (deploy to local metacall/faas)                                        |
 | `--projectName` | Accepts a string indicating the name of your project                                                          |
 | `--email`       | Accepts email id for authentication                                                                           |
 | `--password`    | Accepts password for authentication                                                                           |
@@ -78,8 +79,16 @@ metacall-deploy --[args=value]
 | `--inspect`     | Accepts format of output : "Table", "Raw", "OpenAPIv3" and Lists out all the deployments with specifications. |
 | `--delete`      | Accepts boolean value: it provides you all the available deployment options to delete                         |
 | `--confDir`     | Accepts relative path for changing default config directory                                                   |
+| `--serverUrl`   | Accepts URL of the MetaCall FaaS base server to override default endpoint                                     |
 | `--logout`      | Accepts boolean value: use it in order to expire your current session.                                        |
 | `--listPlans`   | Accepts boolean value: list all the plans that are offered in your account using it.                          |
+| `--env`         | Accepts environment variable as `KEY=VALUE` (can be used multiple times)                                      |
+| `--envFile`     | Accepts path to `.env` file (can be used multiple times)                                                      |
+| `--ignore`      | Accepts pattern to ignore files (can be used multiple times)                                                  |
+| `--quiet`       | Accepts boolean value: suppresses non-essential output                                                        |
+| `--verbose`     | Accepts boolean value: shows detailed output for debugging                                                    |
+| `--json`        | Accepts boolean value: outputs CLI results in JSON format (useful for scripting)                              |
+| `--dryRun`      | Accepts boolean value: shows what would be deployed without actually deploying                                |
 | `--logs`        | Print the logs of a deployment.                                                                               |
 
 ## Ignore Files
