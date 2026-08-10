@@ -12,7 +12,7 @@ import {
 	ResourceType
 } from '@metacall/protocol/protocol';
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { basename, join, resolve } from 'path';
 import args from './cli/args';
 import { input } from './cli/inputs';
 import {
@@ -36,6 +36,9 @@ export enum ErrorCode {
 	DeployPackageFailed = 5,
 	DeployRepositoryFailed = 6
 }
+
+export const buildAlreadyExistsMessage = (deploymentName: string): string =>
+	`Deployment "${deploymentName}" already exists. Use --force to redeploy or --delete to remove it.`;
 
 export const deployPackage = async (
 	rootPath: string,
@@ -102,7 +105,26 @@ export const deployPackage = async (
 					);
 				}
 			} catch (err) {
-				apiError(err as ProtocolError);
+				const protocolErr = err as ProtocolError;
+				const responseData = protocolErr.response?.data;
+				const isAlreadyExists =
+					protocolErr.response?.status === 400 &&
+					(String(responseData)
+						.toLowerCase()
+						.includes('already exist') ||
+						String(responseData)
+							.toLowerCase()
+							.includes('duplicate') ||
+						String(responseData)
+							.toLowerCase()
+							.includes('conflict'));
+
+				if (isAlreadyExists) {
+					debug(`Deploy API returned 400: ${String(responseData)}`);
+					error(buildAlreadyExistsMessage(name));
+					return;
+				}
+				apiError(protocolErr);
 			}
 		};
 
@@ -225,6 +247,22 @@ export const deployPackage = async (
 			}
 		}
 	} catch (e) {
+		const protocolErr = e as ProtocolError;
+		const responseData = protocolErr.response?.data;
+		const isAlreadyExists =
+			protocolErr.response?.status === 400 &&
+			(String(responseData).toLowerCase().includes('already exist') ||
+				String(responseData).toLowerCase().includes('duplicate') ||
+				String(responseData).toLowerCase().includes('conflict'));
+
+		if (isAlreadyExists) {
+			debug(`Deploy API returned 400: ${String(responseData)}`);
+			const deployName =
+				(args['projectName'] as string | undefined)?.toLowerCase() ??
+				basename(resolve(args['workdir'] ?? '.'));
+			error(buildAlreadyExistsMessage(deployName));
+			return;
+		}
 		error(String(e), ErrorCode.DeployPackageFailed);
 	}
 };
@@ -278,6 +316,20 @@ export const deployFromRepository = async (
 			);
 		}
 	} catch (e) {
+		const protocolErr = e as ProtocolError;
+		const responseData = protocolErr.response?.data;
+		const isAlreadyExists =
+			protocolErr.response?.status === 400 &&
+			(String(responseData).toLowerCase().includes('already exist') ||
+				String(responseData).toLowerCase().includes('duplicate') ||
+				String(responseData).toLowerCase().includes('conflict'));
+
+		if (isAlreadyExists) {
+			const repoName = url.split('/').pop() || url;
+			debug(`Deploy API returned 400: ${String(responseData)}`);
+			error(buildAlreadyExistsMessage(repoName));
+			return;
+		}
 		error(String(e), ErrorCode.DeployRepositoryFailed);
 	}
 };
