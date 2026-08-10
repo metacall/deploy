@@ -166,7 +166,7 @@ export const keys = Object.freeze({
 
 export const deployed = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const api = API(config.token as string, args['dev'] ? config.devURL : config.baseURL);
 
 	return await waitFor(async () => {
 		const inspect = await api.inspect();
@@ -188,7 +188,7 @@ export const deployed = async (suffix: string): Promise<boolean> => {
 
 export const deleted = async (suffix: string): Promise<boolean> => {
 	const config = await startup(args['confDir']);
-	const api = API(config.token as string, config.baseURL);
+	const api = API(config.token as string, args['dev'] ? config.devURL : config.baseURL);
 
 	return await deletedDeploy(suffix, api);
 };

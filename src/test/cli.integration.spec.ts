@@ -52,7 +52,7 @@ describe('Integration CLI (Deploy)', function () {
 	});
 
 	// --token
-	it('Should be able to login using --token flag', async function () {
+	(process.env.TEST_DEPLOY_LOCAL === 'true' ? it.skip : it)('Should be able to login using --token flag', async function () {
 		const file = await load();
 		const token = file.token || '';
 
@@ -76,7 +76,7 @@ describe('Integration CLI (Deploy)', function () {
 	});
 
 	// TODO: --confDir
-	it('Should be able to login using --confDir flag', async function () {
+	(process.env.TEST_DEPLOY_LOCAL === 'true' ? it.skip : it)('Should be able to login using --confDir flag', async function () {
 		const file = await load();
 		const token = file.token || '';
 
