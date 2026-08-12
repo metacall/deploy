@@ -84,7 +84,9 @@ export const logs = async () => {
 		'Select the deployment to get the logs:'
 	);
 
-	const jobs = await api.availableJobLogs(suffix);
+	const selectedDeploy = suffix.split(' ');
 
-	return await logJobs(jobs, suffix);
+	const jobs = await api.availableJobLogs(selectedDeploy[0]);
+
+	return await logJobs(jobs, selectedDeploy[0]);
 };
