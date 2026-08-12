@@ -101,7 +101,7 @@
 		"dotenv": "^16.4.7",
 		"gauge": "^3.0.0",
 		"ini": "^1.3.5",
-		"inquirer": "^10.2.2",
+		"inquirer": "^14.0.2",
 		"openapi-types": "^12.1.0",
 		"ts-command-line-args": "^2.2.0",
 		"zod": "^1.11.10"
